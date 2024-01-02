@@ -139,6 +139,11 @@ class Tile():
     
     def on_click(self):
         pass
+
+    def draw(self,screen:pygame.Surface):
+        screen.blit(self.get_img(),(self.get_x(),self.get_y()))
+        if self.is_focused():
+            screen.blit(self.get_focus_layer(),(self.get_x(),self.get_y()))
         
 class Start(Tile):
     texture = 'Start.png'

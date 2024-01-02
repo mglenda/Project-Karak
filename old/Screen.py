@@ -103,12 +103,10 @@ class CastleScreen(Screen):
         super(self.__class__,self).draw()
         t:Tiles.Tile
         for t in self.tilemap.get_tiles():
-            self.get_screen().blit(t.get_img(),(t.get_x(),t.get_y()))
-            if t.is_focused():
-                self.get_screen().blit(t.get_focus_layer(),(t.get_x(),t.get_y()))
+            t.draw(self.get_screen())
         t = self.tilemap.get_spawned_tile()
         if t is not None:
-            self.get_screen().blit(t.get_img(),(t.get_x(),t.get_y()))
+            t.draw(self.get_screen())
 
     def mouse_motion(self,x,y):
         t:Tiles.Tile

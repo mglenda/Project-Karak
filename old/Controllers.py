@@ -24,9 +24,11 @@ class MainController():
                 if t is not None and not t.is_revealed():
                     screen.get_castle().get_tilemap().tile_spawn(parent=t)
                     self.game.set_state(GameLogic.STATE_TILE_SPAWN)
+                    # self.game.lock_mouse_motion()
             elif self.game.get_state() == GameLogic.STATE_TILE_SPAWN:
                 screen.get_castle().get_tilemap().tile_spawn_confirm()
                 self.game.set_state(GameLogic.STATE_DEFAULT)
+                # self.game.unlock_mouse_motion()
 
     def mouse_wheel_up(self,screen:Screen.MainScreen):
         if self.game.get_focused_layer() == GameLogic.FOCUS_CASTLE_SCREEN:
