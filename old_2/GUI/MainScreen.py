@@ -8,8 +8,7 @@ class MainScreen():
         self.WIDTH = pygame.display.Info().current_w
         self.HEIGHT = pygame.display.Info().current_h
         self.surf = pygame.display.set_mode((self.WIDTH,self.HEIGHT),pygame.FULLSCREEN)
-        self.rect = (255,150,0)
-        self.add(cont=Castle.CastleScreen(w=self.surf.get_width(),h=self.surf.get_height()),x=10,y=45)
+        self.rgb = (255,150,0)
 
     def add(self,cont:Graphics.GraphicLayoutContainer,x,y):
         cont.set_abs_point(x,y)
@@ -19,7 +18,7 @@ class MainScreen():
         self.conts.remove(cont)
 
     def draw(self):
-        pygame.draw.rect(self.surf,self.rect,(0,0,self.surf.get_width(),self.surf.get_height()))
+        pygame.draw.rect(self.surf,self.rgb,(0,0,self.surf.get_width(),self.surf.get_height()))
         cont:Graphics.GraphicLayoutContainer
         for cont in self.conts:
             cont.draw()
@@ -31,4 +30,12 @@ class MainScreen():
         for cont in self.conts:
             if cont._collides(x,y):
                 cont._on_mouse_motion(coords)
+                break
+
+    def _on_mouse_click(self,coords:tuple):
+        x,y = coords[0],coords[1]
+        cont:Graphics.GraphicLayoutContainer
+        for cont in self.conts:
+            if cont._collides(x,y):
+                cont._on_mouse_click(coords)
                 break
