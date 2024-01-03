@@ -8,6 +8,7 @@ game = Controller.Main()
 
 def main():
     pygame.display.set_caption("Karak")
+    pygame.font.init()
 
     while True:
         for event in pygame.event.get():
@@ -33,6 +34,13 @@ def main():
                 #WHEEL DOWN = 5
                 if event.button == 5:
                     game._on_mouse_wheel_down(x=coords[0],y=coords[1])
+            elif event.type == pygame.KEYDOWN:
+                game._on_key_pressed(event.key)
+            elif event.type == pygame.KEYUP:
+                game._on_key_released(event.key)
+        for key,is_pressed in enumerate(pygame.key.get_pressed()):
+            if is_pressed == True:
+                game._on_key_hold(key)
         game.draw()
         pygame.display.update()
         pygame.time.Clock().tick(60)
