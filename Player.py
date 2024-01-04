@@ -1,8 +1,8 @@
 from Hero import Hero
 
 class Player():
-    _name:str = 'Player'
-    _hero:Hero = None
+    _name:str
+    _hero:Hero
 
     def __init__(self,name):
         self._name = name

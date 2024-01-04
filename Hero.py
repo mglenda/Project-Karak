@@ -4,6 +4,7 @@ import Items
 
 MAX_HP = 5
 DEF_MOVE_POINTS = 4
+PATH = 'Textures\\Heroes\\Retextured\\'
 
 class Hero():
     _inventory: Inventory
@@ -13,6 +14,7 @@ class Hero():
     _alive: bool
     _move_points: int
     _chests: float
+    _background: str
 
     def __init__(self) -> None:
         self._inventory = Inventory()
@@ -83,8 +85,58 @@ class Hero():
         return self._move_points
 
 class Wizard(Hero):
-
+    _background = PATH + 'Wizard.png'
     def __init__(self) -> None:
         super().__init__()
         self.add_ability(Ability.AstralWalking())
         self.add_ability(Ability.MagicalAffinity())
+
+class Warrior(Hero):
+    _background = PATH + 'Warrior.png'
+    def __init__(self) -> None:
+        super().__init__()
+
+class Warlock(Hero):
+    _background = PATH + 'Warlock.png'
+    def __init__(self) -> None:
+        super().__init__()
+
+class Thief(Hero):
+    _background = PATH + 'Thief.png'
+    def __init__(self) -> None:
+        super().__init__()
+        
+class Swordsman(Hero):
+    _background = PATH + 'Swordsman.png'
+    def __init__(self) -> None:
+        super().__init__()
+
+class Ranger(Hero):
+    _background = PATH + 'Ranger.png'
+    def __init__(self) -> None:
+        super().__init__()
+
+class Oracle(Hero):
+    _background = PATH + 'Oracle.png'
+    def __init__(self) -> None:
+        super().__init__()
+
+class LordOfKarak(Hero):
+    _background = PATH + 'LordOfKarak.png'
+    def __init__(self) -> None:
+        super().__init__()
+
+class BattleMage(Hero):
+    _background = PATH + 'BattleMage.png'
+    def __init__(self) -> None:
+        super().__init__()
+
+class Barbarian(Hero):
+    _background = PATH + 'Barbarian.png'
+    def __init__(self) -> None:
+        super().__init__()
+
+class Acrobat(Hero):
+    _background = PATH + 'Acrobat.png'
+    def __init__(self) -> None:
+        super().__init__()

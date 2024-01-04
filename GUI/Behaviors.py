@@ -5,59 +5,59 @@ EVENT_MOUSE_LEFTCLICK = 3
 EVENT_MOUSE_WHEELUP = 4
 EVENT_MOUSE_WHEELDOWN = 5
 EVENT_MOUSE_WHEELCLICK = 6
+EVENT_MOUSE_LEFTPRESS = 7
+EVENT_MOUSE_RIGHTPRESS = 8
+EVENT_MOUSE_WHEELPRESS = 9
 
 class MouseBehavior():
     def _on_mouse_enter(self):
-        if hasattr(self,'mouse_events') and self.mouse_events[EVENT_MOUSE_ENTER] is not None:
-            func = self.mouse_events[EVENT_MOUSE_ENTER]['func']
-            args = self.mouse_events[EVENT_MOUSE_ENTER]['args']
-            func(args)
+        self._execute(EVENT_MOUSE_ENTER)
 
     def _on_mouse_leave(self):
-        if hasattr(self,'mouse_events') and self.mouse_events[EVENT_MOUSE_LEAVE] is not None:
-            func = self.mouse_events[EVENT_MOUSE_LEAVE]['func']
-            args = self.mouse_events[EVENT_MOUSE_LEAVE]['args']
-            func(args)
+        self._execute(EVENT_MOUSE_LEAVE)
 
     def _on_mouse_right_click(self,x,y):
-        if hasattr(self,'mouse_events') and self.mouse_events[EVENT_MOUSE_RIGHTCLICK] is not None:
-            func = self.mouse_events[EVENT_MOUSE_RIGHTCLICK]['func']
-            args = self.mouse_events[EVENT_MOUSE_RIGHTCLICK]['args']
-            func(args)
+        self._execute(EVENT_MOUSE_RIGHTCLICK)
 
     def _on_mouse_left_click(self,x,y):
-        if hasattr(self,'mouse_events') and self.mouse_events[EVENT_MOUSE_LEFTCLICK] is not None:
-            func = self.mouse_events[EVENT_MOUSE_LEFTCLICK]['func']
-            args = self.mouse_events[EVENT_MOUSE_LEFTCLICK]['args']
-            func(args)
+        self._execute(EVENT_MOUSE_LEFTCLICK)
 
     def _on_mouse_wheel_up(self,x,y):
-        if hasattr(self,'mouse_events') and self.mouse_events[EVENT_MOUSE_WHEELUP] is not None:
-            func = self.mouse_events[EVENT_MOUSE_WHEELUP]['func']
-            args = self.mouse_events[EVENT_MOUSE_WHEELUP]['args']
-            func(args)
+        self._execute(EVENT_MOUSE_WHEELUP)
 
     def _on_mouse_wheel_down(self,x,y):
-        if hasattr(self,'mouse_events') and self.mouse_events[EVENT_MOUSE_WHEELDOWN] is not None:
-            func = self.mouse_events[EVENT_MOUSE_WHEELDOWN]['func']
-            args = self.mouse_events[EVENT_MOUSE_WHEELDOWN]['args']
-            func(args)
+        self._execute(EVENT_MOUSE_WHEELDOWN)
 
     def _on_mouse_wheel_click(self,x,y):
-        if hasattr(self,'mouse_events') and self.mouse_events[EVENT_MOUSE_WHEELCLICK] is not None:
-            func = self.mouse_events[EVENT_MOUSE_WHEELCLICK]['func']
-            args = self.mouse_events[EVENT_MOUSE_WHEELCLICK]['args']
-            func(args)
+        self._execute(EVENT_MOUSE_WHEELCLICK)
+    
+    def _on_mouse_left_press(self,x,y):
+        self._execute(EVENT_MOUSE_LEFTPRESS)
 
+    def _on_mouse_right_press(self,x,y):
+        self._execute(EVENT_MOUSE_RIGHTPRESS)
+
+    def _on_mouse_wheel_press(self,x,y):
+        self._execute(EVENT_MOUSE_WHEELPRESS)
+    
     def _on_mouse_motion(self,x,y):
         pass
 
     def _on_mouse_exit(self):
         self._on_mouse_leave()
 
+    def _execute(self,evt:int):
+        if hasattr(self,'mouse_events') and self.mouse_events[evt] is not None:
+            func = self.mouse_events[evt]['func']
+            args = self.mouse_events[evt]['args']
+            if len(args) == 0:
+                func()
+            else:
+                func(*args)
+
     def register_mouse_event(self,evt: int,func,*args: list):
         if not hasattr(self,'mouse_events'):
-            self.mouse_events = [None,None,None,None,None,None,None]
+            self.mouse_events = [None,None,None,None,None,None,None,None,None,None]
         self.mouse_events[evt] = {"func": func
                                     ,'args': args}
         

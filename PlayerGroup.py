@@ -1,5 +1,7 @@
 from Player import Player
 
+MAXIMUM_PLAYERS = 5
+
 class PlayerGroup():
     _Players = []
 
@@ -17,3 +19,6 @@ class PlayerGroup():
     
     def get(self,i:int):
         return self._Players[i]
+    
+    def get_count(self):
+        return len(self._Players)
