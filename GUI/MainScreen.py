@@ -1,69 +1,53 @@
 import pygame
-import GUI.Graphics as G
-from GUI.MainMenu import MainMenu
+from GUI.Frame import Frame, FrameInterface
+from GUI._ComponentListeners import KeyBoardListener
 from Game import GAME
 
-class MainScreen(G.Panel):
-    is_shift_hold: bool
-    text_input: G.TextField
+class MainScreen(Frame,KeyBoardListener):
+    _entered: FrameInterface
+    def __init__(self) -> None:
+        super().__init__(None)
+        self.set_x(0)
+        self.set_y(0)
+        self.set_w(pygame.display.Info().current_w)
+        self.set_h(pygame.display.Info().current_h)
+        self._surface = pygame.display.set_mode((self._w,self._h),pygame.FULLSCREEN)
+        self.set_visible(True)
+        self.set_active(True)
+        self._entered = None
 
-    def __init__(self, w, h) -> None:
-        self.last_hold = pygame.time.get_ticks()
-        self.is_shift_hold = False
-        self.text_input = None
-        super().__init__(w=w, h=h, rgb=(0,0,0), surface=pygame.display.set_mode((w,h),pygame.FULLSCREEN))
-        self.set_abs_point(0,0)
+    def draw(self):
+        pygame.draw.rect(self._surface,(0,0,0),(0,0,self._w,self._h))
+        c:Frame
+        for c in self.get_children():
+            if c.is_visible() and c.get_x() is not None and c.get_y() is not None:
+                self._surface.blit(c.get_surface(),(c.get_x(),c.get_y()))
 
-        self.main_menu = MainMenu(w,h)
-        self.add(self.main_menu,G.ATTPOINT_CENTER,G.ATTPOINT_CENTER)
-        self.set_text_input(self.main_menu.player_name_text)
+    def add(self, component: FrameInterface):
+        return super().add(component)
 
-    def set_text_input(self,text_input:G.TextField):
-        self.text_input = text_input
+    def is_active(self) -> bool:
+        return self._active
     
-    def get_text_input(self) -> G.TextField:
-        return self.text_input
+    def is_visible(self) -> bool:
+        return self._visible
     
-    def clear_text_input(self):
-        self.text_input = None
+    def _on_mouse_motion(self, x, y) -> bool:
+        e:FrameInterface
+        for e in reversed(self.get_children()):
+            if e.is_active() and e.collide(x,y):
+                if self._entered != e:
+                    if self._entered is not None and self._entered.is_active():
+                        self._entered._on_mouse_leave()
+                    self._entered = e
+                    e._on_mouse_enter()
+                    break
+        if self._entered is not None and not self._entered.collide(x,y) and self._entered.is_active():
+            self._entered._on_mouse_leave()
+            self._entered = None
+    
+    def _on_mouse_left_click(self, x, y):
+        super()._on_mouse_left_click(x, y)
 
-    def _on_key_hold(self, key: int):
-        if key == 119 or key == 82:
-            #Up
-            pass
-        if key == 115 or key == 79:
-            #Down
-            pass
-        if key == 97 or key == 80:
-            #Left
-            pass
-        if key == 100 or key == 81:
-            #Right
-            pass
-        if key == 42:
-            now = pygame.time.get_ticks()
-            if now - self.last_hold >= 150 and self.text_input is not None:
-                self.last_hold = now
-                self.text_input.set_text(self.text_input.get_text()[:-1])
-    
-    def _on_key_pressed(self, key: int):
-        if key == pygame.K_LSHIFT:
-            self.is_shift_hold = True
-        if self.text_input is not None:
-            if key == pygame.K_BACKSPACE:
-                self.last_hold = pygame.time.get_ticks()
-                self.text_input.set_text(self.text_input.get_text()[:-1])
-            else:
-                try:
-                    char:str
-                    if key >= 97 and key <= 122:
-                        char = chr(key - 32 if self.is_shift_hold else key)
-                    else:
-                        char = chr(key)
-                    self.text_input.set_text(self.text_input.get_text() + char)
-                except:
-                    pass
-   
-    def _on_key_released(self, key: int):
-        if key == pygame.K_LSHIFT:
-            self.is_shift_hold = False
+    def _on_mouse_right_click(self, x, y):
+        super()._on_mouse_right_click(x, y)

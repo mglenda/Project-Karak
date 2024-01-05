@@ -46,13 +46,15 @@ def main():
                 key_pressed = True
             elif event.type == pygame.KEYUP:
                 GAME.get_screen()._on_key_released(event.key)
+            elif event.type == pygame.WINDOWENTER:
+                GAME.get_screen().draw()
         if not key_pressed:
             for key,is_pressed in enumerate(pygame.key.get_pressed()):
                 if is_pressed == True:
                     GAME.get_screen()._on_key_hold(key)
-        GAME.get_screen().draw()
+
         pygame.display.flip()
-        pygame.time.Clock().tick(60)
+        pygame.time.Clock().tick(120)
 
 if __name__ == "__main__":
     main()
