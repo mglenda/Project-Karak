@@ -12,6 +12,15 @@ class FrameInterface(Element):
     def __init__(self) -> None:
         super().__init__()
 
+    def get_attached_parent(self) -> Element:
+        pass
+
+    def get_attached_point(self) -> int:
+        pass
+
+    def get_attached_point_parent(self) -> int:
+        pass
+
     def set_point(self,att_point: int,parent: Element,att_point_parent: int,x_offset: int, y_offset: int):
         pass
 
@@ -49,10 +58,10 @@ class FrameInterface(Element):
         pass
     
     def is_visible(self) -> bool:
-        return self._parent is not None and super().is_visible() and self._parent.is_visible()
+        return (self._parent is None or self._parent.is_visible()) and super().is_visible() 
     
     def is_active(self) -> bool:
-        return self._parent is not None and super().is_active() and self._parent.is_active()
+        return (self._parent is None or self._parent.is_active()) and super().is_active() 
     
     def destroy(self):
         pass
@@ -63,9 +72,14 @@ class FrameInterface(Element):
     def set_parent(self,p: Element):
         self._parent = p
 
+    def get_parent(self) -> Element:
+        return self._parent
+
     def get_children(self) -> list:
         pass
 
+    def _refresh(self):
+        pass
 
 class Frame(FrameInterface):
     _parent: FrameInterface
@@ -79,6 +93,17 @@ class Frame(FrameInterface):
         self._attachet_point_parent = None
         if parent is not None:
             parent.add(self)
+        else:
+            self._parent = None
+
+    def get_attached_parent(self) -> Element:
+        return self._attached_parent
+
+    def get_attached_point(self) -> int:
+        return self._attached_point
+
+    def get_attached_point_parent(self) -> int:
+        return self._attachet_point_parent
 
     def set_point(self,att_point: int,att_point_parent: int,x_offset: int = 0, y_offset: int = 0,parent: FrameInterface = None):
         self._deattach()
@@ -119,6 +144,12 @@ class Frame(FrameInterface):
         if self._parent is not None:
             self._parent.remove(self)
 
+        if self == GAME.screen._focused:
+            GAME.screen._focused = None
+            
+        if self == GAME.screen._entered:
+            GAME.screen._entered = None
+
         return was_visible
 
     def remove(self,component: FrameInterface):
@@ -140,70 +171,67 @@ class Frame(FrameInterface):
     def deattach(self,component: FrameInterface):
         self._attached_elements.remove(component)
 
-    def draw(self):
-        if self in GAME.get_screen()._components:
-            GAME.get_screen().draw()
-
     def _attach(self):
-        x: int = self._attached_parent.get_x()
-        y: int = self._attached_parent.get_y()
-        if x is not None and y is not None:
-            w: int = self._attached_parent.get_w()
-            h: int = self._attached_parent.get_h()
-            point: int = self._attachet_point_parent
-            if point == FRAMEPOINT.CENTER:
-                x += w / 2
-                y += h / 2
-            if point == FRAMEPOINT.TOP:
-                x += w / 2
-            if point == FRAMEPOINT.TOPRIGHT:
-                x += w
-            if point == FRAMEPOINT.BOTTOM:
-                x += w / 2
-                y += h
-            if point == FRAMEPOINT.BOTTOMLEFT:
-                y += h
-            if point == FRAMEPOINT.BOTTOMRIGHT:
-                x += w
-                y += h
-            if point == FRAMEPOINT.LEFT:
-                y += h / 2
-            if point == FRAMEPOINT.RIGHT:
-                x += w
-                y += h / 2
-            
-            w = self.get_w()
-            h = self.get_h()
-            point: int = self._attached_point
+        if self._attached_parent is not None:
+            x: int = self._attached_parent.get_x()
+            y: int = self._attached_parent.get_y()
+            if x is not None and y is not None:
+                w: int = self._attached_parent.get_w()
+                h: int = self._attached_parent.get_h()
+                point: int = self._attachet_point_parent
+                if point == FRAMEPOINT.CENTER:
+                    x += w / 2
+                    y += h / 2
+                if point == FRAMEPOINT.TOP:
+                    x += w / 2
+                if point == FRAMEPOINT.TOPRIGHT:
+                    x += w
+                if point == FRAMEPOINT.BOTTOM:
+                    x += w / 2
+                    y += h
+                if point == FRAMEPOINT.BOTTOMLEFT:
+                    y += h
+                if point == FRAMEPOINT.BOTTOMRIGHT:
+                    x += w
+                    y += h
+                if point == FRAMEPOINT.LEFT:
+                    y += h / 2
+                if point == FRAMEPOINT.RIGHT:
+                    x += w
+                    y += h / 2
+                
+                w = self.get_w()
+                h = self.get_h()
+                point: int = self._attached_point
 
-            if point == FRAMEPOINT.CENTER:
-                x -= w / 2
-                y -= h / 2
-            if point == FRAMEPOINT.TOP:
-                x -= w / 2
-            if point == FRAMEPOINT.TOPRIGHT:
-                x -= w
-            if point == FRAMEPOINT.BOTTOM:
-                x -= w / 2
-                y -= h
-            if point == FRAMEPOINT.BOTTOMLEFT:
-                y -= h
-            if point == FRAMEPOINT.BOTTOMRIGHT:
-                x -= w
-                y -= h
-            if point == FRAMEPOINT.LEFT:
-                y -= h / 2
-            if point == FRAMEPOINT.RIGHT:
-                x -= w
-                y -= h / 2
+                if point == FRAMEPOINT.CENTER:
+                    x -= w / 2
+                    y -= h / 2
+                if point == FRAMEPOINT.TOP:
+                    x -= w / 2
+                if point == FRAMEPOINT.TOPRIGHT:
+                    x -= w
+                if point == FRAMEPOINT.BOTTOM:
+                    x -= w / 2
+                    y -= h
+                if point == FRAMEPOINT.BOTTOMLEFT:
+                    y -= h
+                if point == FRAMEPOINT.BOTTOMRIGHT:
+                    x -= w
+                    y -= h
+                if point == FRAMEPOINT.LEFT:
+                    y -= h / 2
+                if point == FRAMEPOINT.RIGHT:
+                    x -= w
+                    y -= h / 2
 
-        if x != self.get_x() or y != self.get_y():
-            self.set_x(x)
-            self.set_y(y)
+            if x != self.get_x() or y != self.get_y():
+                self.set_x(x)
+                self.set_y(y)
 
-            c:FrameInterface
-            for c in self._attached_elements:
-                c._attach()
+                c:FrameInterface
+                for c in self._attached_elements:
+                    c._attach()
 
     def _deattach(self):
         if self._attached_parent is not None:
@@ -233,7 +261,7 @@ class Frame(FrameInterface):
 
         e:FrameInterface
         for e in self._attached_elements:
-            e._move(x_offset,y_offset)
+            e._attach()
 
     def _resize(self,w: int, h:int):
         if w != self.get_w() or h != self.get_h():
@@ -241,11 +269,13 @@ class Frame(FrameInterface):
             h_ratio = h / self.get_h()
             self.set_w(w)
             self.set_h(h)
-            self._attach() 
+            self._attach()
             
             e:FrameInterface
             for e in self._attached_elements:
                 e._attach()
 
             for e in self._components:
-                e.resize(e.get_w() * w_ratio,e.get_h() * h_ratio)
+                e._resize(e.get_w() * w_ratio,e.get_h() * h_ratio)
+            
+            self._refresh()

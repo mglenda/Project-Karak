@@ -6,6 +6,8 @@ def main():
     pygame.display.set_caption("Karak")
     pygame.font.init()
     GAME.start()
+    _unicode_pressed: str = ''
+    now = None
     while True:
         key_pressed = False
         for event in pygame.event.get():
@@ -42,16 +44,24 @@ def main():
                 if event.button == 3:
                     GAME.get_screen()._on_mouse_right_press(x=coords[0],y=coords[1])
             elif event.type == pygame.KEYDOWN:
-                GAME.get_screen()._on_key_pressed(event.key)
+                GAME.get_screen()._on_key_pressed(event.key,event.unicode)
+                _unicode_pressed = event.unicode
                 key_pressed = True
             elif event.type == pygame.KEYUP:
-                GAME.get_screen()._on_key_released(event.key)
+                if _unicode_pressed == event.unicode:
+                    _unicode_pressed = ''
+                GAME.get_screen()._on_key_released(event.key,event.unicode)
             elif event.type == pygame.WINDOWENTER:
-                GAME.get_screen().draw()
+                now = pygame.time.get_ticks() + 50
+
+        if now is not None and pygame.time.get_ticks() - now >= 0:
+            now = None
+            GAME.get_screen().draw()
+                
         if not key_pressed:
-            for key,is_pressed in enumerate(pygame.key.get_pressed()):
-                if is_pressed == True:
-                    GAME.get_screen()._on_key_hold(key)
+            keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
+            if True in keys:
+                GAME.get_screen()._on_key_hold(keys,_unicode_pressed)
 
         pygame.display.flip()
         pygame.time.Clock().tick(120)

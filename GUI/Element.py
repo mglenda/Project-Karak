@@ -1,5 +1,6 @@
 import pygame
 from GUI._ComponentListeners import MouseListener
+from Game import GAME
 
 class Element(MouseListener):
     _x: int
@@ -62,7 +63,7 @@ class Element(MouseListener):
         return self._surface
 
     def draw(self):
-        pass
+        GAME.get_screen().draw()
 
     def set_active(self,active: bool):
         self._active = active
@@ -79,9 +80,7 @@ class Element(MouseListener):
         return self._visible
     
     def rotate(self,angle: int):
-        self._angle += angle
-        if self._angle >= 360 or self._angle < 0:
-            self._angle = self._angle % 360
+        self._angle = (self._angle + angle) % 360
 
     def set_x_offset(self,x_offset: int):
         self._x_offset = x_offset

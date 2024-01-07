@@ -4,9 +4,10 @@ MAXIMUM_PLAYERS = 5
 
 class PlayerGroup():
     _Players = []
+    _current: int
 
     def __init__(self) -> None:
-        pass
+        self._current = -1
 
     def add(self,player:Player):
         self._Players.append(player)
@@ -17,8 +18,9 @@ class PlayerGroup():
     def get_all(self):
         return self._Players
     
-    def get(self,i:int):
+    def get(self,i:int) -> Player:
         return self._Players[i]
     
     def get_count(self):
         return len(self._Players)
+    

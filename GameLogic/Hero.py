@@ -1,10 +1,11 @@
 from GameLogic.Inventory import Inventory
 import GameLogic.Ability as Ability
 import GameLogic.Items as Items
+from GUI.GraphicComponents import TileInterface
 
 MAX_HP = 5
 DEF_MOVE_POINTS = 4
-PATH = 'Textures\\Heroes\\Retextured\\'
+PATH = '_Textures\\Heroes\\Retextured\\'
 
 class Hero():
     _inventory: Inventory
@@ -15,6 +16,7 @@ class Hero():
     _move_points: int
     _chests: float
     _background: str
+    _tile: TileInterface
 
     def __init__(self) -> None:
         self._inventory = Inventory()
@@ -22,13 +24,30 @@ class Hero():
         self._hit_points = MAX_HP
         self._alive = True
         self._chests = 0
+        self._move_points = DEF_MOVE_POINTS
+        self.reload_abilities()
+
+    def set_tile(self, tile: TileInterface):
+        self._tile = tile
+
+    def get_tile(self) -> TileInterface:
+        return self._tile
+
+    def reload_abilities(self):
+        self._abilities = []
+        a:Ability.Ability
+        for a in self.__class__._abilities:
+            self._abilities.append(a())
 
     def add_ability(self,ability:Ability.Ability):
         if ability not in self._abilities:
             self._abilities.append(ability)
 
     def remove_ability(self,ability:Ability.Ability):
-        self._abilities.remove(ability)
+        a: Ability.Ability
+        for a in reversed(self._abilities):
+            if isinstance(a,ability):
+                self._abilities.remove(a)
 
     def has_ability(self,ability:Ability.Ability):
         if not self._cursed:
@@ -85,50 +104,50 @@ class Hero():
 
 class Wizard(Hero):
     _background = PATH + 'Wizard.png'
-    _abilities = [Ability.AstralWalking()
-                  ,Ability.MagicalAffinity()]
+    _abilities = [Ability.AstralWalking
+                  ,Ability.MagicalAffinity]
     def __init__(self) -> None:
         super().__init__()
 
 class Warrior(Hero):
     _background = PATH + 'Warrior.png'
-    _abilities = [Ability.AstralWalking()
-                  ,Ability.MagicalAffinity()]
+    _abilities = [Ability.Reincarnation
+                  ,Ability.DoubleAttack]
     def __init__(self) -> None:
         super().__init__()
 
 class Warlock(Hero):
     _background = PATH + 'Warlock.png'
-    _abilities = [Ability.AstralWalking()
-                  ,Ability.MagicalAffinity()]
+    _abilities = [Ability.Sacrifice
+                  ,Ability.MagicSwap]
     def __init__(self) -> None:
         super().__init__()
 
 class Thief(Hero):
     _background = PATH + 'Thief.png'
-    _abilities = [Ability.AstralWalking()
-                  ,Ability.MagicalAffinity()]
+    _abilities = [Ability.Backstab
+                  ,Ability.Stealth]
     def __init__(self) -> None:
         super().__init__()
         
 class Swordsman(Hero):
     _background = PATH + 'Swordsman.png'
-    _abilities = [Ability.AstralWalking()
-                  ,Ability.MagicalAffinity()]
+    _abilities = [Ability.Unstoppable
+                  ,Ability.CombatTraining]
     def __init__(self) -> None:
         super().__init__()
 
 class Ranger(Hero):
     _background = PATH + 'Ranger.png'
-    _abilities = [Ability.AstralWalking()
-                  ,Ability.MagicalAffinity()]
+    _abilities = [Ability.Eavesdropping
+                  ,Ability.BearAttack]
     def __init__(self) -> None:
         super().__init__()
 
 class Oracle(Hero):
     _background = PATH + 'Oracle.png'
-    _abilities = [Ability.AstralWalking()
-                  ,Ability.MagicalAffinity()]
+    _abilities = [Ability.Fateweaver
+                  ,Ability.Foresight]
     def __init__(self) -> None:
         super().__init__()
 
@@ -140,21 +159,21 @@ class LordOfKarak(Hero):
 
 class BattleMage(Hero):
     _background = PATH + 'BattleMage.png'
-    _abilities = [Ability.AstralWalking()
-                  ,Ability.MagicalAffinity()]
+    _abilities = [Ability.SwordMaster
+                  ,Ability.BlitzAttack]
     def __init__(self) -> None:
         super().__init__()
 
 class Barbarian(Hero):
     _background = PATH + 'Barbarian.png'
-    _abilities = [Ability.AstralWalking()
-                  ,Ability.MagicalAffinity()]
+    _abilities = [Ability.Berserk
+                  ,Ability.Perseverance]
     def __init__(self) -> None:
         super().__init__()
 
 class Acrobat(Hero):
     _background = PATH + 'Acrobat.png'
-    _abilities = [Ability.AstralWalking()
-                  ,Ability.MagicalAffinity()]
+    _abilities = [Ability.ThrowingDaggers
+                  ,Ability.Sprint]
     def __init__(self) -> None:
         super().__init__()

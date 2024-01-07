@@ -18,11 +18,13 @@ p.get_hero().remove_item(key)
 print(p.get_hero().get_item(Items.Key))
 print(p.get_hero().has_ability(Ability.UnlockChest))
 
-print(1325 % 360)
+b = Hero.Barbarian()
+b2 = Hero.Barbarian()
+w = Hero.Wizard()
 
-l = [1,2,3,4,5,6,7,8,9,10,11,12]
+b.remove_ability(Ability.Perseverance)
 
-for i in reversed(l):
-    l.remove(i)
+x:int = 12
+f:float = 12.5
 
-print(l)
+print(x < f)
