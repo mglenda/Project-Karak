@@ -1,4 +1,5 @@
 import GameLogic.Ability as Ability
+from GameLogic.Placeable import Placeable
 
 PATH = '_Textures\\Items\\Retextured\\'
 
@@ -7,11 +8,10 @@ TYPE_WEAPON = 1
 TYPE_SCROLL = 2
 TYPE_CHEST = 4
 
-class Item():
+class Item(Placeable):
     _ability: Ability.Ability
     _type: int
     _bonus: float
-    _background: str
 
     def __init__(self) -> None:
         pass

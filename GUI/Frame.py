@@ -106,6 +106,10 @@ class Frame(FrameInterface):
         return self._attachet_point_parent
 
     def set_point(self,att_point: int,att_point_parent: int,x_offset: int = 0, y_offset: int = 0,parent: FrameInterface = None):
+        self._set_point(att_point,att_point_parent,x_offset,y_offset,parent)
+        self.draw()
+
+    def _set_point(self,att_point: int,att_point_parent: int,x_offset: int = 0, y_offset: int = 0,parent: FrameInterface = None):
         self._deattach()
         self.set_x_offset(x_offset)
         self.set_y_offset(y_offset)
@@ -116,8 +120,7 @@ class Frame(FrameInterface):
         self._attached_point = att_point
         self._attachet_point_parent = att_point_parent
         self._attach()
-        self.set_visible(True)
-        self.draw()
+        self._set_visible(True)
 
     def destroy(self):
         if self._destroy():
@@ -178,50 +181,49 @@ class Frame(FrameInterface):
             if x is not None and y is not None:
                 w: int = self._attached_parent.get_w()
                 h: int = self._attached_parent.get_h()
-                point: int = self._attachet_point_parent
-                if point == FRAMEPOINT.CENTER:
+                
+                if self._attachet_point_parent == FRAMEPOINT.CENTER:
                     x += w / 2
                     y += h / 2
-                if point == FRAMEPOINT.TOP:
+                elif self._attachet_point_parent == FRAMEPOINT.TOP:
                     x += w / 2
-                if point == FRAMEPOINT.TOPRIGHT:
+                elif self._attachet_point_parent == FRAMEPOINT.TOPRIGHT:
                     x += w
-                if point == FRAMEPOINT.BOTTOM:
+                elif self._attachet_point_parent == FRAMEPOINT.BOTTOM:
                     x += w / 2
                     y += h
-                if point == FRAMEPOINT.BOTTOMLEFT:
+                elif self._attachet_point_parent == FRAMEPOINT.BOTTOMLEFT:
                     y += h
-                if point == FRAMEPOINT.BOTTOMRIGHT:
+                elif self._attachet_point_parent == FRAMEPOINT.BOTTOMRIGHT:
                     x += w
                     y += h
-                if point == FRAMEPOINT.LEFT:
+                elif self._attachet_point_parent == FRAMEPOINT.LEFT:
                     y += h / 2
-                if point == FRAMEPOINT.RIGHT:
+                elif self._attachet_point_parent == FRAMEPOINT.RIGHT:
                     x += w
                     y += h / 2
                 
                 w = self.get_w()
                 h = self.get_h()
-                point: int = self._attached_point
 
-                if point == FRAMEPOINT.CENTER:
+                if self._attached_point == FRAMEPOINT.CENTER:
                     x -= w / 2
                     y -= h / 2
-                if point == FRAMEPOINT.TOP:
+                elif self._attached_point == FRAMEPOINT.TOP:
                     x -= w / 2
-                if point == FRAMEPOINT.TOPRIGHT:
+                elif self._attached_point == FRAMEPOINT.TOPRIGHT:
                     x -= w
-                if point == FRAMEPOINT.BOTTOM:
+                elif self._attached_point == FRAMEPOINT.BOTTOM:
                     x -= w / 2
                     y -= h
-                if point == FRAMEPOINT.BOTTOMLEFT:
+                elif self._attached_point == FRAMEPOINT.BOTTOMLEFT:
                     y -= h
-                if point == FRAMEPOINT.BOTTOMRIGHT:
+                elif self._attached_point == FRAMEPOINT.BOTTOMRIGHT:
                     x -= w
                     y -= h
-                if point == FRAMEPOINT.LEFT:
+                elif self._attached_point == FRAMEPOINT.LEFT:
                     y -= h / 2
-                if point == FRAMEPOINT.RIGHT:
+                elif self._attached_point == FRAMEPOINT.RIGHT:
                     x -= w
                     y -= h / 2
 
@@ -250,10 +252,6 @@ class Frame(FrameInterface):
     def move(self, x_offset: int, y_offset: int):
         self._move(x_offset,y_offset)
         self.draw()
-    
-    def resize(self, w: int, h: int):
-        self._resize(w,h)
-        self.draw()
 
     def _move(self,x_offset: int, y_offset: int):
         self._x_offset += x_offset
@@ -263,7 +261,12 @@ class Frame(FrameInterface):
         for e in self._attached_elements:
             e._attach()
 
+    def resize(self, w: int, h: int):
+        self._resize(w,h)
+        self.draw()       
+
     def _resize(self,w: int, h:int):
+        pass
         if w != self.get_w() or h != self.get_h():
             w_ratio = w / self.get_w()
             h_ratio = h / self.get_h()
@@ -272,9 +275,6 @@ class Frame(FrameInterface):
             self._attach()
             
             e:FrameInterface
-            for e in self._attached_elements:
-                e._attach()
-
             for e in self._components:
                 e._resize(e.get_w() * w_ratio,e.get_h() * h_ratio)
             

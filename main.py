@@ -63,7 +63,7 @@ def main():
             if True in keys:
                 GAME.get_screen()._on_key_hold(keys,_unicode_pressed)
 
-        pygame.display.flip()
+        pygame.display.update()
         pygame.time.Clock().tick(120)
 
 if __name__ == "__main__":

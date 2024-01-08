@@ -6,6 +6,7 @@ class MainScreen(Frame,KeyBoardListener):
     _entered: FrameInterface
     _focused: KeyBoardListener
     def __init__(self) -> None:
+        self._is_draw_called = 0
         super().__init__(None)
         self.set_x(0)
         self.set_y(0)

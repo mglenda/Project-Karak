@@ -4,8 +4,12 @@ from GUI._ComponentListeners import KeyBoardListener
 from GUI.Tile import Unknown,Start,Tile
 import GUI._const_mouseevents as MouseEvent
 from GUI.TilePack import TilePack
+from GUI.MinionPack import MinionPack
 from GameLogic.Player import Player
 from GameLogic.Hero import Hero
+from GameLogic.Placeable import Placeable
+import GameLogic.Items as Items
+import GameLogic.Minion as Minions
 from Game import GAME
 import pygame
 
@@ -18,11 +22,13 @@ class CastleScreen(Rect,KeyBoardListener):
     _player_i: int
     _tilemap: dict
     _tilepack: TilePack
+    _minionpack: MinionPack
     _tilesize: int
     def __init__(self) -> None:
         super().__init__(GAME.screen.get_w(), GAME.screen.get_h(), (40,40,40), GAME.screen)
         self._tilesize = self.get_h() * 0.15
         self._tilepack = TilePack()
+        self._minionpack = MinionPack()
         self._is_pressed = False
         self._zoom = 0.0
         self._player_i = 0
@@ -51,6 +57,11 @@ class CastleScreen(Rect,KeyBoardListener):
             else:
                 tile.set_active(False)
 
+    def disable_all_tiles(self):
+        tile: Tile
+        for _,tile in self._tilemap.items():
+            tile.set_active(False)
+
     def are_tiles_accesible(self, tile_one: Tile, tile_two: Tile) -> bool:
         c_one,r_one = tile_one.get_c(),tile_one.get_r()
         c_two,r_two = tile_two.get_c(),tile_two.get_r()
@@ -76,6 +87,18 @@ class CastleScreen(Rect,KeyBoardListener):
                 pass
 
         return accesible
+    
+    def center_camera(self, hero:Hero):
+        tile: Tile = hero.get_tile()
+        x,y = tile.get_x(),tile.get_y()
+        xoff,yoff = tile.get_x_offset(),tile.get_y_offset()
+
+        midx = GAME.get_screen().get_w() / 2
+        midy = GAME.get_screen().get_h() / 2
+        midx -= tile.get_w()
+        midy -= tile.get_h()
+
+        self._start_tile.move(midx - (x + xoff),midy - (y + yoff))
 
     def move_to_tile(self, tile: Tile):
         hero: Hero = self.get_current_hero()
@@ -89,9 +112,8 @@ class CastleScreen(Rect,KeyBoardListener):
         hero: Hero = self.get_current_hero()
         if isinstance(tile,Unknown):
             tile_type = self._tilepack.pick()
-            if tile_type is not None:
-                self.spawn_tile(tile_type,tile,hero.get_tile())
-            else:
+            self.spawn_tile(tile_type,tile,hero.get_tile())
+            if len(self._tilepack.pack) == 0:
                 tile: Tile
                 for k in list(self._tilemap.keys()):
                     if isinstance(self._tilemap[k],Unknown):
@@ -104,6 +126,8 @@ class CastleScreen(Rect,KeyBoardListener):
         att_point,att_point_parent = parent.get_attached_point(),parent.get_attached_point_parent()
         new_parent = parent.get_attached_parent()
         self.destroy_tile(parent)
+
+        self.disable_all_tiles()
 
         tile: Tile = self.create_tile(tile_type,new_parent,att_point,att_point_parent,c,r)
 
@@ -129,19 +153,28 @@ class CastleScreen(Rect,KeyBoardListener):
     def place_tile(self, tile: Tile):
         c,r = tile.get_c(),tile.get_r()
 
-        if (str(c) + str(r-1)) not in self._tilemap and not isinstance(tile,Unknown) and tile.is_passable_top():
-            self.create_tile(Unknown,tile,FRAMEPOINT.BOTTOM,FRAMEPOINT.TOP,c,r-1)
-        if (str(c+1) + str(r)) not in self._tilemap and not isinstance(tile,Unknown) and tile.is_passable_right():
-            self.create_tile(Unknown,tile,FRAMEPOINT.LEFT,FRAMEPOINT.RIGHT,c+1,r)
-        if (str(c) + str(r+1)) not in self._tilemap and not isinstance(tile,Unknown) and tile.is_passable_bottom():
-            self.create_tile(Unknown,tile,FRAMEPOINT.TOP,FRAMEPOINT.BOTTOM,c,r+1)
-        if (str(c-1) + str(r)) not in self._tilemap and not isinstance(tile,Unknown) and tile.is_passable_left():
-            self.create_tile(Unknown,tile,FRAMEPOINT.RIGHT,FRAMEPOINT.LEFT,c-1,r)
+        if len(self._tilepack.pack) > 0:
+            if (str(c) + str(r-1)) not in self._tilemap and not isinstance(tile,Unknown) and tile.is_passable_top():
+                self.create_tile(Unknown,tile,FRAMEPOINT.BOTTOM,FRAMEPOINT.TOP,c,r-1)
+            if (str(c+1) + str(r)) not in self._tilemap and not isinstance(tile,Unknown) and tile.is_passable_right():
+                self.create_tile(Unknown,tile,FRAMEPOINT.LEFT,FRAMEPOINT.RIGHT,c+1,r)
+            if (str(c) + str(r+1)) not in self._tilemap and not isinstance(tile,Unknown) and tile.is_passable_bottom():
+                self.create_tile(Unknown,tile,FRAMEPOINT.TOP,FRAMEPOINT.BOTTOM,c,r+1)
+            if (str(c-1) + str(r)) not in self._tilemap and not isinstance(tile,Unknown) and tile.is_passable_left():
+                self.create_tile(Unknown,tile,FRAMEPOINT.RIGHT,FRAMEPOINT.LEFT,c-1,r)
 
         tile.clear_mouse_event(MouseEvent.WHEELUP)
         tile.clear_mouse_event(MouseEvent.WHEELDOWN)
         tile.register_mouse_event(MouseEvent.LEFTCLICK,self.move_to_tile,tile)
         tile.set_active(False)
+
+        if tile.is_spawn() and not tile.is_placed():
+            minion: Placeable = self._minionpack.pick()
+            if minion is not None:
+                tile.add_placeable(minion())
+
+        tile.set_placed(True)
+
         self.move_to_tile(tile)
         
     def create_tile(self, tile_type: Tile, parent: Tile, att_point: int, att_point_parent: int,c: int, r: int) -> Tile:
@@ -170,13 +203,13 @@ class CastleScreen(Rect,KeyBoardListener):
     def _on_key_hold(self, keys: pygame.key.ScancodeWrapper, unicode: str):
         x,y = 0,0
         if keys[pygame.K_UP] or keys[pygame.K_w]:
-            y += 10 + (10 * self._zoom)
+            y += 15 + (10 * self._zoom)
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            y -= 10 + (10 * self._zoom)
+            y -= 15 + (10 * self._zoom)
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            x -= 10 + (10 * self._zoom)
+            x -= 15 + (10 * self._zoom)
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            x += 10 + (10 * self._zoom)
+            x += 15 + (10 * self._zoom)
         if x != 0 or y != 0:
             self._start_tile.move(x,y)
 
@@ -194,11 +227,14 @@ class CastleScreen(Rect,KeyBoardListener):
     def _on_mouse_left_click(self, x, y):
         self._is_pressed = False
 
+    def _on_mouse_leave(self):
+        self._is_pressed = False
+
     def _on_mouse_wheel_down(self, x, y):
         w = self._start_tile.get_w() - 10
         h = self._start_tile.get_h() - 10
-        if w >= self.get_h()*0.05:
-            self._zoom -= 0.05
+        if w >= self.get_h()*0.08:
+            self._zoom -= 0.2
             tile: Tile
             for _,tile in self._tilemap.items():
                 tile._resize(w,h)
@@ -208,8 +244,8 @@ class CastleScreen(Rect,KeyBoardListener):
     def _on_mouse_wheel_up(self, x, y):
         w = self._start_tile.get_w() + 10
         h = self._start_tile.get_h() + 10
-        if w <= self.get_h()*0.3:
-            self._zoom += 0.05
+        if w <= self.get_h()*0.2:
+            self._zoom += 0.2
             tile: Tile
             for _,tile in self._tilemap.items():
                 tile._resize(w,h)

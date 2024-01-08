@@ -1,6 +1,7 @@
 import pygame
 from GUI._ComponentListeners import MouseListener
 from Game import GAME
+from threading import Thread
 
 class Element(MouseListener):
     _x: int
@@ -73,8 +74,11 @@ class Element(MouseListener):
     
     def set_visible(self,visible: bool):
         if visible != self._visible:
-            self._visible = visible
+            self._set_visible(visible)
             self.draw()
+
+    def _set_visible(self, visible:bool):
+            self._visible = visible
 
     def is_visible(self) -> bool:
         return self._visible

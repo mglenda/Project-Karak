@@ -1,7 +1,8 @@
 import pygame
 from GUI.Frame import Frame,FRAMEPOINT
 
-FONT_PATH = 'Fonts\\BreatheFireIii-PKLOB.ttf'
+FONT_PATH_NUMBERS = 'Fonts\\Carre-JWja.ttf'
+FONT_PATH_REGULAR = 'Fonts\\BreatheFireIii-PKLOB.ttf'
 
 class Rect(Frame):
     _color: tuple
@@ -27,6 +28,9 @@ class Rect(Frame):
         self._surface = pygame.Surface((self._w,self._h))
         pygame.draw.rect(self._surface,self._color,(0,0,self._w,self._h))
 
+    def get_tilesize(self) -> int:
+        pass
+
 
 class Image(Frame):
     _stored: pygame.Surface
@@ -40,8 +44,7 @@ class Image(Frame):
         self._refresh()
 
     def _refresh(self):
-        self._surface = self._stored
-        self._surface = pygame.transform.scale(self._surface,(self._w,self._h))
+        self._surface = pygame.transform.smoothscale(self._stored,(self._w,self._h))
         if self._angle != 0:
             self._surface = pygame.transform.rotate(self._surface,self._angle)
 
@@ -71,10 +74,13 @@ class TextField(Frame):
     _text: str
     _max_length: int
     _font_size: int
-    def __init__(self,parent: Frame,font_color: tuple = (255,215,0),font_size: int = 15,text: str = '',max_length: int = 15) -> None:
+    _stored: pygame.Surface
+    _font_path: str
+    def __init__(self,parent: Frame,font_color: tuple = (255,215,0),font_size: int = 15,text: str = '',max_length: int = 15,font_path: str = FONT_PATH_REGULAR) -> None:
         super().__init__(parent)
-        self._font = pygame.font.Font(FONT_PATH,font_size)
+        self._font = pygame.font.Font(font_path,font_size)
         self._font_color = font_color
+        self._font_path = font_path
         self._max_length = max_length
         self._font_size = font_size
         self._text = None
@@ -91,7 +97,10 @@ class TextField(Frame):
             if len(text) > self._max_length:
                 text = text[:self._max_length]
             self._text = text
+            w,h = self.get_w(),self.get_h()
             self._refresh()
+            if h != 0:
+                self._resize(w,h)
             return True
         return False
 
@@ -113,8 +122,11 @@ class TextField(Frame):
     def _set_font_size(self,font_size:int) -> bool:
         if self._font_size != font_size:
             self._font_size = font_size
-            self._font = pygame.font.Font(FONT_PATH,font_size)
+            self._font = pygame.font.Font(self._font_path,font_size)
+            w,h = self.get_w(),self.get_h()
             self._refresh()
+            if h != 0:
+                self._resize(w,h)
             return True
         return False
             
@@ -122,13 +134,20 @@ class TextField(Frame):
         return self._text
     
     def _refresh(self):
-        self._surface = self._font.render(self._text,False,self._font_color)
+        self._stored = self._font.render(self._text,False,self._font_color)
+        self._surface = self._stored
         self.set_w(self._surface.get_width())
         self.set_h(self._surface.get_height())
         self._attach()
 
     def _resize(self, w: int, h: int):
-        pass
+        if w != self.get_w() or h != self.get_h():
+            ratio = h / self.get_h()
+            w = self.get_w() * ratio
+            self.set_w(w)
+            self.set_h(h)
+            self._surface = pygame.transform.scale(self._stored,(self._w,self._h))
+            self._attach()
 
 class TileInterface(Image):
     _texture: str
