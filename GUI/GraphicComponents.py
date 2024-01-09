@@ -1,4 +1,5 @@
 import pygame
+from pygame.surface import Surface as Surface
 from GUI.Frame import Frame,FRAMEPOINT
 
 FONT_PATH_NUMBERS = 'Fonts\\Carre-JWja.ttf'
@@ -181,4 +182,10 @@ class TileInterface(Image):
         pass
     
     def rotate_down(self):
+        pass
+
+    def add_hero(self, hero):
+        pass
+
+    def remove_hero(self, hero):
         pass

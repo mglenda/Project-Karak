@@ -43,7 +43,10 @@ class MouseListener():
             if len(args) == 0:
                 func()
             else:
-                func(*args)
+                if isinstance(args,str):
+                    func(args)
+                else:
+                    func(*args)
 
     def register_mouse_event(self,evt: int,func,*args: list):
         if not hasattr(self,'_mouse_events'):

@@ -25,10 +25,14 @@ class Hero():
         self._alive = True
         self._chests = 0
         self._move_points = DEF_MOVE_POINTS
+        self._tile = None
         self.reload_abilities()
 
     def set_tile(self, tile: TileInterface):
+        if self._tile is not None:
+            self._tile.remove_hero(self)
         self._tile = tile
+        tile.add_hero(self)
 
     def get_tile(self) -> TileInterface:
         return self._tile
@@ -88,7 +92,14 @@ class Hero():
             self._hit_points += amnt
 
     def hurt(self):
-        self._hit_points -= 1
+        if self._hit_points == 1:
+            self._hit_points = 0
+            self.kill()
+        else:
+            self._hit_points -= 1
+
+    def get_hit_points(self) -> int:
+        return self._hit_points
 
     def kill(self):
         self._alive = False
@@ -96,11 +107,18 @@ class Hero():
     def ressurect(self,amnt:int):
         self._hit_points = amnt
 
-    def move(self):
+    def move(self,tile: TileInterface):
         self._move_points -= 1
+        self.set_tile(tile)
 
     def get_move_points(self) -> int:
         return self._move_points
+    
+    def refresh_move_points(self):
+        self._move_points = DEF_MOVE_POINTS
+
+    def set_move_points(self, points: int):
+        self._move_points = points
 
 class Wizard(Hero):
     _background = PATH + 'Wizard.png'
@@ -175,5 +193,26 @@ class Acrobat(Hero):
     _background = PATH + 'Acrobat.png'
     _abilities = [Ability.ThrowingDaggers
                   ,Ability.Sprint]
+    def __init__(self) -> None:
+        super().__init__()
+
+class WarriorPrincess(Hero):
+    _background = PATH + 'WarriorPrincess.png'
+    _abilities = [Ability.DualWielding
+                  ,Ability.TacticalReposition]
+    def __init__(self) -> None:
+        super().__init__()
+
+class BeastHunter(Hero):
+    _background = PATH + 'BeastHunter.png'
+    _abilities = [Ability.Protector
+                  ,Ability.Ambush]
+    def __init__(self) -> None:
+        super().__init__()
+
+class Alchemist(Hero):
+    _background = PATH + 'Alchemist.png'
+    _abilities = [Ability.Stoneskin
+                  ,Ability.Transformation]
     def __init__(self) -> None:
         super().__init__()

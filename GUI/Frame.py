@@ -174,6 +174,36 @@ class Frame(FrameInterface):
     def deattach(self,component: FrameInterface):
         self._attached_elements.remove(component)
 
+    def get_point(self,att_point):
+        x: int = self.get_x()
+        y: int = self.get_y()
+        if x is not None and y is not None:
+            w: int = self.get_w()
+            h: int = self.get_h()
+            
+            if att_point == FRAMEPOINT.CENTER:
+                x += w / 2
+                y += h / 2
+            elif att_point == FRAMEPOINT.TOP:
+                x += w / 2
+            elif att_point == FRAMEPOINT.TOPRIGHT:
+                x += w
+            elif att_point == FRAMEPOINT.BOTTOM:
+                x += w / 2
+                y += h
+            elif att_point == FRAMEPOINT.BOTTOMLEFT:
+                y += h
+            elif att_point == FRAMEPOINT.BOTTOMRIGHT:
+                x += w
+                y += h
+            elif att_point == FRAMEPOINT.LEFT:
+                y += h / 2
+            elif att_point == FRAMEPOINT.RIGHT:
+                x += w
+                y += h / 2
+
+        return x,y
+
     def _attach(self):
         if self._attached_parent is not None:
             x: int = self._attached_parent.get_x()
@@ -273,7 +303,8 @@ class Frame(FrameInterface):
             self.set_w(w)
             self.set_h(h)
             self._attach()
-            
+            self._x_offset *= w_ratio
+            self._y_offset *= h_ratio
             e:FrameInterface
             for e in self._components:
                 e._resize(e.get_w() * w_ratio,e.get_h() * h_ratio)

@@ -151,6 +151,49 @@ class Unstoppable(Ability):
     def __init__(self) -> None:
         super().__init__()
 
+class TacticalReposition(Ability):
+    _passive: bool = True
+    _background: str = PATH + 'TacticalReposition.png'
+
+    def __init__(self) -> None:
+        super().__init__()
+
+class DualWielding(Ability):
+    _passive: bool = True
+    _background: str = PATH + 'DualWielding.png'
+
+    def __init__(self) -> None:
+        super().__init__()
+
+class Ambush(Ability):
+    _passive: bool = True
+    _background: str = PATH + 'Ambush.png'
+
+    def __init__(self) -> None:
+        super().__init__()
+
+class Protector(Ability):
+    _passive: bool = True
+    _background: str = PATH + 'Protector.png'
+
+    def __init__(self) -> None:
+        super().__init__()
+
+class Stoneskin(Ability):
+    _passive: bool = True
+    _background: str = PATH + 'Stoneskin.png'
+
+    def __init__(self) -> None:
+        super().__init__()
+
+class Transformation(Ability):
+    _passive: bool = True
+    _background: str = PATH + 'Transformation.png'
+
+    def __init__(self) -> None:
+        super().__init__()
+
+
 #Item Abilities
 class UnlockChest(Ability):
     _passive: bool = False

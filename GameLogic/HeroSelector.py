@@ -6,14 +6,17 @@ class HeroSelector():
     i: int
     def __init__(self) -> None:
         self.pack.append(Hero.Acrobat)
+        self.pack.append(Hero.Alchemist)
         self.pack.append(Hero.Barbarian)
         self.pack.append(Hero.BattleMage)
+        self.pack.append(Hero.BeastHunter)
         self.pack.append(Hero.Oracle)
         self.pack.append(Hero.Ranger)
         self.pack.append(Hero.Swordsman)
         self.pack.append(Hero.Thief)
         self.pack.append(Hero.Warlock)
         self.pack.append(Hero.Warrior)
+        self.pack.append(Hero.WarriorPrincess)
         self.pack.append(Hero.Wizard)
         self.i = len(self.pack)-1
     

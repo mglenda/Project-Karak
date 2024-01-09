@@ -1,4 +1,6 @@
 import pygame
+from GameLogic.Timer import Timer
+from typing import Callable, List, Tuple
 
 pygame.init()
 
@@ -22,11 +24,43 @@ class Game():
         from GameLogic.PlayerGroup import PlayerGroup
         self.players = PlayerGroup()
 
+        from GUI.Dice import DiceImages
+        DiceImages._load()
+
+        self.timers = []
+        self.player_panels = []
+
     def spawn(self):
         from GUI.CastleScreen import CastleScreen
         self.flush_main_menu()
         self.castle = CastleScreen()
         self.screen.set_focus(self.castle)
+
+        from GUI.PlayerPanel import PlayerPanel,FRAMEPOINT
+        h = self.screen.get_h() * 0.24
+        w = h * 1.58
+        for pl in self.players.get_all():
+            p = PlayerPanel(w*0.9,h*0.9,self.screen)
+            p.load_player(pl)
+            self.player_panels.append(p)
+
+        p: PlayerPanel
+        for i,p in enumerate(self.player_panels):
+            if i == 0:
+                p._set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.BOTTOM)
+            else:
+                p._resize(p.get_w()*0.7,p.get_h()*0.7)
+                if i == 1 or i == 2:
+                    p._set_point(FRAMEPOINT.BOTTOMRIGHT,FRAMEPOINT.BOTTOMLEFT,-p.get_w() / 5,0,self.player_panels[i-1])
+                elif i == 3:
+                    p._set_point(FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMRIGHT,p.get_w() / 5,0,self.player_panels[0])
+                elif i == 4:
+                    p._set_point(FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMRIGHT,p.get_w() / 5,0,self.player_panels[i-1])
+
+        self.screen.draw()
+
+    def get_player_panels(self) -> list:
+        return self.player_panels
 
     def get_castle(self):
         return self.castle
@@ -40,5 +74,17 @@ class Game():
     
     def get_players(self):
         return self.players
+    
+    def run_timers(self):
+        t: Timer
+        for t in reversed(self.timers):
+            if t.is_alive():
+                t._run()
+            else:
+                self.timers.remove(t)
+                t.destroy()
 
+    def register_timer(self,millis: int,loop_operations: List[Tuple[Callable, Tuple]], loops: int = 0, loop_inc_millis: int = 0, exit_operations: List[Tuple[Callable, Tuple]] = []):
+        self.timers.append(Timer(millis,loop_operations,loops,loop_inc_millis,exit_operations))
+        
 GAME = Game()

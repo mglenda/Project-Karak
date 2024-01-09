@@ -5,6 +5,8 @@ from GUI.Tile import Unknown,Start,Tile
 import GUI._const_mouseevents as MouseEvent
 from GUI.TilePack import TilePack
 from GUI.MinionPack import MinionPack
+from GUI.PlayerPanel import PlayerPanel
+from GameLogic.DiceRoller import DiceRoller,DICE_NORMAL,DICE_WARLOCK
 from GameLogic.Player import Player
 from GameLogic.Hero import Hero
 from GameLogic.Placeable import Placeable
@@ -19,11 +21,13 @@ class CastleScreen(Rect,KeyBoardListener):
     _motion_y: int
     _is_pressed: bool
     _zoom: float
-    _player_i: int
+    _player_order: list
+    _cur_player: Player
     _tilemap: dict
     _tilepack: TilePack
     _minionpack: MinionPack
     _tilesize: int
+    _dr: DiceRoller
     def __init__(self) -> None:
         super().__init__(GAME.screen.get_w(), GAME.screen.get_h(), (40,40,40), GAME.screen)
         self._tilesize = self.get_h() * 0.15
@@ -31,7 +35,7 @@ class CastleScreen(Rect,KeyBoardListener):
         self._minionpack = MinionPack()
         self._is_pressed = False
         self._zoom = 0.0
-        self._player_i = 0
+        self._player_order = []
         self.set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPLEFT)
 
         self._start_tile = Start(self)
@@ -41,11 +45,52 @@ class CastleScreen(Rect,KeyBoardListener):
         self.set_active(True)
 
         p: Player
-        for p in GAME.players.get_all():
+        for p in GAME.get_players().get_all():
             p.get_hero().set_tile(self._start_tile)
-            self._start_tile.add_hero(p.get_hero())
+            self._player_order.append(p)
+            p.get_hero().refresh_move_points()
 
-        self.place_tile(self._start_tile)
+        self._cur_player = self._player_order[0]
+
+        self.place_tile(self._start_tile,False)
+
+    def move_to_tile(self, tile: Tile):
+        hero: Hero = self.get_current_hero()
+        hero.move(tile)
+        self.load_action_options()
+
+        if hero.get_move_points() <= 0:
+            self.player_turn_end()
+        else:
+            self.center_camera(self._cur_player)
+
+    def player_turn_end(self):
+        self.get_current_hero().hurt()
+        p = self._player_order[0]
+        self._player_order.remove(p)
+        self._player_order.append(p)
+        self._cur_player = self._player_order[0]
+        self.get_current_hero().refresh_move_points()
+        self.refresh_player_panels()
+        self.load_action_options()
+        self.center_camera(self._cur_player)
+
+    def refresh_player_panels(self):
+        p:PlayerPanel
+        for i,p in enumerate(GAME.get_player_panels()):
+            p.load_player(self._player_order[i])
+
+    def dice_roll(self,*dices):
+        self._dr = DiceRoller(*dices)
+        GAME.register_timer(50,[
+            (self._dr.roll,())
+        ],15,10
+        ,[
+            (self.roll_end,())
+        ])
+
+    def roll_end(self):
+        print(self._dr.roll())
 
     def load_action_options(self):
         hero: Hero = self.get_current_hero()
@@ -88,25 +133,16 @@ class CastleScreen(Rect,KeyBoardListener):
 
         return accesible
     
-    def center_camera(self, hero:Hero):
-        tile: Tile = hero.get_tile()
+    def center_camera(self, player: Player):
+        tile: Tile = player.get_hero().get_tile()
         x,y = tile.get_x(),tile.get_y()
-        xoff,yoff = tile.get_x_offset(),tile.get_y_offset()
 
         midx = GAME.get_screen().get_w() / 2
         midy = GAME.get_screen().get_h() / 2
-        midx -= tile.get_w()
-        midy -= tile.get_h()
+        midx -= tile.get_w()/2
+        midy -= tile.get_h()/2
 
-        self._start_tile.move(midx - (x + xoff),midy - (y + yoff))
-
-    def move_to_tile(self, tile: Tile):
-        hero: Hero = self.get_current_hero()
-        former_tile: Tile = hero.get_tile()
-        former_tile.remove_hero(hero)
-        hero.set_tile(tile)
-        tile.add_hero(hero)
-        self.load_action_options()
+        self._start_tile.move(midx - x,midy - y)
 
     def explore_tile(self, tile: Tile):
         hero: Hero = self.get_current_hero()
@@ -138,7 +174,7 @@ class CastleScreen(Rect,KeyBoardListener):
             self.rotate_tile_up(tile,start)
 
     def get_current_hero(self) -> Hero:
-        return GAME.players.get(self._player_i).get_hero()
+        return self._cur_player.get_hero()
     
     def rotate_tile_up(self, tile: Tile, start: Tile):
         tile.rotate_up()
@@ -150,7 +186,7 @@ class CastleScreen(Rect,KeyBoardListener):
         if not self.are_tiles_accesible(tile,start):
             self.rotate_tile_down(tile,start)
         
-    def place_tile(self, tile: Tile):
+    def place_tile(self, tile: Tile, moving:bool = True):
         c,r = tile.get_c(),tile.get_r()
 
         if len(self._tilepack.pack) > 0:
@@ -174,8 +210,8 @@ class CastleScreen(Rect,KeyBoardListener):
                 tile.add_placeable(minion())
 
         tile.set_placed(True)
-
-        self.move_to_tile(tile)
+        if moving:
+            self.move_to_tile(tile)
         
     def create_tile(self, tile_type: Tile, parent: Tile, att_point: int, att_point_parent: int,c: int, r: int) -> Tile:
         tile:Tile = tile_type(self,c,r)
@@ -186,11 +222,6 @@ class CastleScreen(Rect,KeyBoardListener):
         else:
             tile.register_mouse_event(MouseEvent.LEFTCLICK,self.place_tile,tile)
         return tile
-
-    def player_turn_end(self):
-        self._player_i += 1
-        if self._player_i >= len(GAME.players.get_count()):
-            self._player_i = 0
 
     def destroy_tile(self, tile: Tile):
         cr = str(tile.get_c()) + str(tile.get_r())
@@ -203,13 +234,13 @@ class CastleScreen(Rect,KeyBoardListener):
     def _on_key_hold(self, keys: pygame.key.ScancodeWrapper, unicode: str):
         x,y = 0,0
         if keys[pygame.K_UP] or keys[pygame.K_w]:
-            y += 15 + (10 * self._zoom)
+            y += 25 + (10 * self._zoom)
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            y -= 15 + (10 * self._zoom)
+            y -= 25 + (10 * self._zoom)
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            x -= 15 + (10 * self._zoom)
+            x -= 25 + (10 * self._zoom)
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            x += 15 + (10 * self._zoom)
+            x += 25 + (10 * self._zoom)
         if x != 0 or y != 0:
             self._start_tile.move(x,y)
 
@@ -223,7 +254,7 @@ class CastleScreen(Rect,KeyBoardListener):
         self._motion_x = x
         self._motion_y = y
         self._is_pressed = True
-    
+
     def _on_mouse_left_click(self, x, y):
         self._is_pressed = False
 
@@ -234,7 +265,7 @@ class CastleScreen(Rect,KeyBoardListener):
         w = self._start_tile.get_w() - 10
         h = self._start_tile.get_h() - 10
         if w >= self.get_h()*0.08:
-            self._zoom -= 0.2
+            self._zoom -= 0.1
             tile: Tile
             for _,tile in self._tilemap.items():
                 tile._resize(w,h)
@@ -245,7 +276,7 @@ class CastleScreen(Rect,KeyBoardListener):
         w = self._start_tile.get_w() + 10
         h = self._start_tile.get_h() + 10
         if w <= self.get_h()*0.2:
-            self._zoom += 0.2
+            self._zoom += 0.1
             tile: Tile
             for _,tile in self._tilemap.items():
                 tile._resize(w,h)

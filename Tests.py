@@ -1,30 +1,27 @@
-import GameLogic.Ability as Ability
-import GameLogic.Hero as Hero
-import GameLogic.Inventory as Inventory
-import GameLogic.Items as Items
-import GameLogic.Player as Player
-import GameLogic.PlayerGroup as PlayerGroup
-import GameLogic.Minion as Minion
+from typing import Callable, List, Tuple, Union
 
+def apply_operation(operations: List[Tuple[Callable, Tuple]]) -> List[Union[int, str]]:
+    results = [operation(*params) for operation, params in operations]
+    return results
 
-p = Player.Player('Marek')
-p.set_hero(Hero.Wizard())
+# Example functions with different signatures
+def add(x: int, y: int) -> int:
+    return x + y
 
-print(p.get_name())
-print(p.get_hero().get_abilities())
-p.get_hero().add_item(Items.Key())
-key = p.get_hero().get_item(Items.Key)
-p.get_hero().remove_item(key)
-print(p.get_hero().get_item(Items.Key))
-print(p.get_hero().has_ability(Ability.UnlockChest))
+def multiply(x: int, y: int) -> int:
+    return x * y
 
-b = Hero.Barbarian()
-b2 = Hero.Barbarian()
-w = Hero.Wizard()
+def concat_strings(x: str, y: str) -> str:
+    return x + y
 
-b.remove_ability(Ability.Perseverance)
+# Using the apply_operation function with different operations and parameters
+operations_and_params = [
+    (add, (3, 5)),
+    (multiply, (2, 3)),
+    (concat_strings, ("Hello", "World"))
+]
 
-x:int = 12
-f:float = 12.5
+results = apply_operation(operations_and_params)
 
-print(x < f)
+for i in range(2,4):
+    print(i)
