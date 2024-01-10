@@ -47,15 +47,15 @@ class Game():
         p: PlayerPanel
         for i,p in enumerate(self.player_panels):
             if i == 0:
-                p._set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.BOTTOM)
+                p.set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.BOTTOM)
             else:
-                p._resize(p.get_w()*0.7,p.get_h()*0.7)
+                p.resize(p.get_w()*0.7,p.get_h()*0.7)
                 if i == 1 or i == 2:
-                    p._set_point(FRAMEPOINT.BOTTOMRIGHT,FRAMEPOINT.BOTTOMLEFT,-p.get_w() / 5,0,self.player_panels[i-1])
+                    p.set_point(FRAMEPOINT.BOTTOMRIGHT,FRAMEPOINT.BOTTOMLEFT,-p.get_w() / 5,0,self.player_panels[i-1])
                 elif i == 3:
-                    p._set_point(FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMRIGHT,p.get_w() / 5,0,self.player_panels[0])
+                    p.set_point(FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMRIGHT,p.get_w() / 5,0,self.player_panels[0])
                 elif i == 4:
-                    p._set_point(FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMRIGHT,p.get_w() / 5,0,self.player_panels[i-1])
+                    p.set_point(FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMRIGHT,p.get_w() / 5,0,self.player_panels[i-1])
 
         self.screen.draw()
 

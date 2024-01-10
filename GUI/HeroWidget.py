@@ -10,11 +10,11 @@ class HeroWidget(Image):
         self._ability_widgets = []
 
     def load_hero(self,hero:Hero):
-        self._set_texture(hero._background)
+        self.set_texture(hero._background)
 
         w: Image
         for w in self._ability_widgets:
-            w._destroy()
+            w.destroy()
         self._ability_widgets = []
 
         a: Ability

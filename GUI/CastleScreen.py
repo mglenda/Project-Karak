@@ -30,7 +30,7 @@ class CastleScreen(Rect,KeyBoardListener):
     _dr: DiceRoller
     def __init__(self) -> None:
         super().__init__(GAME.screen.get_w(), GAME.screen.get_h(), (40,40,40), GAME.screen)
-        self._tilesize = self.get_h() * 0.15
+        self._tilesize = self.get_h() * 0.12
         self._tilepack = TilePack()
         self._minionpack = MinionPack()
         self._is_pressed = False
@@ -53,16 +53,17 @@ class CastleScreen(Rect,KeyBoardListener):
         self._cur_player = self._player_order[0]
 
         self.place_tile(self._start_tile,False)
+        self.load_action_options()
 
     def move_to_tile(self, tile: Tile):
         hero: Hero = self.get_current_hero()
         hero.move(tile)
-        self.load_action_options()
 
         if hero.get_move_points() <= 0:
             self.player_turn_end()
         else:
             self.center_camera(self._cur_player)
+            self.load_action_options()
 
     def player_turn_end(self):
         self.get_current_hero().hurt()
@@ -169,6 +170,7 @@ class CastleScreen(Rect,KeyBoardListener):
 
         tile.register_mouse_event(MouseEvent.WHEELUP,self.rotate_tile_up,tile,start)
         tile.register_mouse_event(MouseEvent.WHEELDOWN,self.rotate_tile_down,tile,start)
+        tile.set_active(True)
 
         if not self.are_tiles_accesible(tile,start):
             self.rotate_tile_up(tile,start)
@@ -268,9 +270,8 @@ class CastleScreen(Rect,KeyBoardListener):
             self._zoom -= 0.1
             tile: Tile
             for _,tile in self._tilemap.items():
-                tile._resize(w,h)
+                tile.resize(w,h)
             self._tilesize = h
-            self.draw()
     
     def _on_mouse_wheel_up(self, x, y):
         w = self._start_tile.get_w() + 10
@@ -279,6 +280,5 @@ class CastleScreen(Rect,KeyBoardListener):
             self._zoom += 0.1
             tile: Tile
             for _,tile in self._tilemap.items():
-                tile._resize(w,h)
+                tile.resize(w,h)
             self._tilesize = h
-            self.draw()

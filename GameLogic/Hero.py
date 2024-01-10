@@ -6,6 +6,7 @@ from GUI.GraphicComponents import TileInterface
 MAX_HP = 5
 DEF_MOVE_POINTS = 4
 PATH = '_Textures\\Heroes\\Retextured\\'
+ICON_PATH = '_Textures\\Heroes\\MyIcons\\'
 
 class Hero():
     _inventory: Inventory
@@ -16,6 +17,7 @@ class Hero():
     _move_points: int
     _chests: float
     _background: str
+    _icon: str
     _tile: TileInterface
 
     def __init__(self) -> None:
@@ -122,6 +124,7 @@ class Hero():
 
 class Wizard(Hero):
     _background = PATH + 'Wizard.png'
+    _icon = ICON_PATH + 'Wizard.png'
     _abilities = [Ability.AstralWalking
                   ,Ability.MagicalAffinity]
     def __init__(self) -> None:
@@ -129,6 +132,7 @@ class Wizard(Hero):
 
 class Warrior(Hero):
     _background = PATH + 'Warrior.png'
+    _icon = ICON_PATH + 'Warrior.png'
     _abilities = [Ability.Reincarnation
                   ,Ability.DoubleAttack]
     def __init__(self) -> None:
@@ -136,6 +140,7 @@ class Warrior(Hero):
 
 class Warlock(Hero):
     _background = PATH + 'Warlock.png'
+    _icon = ICON_PATH + 'Warlock.png'
     _abilities = [Ability.Sacrifice
                   ,Ability.MagicSwap]
     def __init__(self) -> None:
@@ -143,6 +148,7 @@ class Warlock(Hero):
 
 class Thief(Hero):
     _background = PATH + 'Thief.png'
+    _icon = ICON_PATH + 'Thief.png'
     _abilities = [Ability.Backstab
                   ,Ability.Stealth]
     def __init__(self) -> None:
@@ -150,6 +156,7 @@ class Thief(Hero):
         
 class Swordsman(Hero):
     _background = PATH + 'Swordsman.png'
+    _icon = ICON_PATH + 'Swordsman.png'
     _abilities = [Ability.Unstoppable
                   ,Ability.CombatTraining]
     def __init__(self) -> None:
@@ -157,6 +164,7 @@ class Swordsman(Hero):
 
 class Ranger(Hero):
     _background = PATH + 'Ranger.png'
+    _icon = ICON_PATH + 'Ranger.png'
     _abilities = [Ability.Eavesdropping
                   ,Ability.BearAttack]
     def __init__(self) -> None:
@@ -164,6 +172,7 @@ class Ranger(Hero):
 
 class Oracle(Hero):
     _background = PATH + 'Oracle.png'
+    _icon = ICON_PATH + 'Oracle.png'
     _abilities = [Ability.Fateweaver
                   ,Ability.Foresight]
     def __init__(self) -> None:
@@ -171,12 +180,14 @@ class Oracle(Hero):
 
 class LordOfKarak(Hero):
     _background = PATH + 'LordOfKarak.png'
+    _icon = ICON_PATH + 'LordOfKarak.png'
     _abilities = []
     def __init__(self) -> None:
         super().__init__()
 
 class BattleMage(Hero):
     _background = PATH + 'BattleMage.png'
+    _icon = ICON_PATH + 'BattleMage.png'
     _abilities = [Ability.SwordMaster
                   ,Ability.BlitzAttack]
     def __init__(self) -> None:
@@ -184,6 +195,7 @@ class BattleMage(Hero):
 
 class Barbarian(Hero):
     _background = PATH + 'Barbarian.png'
+    _icon = ICON_PATH + 'Barbarian.png'
     _abilities = [Ability.Berserk
                   ,Ability.Perseverance]
     def __init__(self) -> None:
@@ -191,6 +203,7 @@ class Barbarian(Hero):
 
 class Acrobat(Hero):
     _background = PATH + 'Acrobat.png'
+    _icon = ICON_PATH + 'Acrobat.png'
     _abilities = [Ability.ThrowingDaggers
                   ,Ability.Sprint]
     def __init__(self) -> None:
@@ -198,6 +211,7 @@ class Acrobat(Hero):
 
 class WarriorPrincess(Hero):
     _background = PATH + 'WarriorPrincess.png'
+    _icon = ICON_PATH + 'WarriorPrincess.png'
     _abilities = [Ability.DualWielding
                   ,Ability.TacticalReposition]
     def __init__(self) -> None:
@@ -205,6 +219,7 @@ class WarriorPrincess(Hero):
 
 class BeastHunter(Hero):
     _background = PATH + 'BeastHunter.png'
+    _icon = ICON_PATH + 'BeastHunter.png'
     _abilities = [Ability.Protector
                   ,Ability.Ambush]
     def __init__(self) -> None:
@@ -212,6 +227,7 @@ class BeastHunter(Hero):
 
 class Alchemist(Hero):
     _background = PATH + 'Alchemist.png'
+    _icon = ICON_PATH + 'Alchemist.png'
     _abilities = [Ability.Stoneskin
                   ,Ability.Transformation]
     def __init__(self) -> None:

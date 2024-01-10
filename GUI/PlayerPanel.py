@@ -10,7 +10,7 @@ class ScrollSlot(Image):
         super().__init__(parent.get_h()/3.4, parent.get_h()/3.4, PATH + 'ScrollSlot.png', parent)
 
         self._icon = Image(self.get_w()*0.8,self.get_h()*0.8,'_Textures\\Items\\Retextured\\FrostFist.png',self)
-        self._icon._set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+        self._icon.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
 
 
 class WeaponSlot(Image):
@@ -19,7 +19,7 @@ class WeaponSlot(Image):
         super().__init__(parent.get_h()/3.4, parent.get_h()/3.4, PATH + 'WeaponSlot.png', parent)
 
         self._icon = Image(self.get_w()*0.8,self.get_h()*0.8,'_Textures\\Items\\Retextured\\Axe.png' ,self)
-        self._icon._set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+        self._icon.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
 
 
 class KeySlot(Image):
@@ -28,7 +28,7 @@ class KeySlot(Image):
         super().__init__(parent.get_h()/3.4, parent.get_h()/3.4, PATH + 'KeySlot.png', parent)
 
         self._icon = Image(self.get_w()*0.8,self.get_h()*0.8,'_Textures\\Items\\Retextured\\Key.png',self)
-        self._icon._set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+        self._icon.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
 
 class HealthSlot(Image):
     _icon: Image
@@ -36,7 +36,7 @@ class HealthSlot(Image):
         super().__init__(parent.get_h()/5.66, parent.get_h()/5.66, PATH + 'HealthSlot.png', parent)
 
         self._icon = Image(self.get_w()*0.8,self.get_h()*0.8,PATH + 'HealthPositive.png',self)
-        self._icon._set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+        self._icon.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
 
     def set_positive(self):
         self._icon.set_texture(PATH + 'HealthPositive.png')
@@ -80,25 +80,25 @@ class PlayerPanel(Image):
             w_slot = WeaponSlot(self)
             self._weapon_slots.append(w_slot)
             if i == 0:
-                w_slot._set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.TOP,0,0,self._key_slot)
+                w_slot.set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.TOP,0,0,self._key_slot)
             else:
-                w_slot._set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.TOP,0,0,self._weapon_slots[i-1])
+                w_slot.set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.TOP,0,0,self._weapon_slots[i-1])
 
         for i in range(3):
             s_slot = ScrollSlot(self)
             self._scroll_slots.append(s_slot)
             if i == 0:
-                s_slot._set_point(FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMRIGHT,0,0,self._key_slot)
+                s_slot.set_point(FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMRIGHT,0,0,self._key_slot)
             else:
-                s_slot._set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.TOP,0,0,self._scroll_slots[i-1])
+                s_slot.set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.TOP,0,0,self._scroll_slots[i-1])
 
         for i in range(5):
             h_slot = HealthSlot(self)
             self._health_slots.append(h_slot)
             if i == 0:
-                h_slot._set_point(FRAMEPOINT.BOTTOMRIGHT,FRAMEPOINT.BOTTOMLEFT,0,0,self._hero_background)
+                h_slot.set_point(FRAMEPOINT.BOTTOMRIGHT,FRAMEPOINT.BOTTOMLEFT,0,0,self._hero_background)
             else:
-                h_slot._set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.TOP,0,0,self._health_slots[i-1])
+                h_slot.set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.TOP,0,0,self._health_slots[i-1])
 
 
     def load_player(self,player: Player):

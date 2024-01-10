@@ -66,17 +66,13 @@ class Button(Image):
     def set_text(self, text: str):
         self._text.set_text(text)
 
-    def set_style(self, button_style: dict):
-        if self._set_style(button_style):
-            self.draw()
-
-    def _set_style(self, button_style: dict) -> bool:
+    def set_style(self, button_style: dict) -> bool:
         if self._button_style != button_style:
             self._button_style = button_style
-            self._set_texture(PATH + self._button_style['img_name'])
-            self._focus_layer._set_texture(PATH + self._button_style['focus_layer'])
-            self._press_layer._set_texture(PATH + self._button_style['press_layer'])
-            self._text._set_color(button_style['font_color'])
+            self.set_texture(PATH + self._button_style['img_name'])
+            self._focus_layer.set_texture(PATH + self._button_style['focus_layer'])
+            self._press_layer.set_texture(PATH + self._button_style['press_layer'])
+            self._text.set_color(button_style['font_color'])
             return True
         return False
     

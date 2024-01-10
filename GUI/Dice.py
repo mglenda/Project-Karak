@@ -1,5 +1,4 @@
 import pygame
-from GUI.Element import Element
 from GUI.GraphicComponents import Image,Frame
 from Game import GAME
 
@@ -36,36 +35,28 @@ class Dice(Frame):
     _stored: Image
     _parent: Frame
     def __init__(self,type: int) -> None:
-        dice = DiceImages.get(type)
+        dice: Image = DiceImages.get(type)
         super().__init__(dice.get_parent())
         self._type = type
         self._stored = dice.get_surface()
         self.set_w(dice.get_w())
         self.set_h(dice.get_h())
-        self._refresh()
+        self.refresh()
 
-    def _refresh(self):
+    def refresh(self):
         self._surface = pygame.transform.smoothscale(self._stored,(self._w,self._h))
         if self._angle != 0:
             self._surface = pygame.transform.rotate(self._surface,self._angle)
 
-    def rotate(self, angle: int):
-        self._rotate(angle)
-        self.draw()
-
-    def _rotate(self,angle: int):
+    def rotate(self,angle: int):
         super().rotate(angle)
-        self._refresh()
+        self.refresh()
 
-    def set_type(self,type: int):
-        if self._set_type(type):
-            self.draw()
-
-    def _set_type(self,type: int) -> bool:
+    def set_type(self,type: int) -> bool:
         if type != self._type:
             self._type = type
             self._stored = DiceImages.get(type).get_surface()
-            self._refresh()
+            self.refresh()
             return True
         return False
     

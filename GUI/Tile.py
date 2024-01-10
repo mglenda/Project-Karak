@@ -15,37 +15,86 @@ class Tile(TileInterface):
     _placeable_widget: PlaceableWidget
     _c: int
     _r: int
-    _heroes: list
+    _heroes: list[Hero]
     _placeable: Placeable
     _is_spawn: bool
     _placed: bool
-    def __init__(self, parent: Rect,c: int,r :int) -> None:
+    _hero_icons: list[Image]
+    def __init__(self, parent: Rect,c: int,r :int, is_revealed: bool = True) -> None:
         super().__init__(parent.get_tilesize(),parent.get_tilesize(), self._texture, parent)
 
         self._c = c
         self._r = r
 
-        self._placeable_widget = PlaceableWidget(self.get_w()*0.6,self.get_h()*0.6,PATH + 'FocusedLayer.png',self)
-        self._placeable_widget._set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+        if is_revealed:
+            self._placeable_widget = None
+            self._hero_icons = []
+            self._heroes = []
+            self._placeable = None
+            self._placed = False
 
         self._active_layer = Image(self.get_w(),self.get_h(),PATH + 'FocusedLayer.png',self)
-        self._active_layer._set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+        self._active_layer.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
 
         self._press_layer = Image(self.get_w(),self.get_h(),PATH + 'FocusedLayer.png',self)
-        self._press_layer._set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+        self._press_layer.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
 
-        self._press_layer._set_visible(False)
-        self._active_layer._set_visible(False)
-        self._placeable_widget._set_visible(False)
+        self._press_layer.set_visible(False)
+        self._active_layer.set_visible(False)
 
-        self._placeable = None
-        self._placed = False
+    def add_hero(self, hero: Hero):
+        self._heroes.append(hero)
 
-        self._heroes = []
-        self.set_active(True)
+        icon:Image = Image(self.get_icon_size(),self.get_icon_size(),hero._icon,self)
+        icon.get_surface().convert_alpha()
+        icon.set_visible(True)
+        self._hero_icons.append(icon)
+
+        self.reattach_hero_icons()
+
+    def remove_hero(self, hero: Hero):
+        i: int = self._heroes.index(hero)
+        del self._heroes[i]
+
+        self._hero_icons[i].destroy()
+        del self._hero_icons[i]
+
+        self.reattach_hero_icons()
+
+    def reattach_hero_icons(self):
+        if len(self._hero_icons) > 0:
+            hi: Image
+            for i,hi in enumerate(self._hero_icons):
+                hi.resize(self.get_icon_size(),self.get_icon_size())
+                if i == 0:
+                    if len(self._hero_icons) == 1 and self._placeable is None:
+                        hi.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+                    else:
+                        hi.set_point(FRAMEPOINT.TOPRIGHT,FRAMEPOINT.TOPRIGHT)
+                elif i == 1:
+                    if len(self._hero_icons) == 2:
+                        hi.set_point(FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMLEFT)
+                    else:
+                        hi.set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPLEFT)
+                elif i == 2:
+                    if len(self._hero_icons) == 3:
+                        hi.set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.BOTTOM)
+                    else:
+                        hi.set_point(FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMLEFT)
+                elif i == 3:
+                    hi.set_point(FRAMEPOINT.BOTTOMRIGHT,FRAMEPOINT.BOTTOMRIGHT)
+                elif i == 4:
+                    hi.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+                
+
+    def get_icon_size(self) -> int:
+        return (0.7 - 0.065 * (len(self._hero_icons) if self._placeable is None else 5)) * self.get_h()
 
     def add_placeable(self, placeable: Placeable):
         self._placeable = placeable
+        if self._placeable_widget is None:
+            self._placeable_widget = PlaceableWidget(self.get_w()*0.6,self.get_h()*0.6,placeable.get_path(),self)
+            self._placeable_widget.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
         self._placeable_widget.load_placeable(placeable)
         self._placeable_widget.set_visible(True)
 
@@ -54,7 +103,8 @@ class Tile(TileInterface):
     
     def remove_placeable(self):
         self._placeable = None
-        self._placeable_widget.set_visible(False)
+        self._placeable_widget.destroy()
+        self._placeable_widget = None
 
     def is_placed(self) -> bool:
         return self._placed
@@ -62,14 +112,8 @@ class Tile(TileInterface):
     def set_placed(self, placed: bool):
         self._placed = placed
 
-    def add_hero(self, hero: Hero):
-        self._heroes.append(hero)
-
     def is_spawn(self) -> bool:
         return self._is_spawn
-
-    def remove_hero(self, hero: Hero):
-        self._heroes.remove(hero)
 
     def get_c(self):
         return self._c
@@ -134,7 +178,7 @@ class Unknown(Tile):
     _pathing = (1,1,1,1)
     _is_spawn = False
     def __init__(self, parent: Rect, c: int, r: int) -> None:
-        super().__init__(parent, c, r)
+        super().__init__(parent, c, r,False)
 
 class Start(Tile):
     _texture = PATH + 'Start.png'

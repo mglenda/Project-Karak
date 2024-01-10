@@ -19,11 +19,10 @@ class MainScreen(Frame,KeyBoardListener):
         self._focused = None
 
     def draw(self):
-        pygame.draw.rect(self._surface,(0,0,0),(0,0,self._w,self._h))
-        c:Frame
-        for c in self.get_children():
-            if c.is_visible() and c.get_x() is not None and c.get_y() is not None:
-                self._surface.blit(c.get_surface(),(c.get_x(),c.get_y()))
+        self._surface.fill((40,40,40))
+        blits = self.get_blits_children()
+        self._surface.blits(blits)
+        pygame.display.update()
 
     def add(self, component: FrameInterface):
         return super().add(component)

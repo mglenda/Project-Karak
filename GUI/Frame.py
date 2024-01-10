@@ -27,12 +27,6 @@ class FrameInterface(Element):
     def set_abs_point(self,x: int,y :int):
         pass
 
-    def move(self,x_offset: int, y_offset: int):
-        pass
-
-    def resize(self,w: int, h:int):
-        pass
-
     def remove(self,component: Element):
         pass
 
@@ -51,22 +45,16 @@ class FrameInterface(Element):
     def _attach(self, parent: Element,att_point: int,att_point_parent: int):
         pass
 
-    def _move(self,x_offset: int, y_offset: int):
+    def move(self,x_offset: int, y_offset: int):
         pass
 
-    def _resize(self,w: int, h:int):
+    def resize(self,w: int, h:int, refresh: bool = True):
         pass
-    
-    def is_visible(self) -> bool:
-        return (self._parent is None or self._parent.is_visible()) and super().is_visible() 
-    
-    def is_active(self) -> bool:
-        return (self._parent is None or self._parent.is_active()) and super().is_active() 
-    
+
+    def set_alpha(self,alpha: int, refresh: bool = True):
+        pass
+
     def destroy(self):
-        pass
-
-    def _destroy(self):
         pass
 
     def set_parent(self,p: Element):
@@ -78,12 +66,20 @@ class FrameInterface(Element):
     def get_children(self) -> list:
         pass
 
-    def _refresh(self):
+    def get_blits_children(self) -> list:
+        pass
+
+    def refresh(self):
         pass
 
 class Frame(FrameInterface):
+    _components: list[FrameInterface]
+    _attached_elements: list[FrameInterface]
+    _attached_point: int
+    _attachet_point_parent: int
     _parent: FrameInterface
     _attached_parent: FrameInterface
+    _alpha: int
     def __init__(self,parent: FrameInterface) -> None:
         super().__init__()
         self._components = []
@@ -91,6 +87,7 @@ class Frame(FrameInterface):
         self._attached_parent = None
         self._attached_point = None
         self._attachet_point_parent = None
+        self._alpha = 255
         if parent is not None:
             parent.add(self)
         else:
@@ -106,10 +103,6 @@ class Frame(FrameInterface):
         return self._attachet_point_parent
 
     def set_point(self,att_point: int,att_point_parent: int,x_offset: int = 0, y_offset: int = 0,parent: FrameInterface = None):
-        self._set_point(att_point,att_point_parent,x_offset,y_offset,parent)
-        self.draw()
-
-    def _set_point(self,att_point: int,att_point_parent: int,x_offset: int = 0, y_offset: int = 0,parent: FrameInterface = None):
         self._deattach()
         self.set_x_offset(x_offset)
         self.set_y_offset(y_offset)
@@ -120,28 +113,32 @@ class Frame(FrameInterface):
         self._attached_point = att_point
         self._attachet_point_parent = att_point_parent
         self._attach()
-        self._set_visible(True)
+        self.set_visible(True)
 
-    def destroy(self):
-        if self._destroy():
-            GAME.get_screen().draw()
+    def get_blits_children(self) -> list:
+        children = []
+        for e in self._components:
+            if e.is_visible() and e.get_x() is not None and e.get_y() is not None:
+                children.append((e.get_surface(),(e.get_x(),e.get_y())))
+                children.extend(e.get_blits_children())
+        return children
 
     def get_children(self) -> list:
         children = []
-        e:FrameInterface
         for e in self._components:
-            children.append(e)
-            children.extend(e.get_children())
+            if e.is_visible() and e.get_x() is not None and e.get_y() is not None:
+                children.append(e)
+                children.extend(e.get_children())
         return children
     
-    def _destroy(self) -> bool:
+    def destroy(self) -> bool:
         self._deattach()
         e:FrameInterface
         for e in reversed(self._attached_elements):
             e._deattach()
 
         for e in reversed(self._components):
-            e._destroy()
+            e.destroy()
         
         was_visible:bool = self.is_visible()
         if self._parent is not None:
@@ -164,8 +161,6 @@ class Frame(FrameInterface):
         if component not in self._components:
             self._components.append(component)
             component.set_parent(self)
-        if self != GAME.get_screen():
-            GAME.get_screen().draw()
 
     def attach(self,component: FrameInterface):
         if component not in self._attached_elements:
@@ -261,7 +256,6 @@ class Frame(FrameInterface):
                 self.set_x(x)
                 self.set_y(y)
 
-                c:FrameInterface
                 for c in self._attached_elements:
                     c._attach()
 
@@ -277,13 +271,8 @@ class Frame(FrameInterface):
         self.set_x(x)
         self.set_y(y)
         self.set_visible(True)
-        self.draw()
 
-    def move(self, x_offset: int, y_offset: int):
-        self._move(x_offset,y_offset)
-        self.draw()
-
-    def _move(self,x_offset: int, y_offset: int):
+    def move(self,x_offset: int, y_offset: int):
         self._x_offset += x_offset
         self._y_offset += y_offset
 
@@ -291,12 +280,7 @@ class Frame(FrameInterface):
         for e in self._attached_elements:
             e._attach()
 
-    def resize(self, w: int, h: int):
-        self._resize(w,h)
-        self.draw()       
-
-    def _resize(self,w: int, h:int):
-        pass
+    def resize(self,w: int, h:int, refresh: bool = True):
         if w != self.get_w() or h != self.get_h():
             w_ratio = w / self.get_w()
             h_ratio = h / self.get_h()
@@ -305,8 +289,18 @@ class Frame(FrameInterface):
             self._attach()
             self._x_offset *= w_ratio
             self._y_offset *= h_ratio
-            e:FrameInterface
+
             for e in self._components:
-                e._resize(e.get_w() * w_ratio,e.get_h() * h_ratio)
+                e.resize(e.get_w() * w_ratio,e.get_h() * h_ratio)
+
+            if refresh:
+                self.refresh()
+
+    def set_alpha(self, alpha: int, refresh:bool = True):
+        if alpha != self._alpha:
+            self._surface.set_alpha(alpha)
+            for e in self._components:
+                e.set_alpha(alpha)
             
-            self._refresh()
+            if refresh:
+                self.refresh()

@@ -63,21 +63,13 @@ class Element(MouseListener):
     def get_surface(self) -> pygame.Surface:
         return self._surface
 
-    def draw(self):
-        GAME.get_screen().draw()
-
     def set_active(self,active: bool):
         self._active = active
 
     def is_active(self) -> bool:
         return self._active
-    
-    def set_visible(self,visible: bool):
-        if visible != self._visible:
-            self._set_visible(visible)
-            self.draw()
 
-    def _set_visible(self, visible:bool):
+    def set_visible(self, visible:bool):
             self._visible = visible
 
     def is_visible(self) -> bool:
@@ -99,4 +91,4 @@ class Element(MouseListener):
         return self._y_offset
     
     def collide(self,x: int,y: int) -> bool:
-        return x >= self.get_x() and x <= self.get_x() + self.get_w() and y >= self.get_y() and y <= self.get_y() + self.get_h() and self.is_visible()
+        return x >= self.get_x() and x <= self.get_x() + self.get_w() and y >= self.get_y() and y <= self.get_y() + self.get_h()

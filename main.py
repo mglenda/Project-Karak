@@ -5,9 +5,9 @@ from Game import GAME
 def main():
     pygame.display.set_caption("Karak")
     pygame.font.init()
+    pygame.Surface.blits
     GAME.start()
     _unicode_pressed: str = ''
-    now = None
     while True:
         key_pressed = False
         for event in pygame.event.get():
@@ -51,12 +51,6 @@ def main():
                 if _unicode_pressed == event.unicode:
                     _unicode_pressed = ''
                 GAME.get_screen()._on_key_released(event.key,event.unicode)
-            elif event.type == pygame.WINDOWENTER:
-                now = pygame.time.get_ticks() + 50
-
-        if now is not None and pygame.time.get_ticks() - now >= 0:
-            now = None
-            GAME.get_screen().draw()
                 
         if not key_pressed:
             keys: pygame.key.ScancodeWrapper = pygame.key.get_pressed()
@@ -64,8 +58,7 @@ def main():
                 GAME.get_screen()._on_key_hold(keys,_unicode_pressed)
 
         GAME.run_timers()
-
-        pygame.display.update()
+        GAME.get_screen().draw()
         pygame.time.Clock().tick(120)
 
 if __name__ == "__main__":
