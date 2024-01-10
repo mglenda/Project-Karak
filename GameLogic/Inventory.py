@@ -5,14 +5,28 @@ MAX_KEYS = 1
 MAX_SCROLLS = 3
 
 class Inventory():
-    _keys = []
-    _weapons = []
-    _scrolls = []
+    _keys = list[Item]
+    _weapons = list[Item]
+    _scrolls = list[Item]
+    _stacks_allowed = dict
 
     def __init__(self) -> None:
-        pass
+        self._weapons: list[Item] = [None,None]
+        self._keys: list[Item] = [None]
+        self._scrolls: list[Item] = [None,None,None]
+        self._stacks_allowed = {}
 
-    def add(self,item:Item) -> bool:
+    def set_allowed_stacks(self, item: Item, stacks: int):
+        item = item if not isinstance(item,Item) else item.__class__
+        self._stacks_allowed[item] = stacks if stacks >= 0 else 0
+
+    def get_allowed_stacks(self, item: Item):
+        item = item if not isinstance(item,Item) else item.__class__
+        if item in self._stacks_allowed.keys():
+            return self._stacks_allowed[item]
+        return 1
+
+    def add(self, item: Item) -> bool:
         if self.has_free_slot(item):
             if item.get_type() == TYPE_KEY:
                 self.add_key(item)
@@ -20,38 +34,49 @@ class Inventory():
                 self.add_scroll(item)
             elif item.get_type() == TYPE_WEAPON:
                 self.add_weapon(item)
+            return True
+        return False
     
     def has_free_slot(self, item: Item) -> bool:
         if item.get_type() == TYPE_KEY:
             return self.has_free_key_slot()
         elif item.get_type() == TYPE_SCROLL:
-            return self.has_free_scrol_slot()
+            return self.has_free_scroll_slot()
         elif item.get_type() == TYPE_WEAPON:
             return self.has_free_weapon_slot()
         
+    def get_weapons(self) -> list[Item]:
+        return self._weapons
+    
+    def get_scrolls(self) -> list[Item]:
+        return self._scrolls
+    
+    def get_keys(self) -> list[Item]:
+        return self._keys
+        
     def add_weapon(self, weapon:Item):
-        self._weapons.append(weapon)
+        for i,w in enumerate(self._weapons):
+            if w == None:
+                self._weapons[i] = weapon
+                break
 
     def add_scroll(self, scroll:Item):
-        self._scrolls.append(scroll)
+        for i,w in enumerate(self._scrolls):
+            if w == None:
+                self._scrolls[i] = scroll
+                break
 
     def add_key(self, key:Item):
-        self._keys.append(key)
+        for i,w in enumerate(self._keys):
+            if w == None:
+                self._keys[i] = key
+                break
 
     def has_free_weapon_slot(self) -> bool:
-        return self.get_weapons_count() < MAX_WEAPONS
+        return len(self._weapons) < MAX_WEAPONS
     
     def has_free_key_slot(self) -> bool:
-        return self.get_keys_count() < MAX_KEYS
+        return len(self._weapons) < MAX_KEYS
     
-    def has_free_scrol_slot(self) -> bool:
-        return self.get_scrolls_count() < MAX_SCROLLS
-    
-    def get_weapons_count(self) -> int:
-        return len(self._weapons)
-    
-    def get_keys_count(self) -> int:
-        return len(self._keys)
-    
-    def get_scrolls_count(self) -> int:
-        return len(self._scrolls)
+    def has_free_scroll_slot(self) -> bool:
+        return len(self._weapons) < MAX_SCROLLS

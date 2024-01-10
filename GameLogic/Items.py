@@ -12,9 +12,13 @@ class Item(Placeable):
     _ability: Ability.Ability
     _type: int
     _bonus: float
+    _background: str
+    _stacks: int
 
     def __init__(self) -> None:
-        pass
+        if self.__class__._ability is not None:
+            self._ability = self.__class__._ability()
+            self._stacks = 1
 
     def get_type(self) -> int:
         return self._type
@@ -23,7 +27,13 @@ class Item(Placeable):
         return self._ability
     
     def get_bonus(self) -> float:
-        return self._bonus
+        return self._bonus * self._stacks
+    
+    def get_icon(self) -> str:
+        return self._background
+    
+    def get_stacks(self) -> int:
+        return self._stacks
 
 class Dagger(Item):
     _type: int = TYPE_WEAPON
@@ -53,7 +63,7 @@ class Axe(Item):
         super().__init__()
 
 class Key(Item):
-    _ability: Ability.Ability = Ability.UnlockChest()
+    _ability: Ability.Ability = Ability.UnlockChest
     _type:int = TYPE_KEY
     _bonus: float = 0.0
     _background: str = PATH + 'Key.png'
@@ -80,7 +90,7 @@ class DragonChest(Item):
         super().__init__()  
 
 class MagicBolt(Item):
-    _ability: Ability.Ability = Ability.MagicBolt()
+    _ability: Ability.Ability = Ability.MagicBolt
     _type:int = TYPE_SCROLL
     _bonus: float = 0.0
     _background: str = PATH + 'MagicBolt.png'
@@ -89,7 +99,7 @@ class MagicBolt(Item):
         super().__init__()
 
 class ThornOfDarkness(Item):
-    _ability: Ability.Ability = Ability.ThornOfDarkness()
+    _ability: Ability.Ability = Ability.ThornOfDarkness
     _type:int = TYPE_SCROLL
     _bonus: float = 0.0
     _background: str = PATH + 'ThornOfDarkness.png'
@@ -98,7 +108,7 @@ class ThornOfDarkness(Item):
         super().__init__()
 
 class HealingPortal(Item):
-    _ability: Ability.Ability = Ability.HealingPortal()
+    _ability: Ability.Ability = Ability.HealingPortal
     _type:int = TYPE_SCROLL
     _bonus: float = 0.0
     _background: str = PATH + 'HealingPortal.png'
@@ -107,7 +117,7 @@ class HealingPortal(Item):
         super().__init__()
 
 class FrostFist(Item):
-    _ability: Ability.Ability = Ability.FrostFist()
+    _ability: Ability.Ability = Ability.FrostFist
     _type:int = TYPE_SCROLL
     _bonus: float = 0.0
     _background: str = PATH + 'FrostFist.png'

@@ -1,5 +1,5 @@
 from GUI.Frame import Frame,FRAMEPOINT
-from GUI.GraphicComponents import Image,TextField
+from GUI.GraphicComponents import Image,TextField,FONT_PATH_NUMBERS
 from GUI.HeroWidget import HeroWidget
 from GameLogic.Player import Player
 PATH = '_Textures\\PlayerPanel\\'
@@ -12,6 +12,15 @@ class ScrollSlot(Image):
         self._icon = Image(self.get_w()*0.8,self.get_h()*0.8,'_Textures\\Items\\Retextured\\FrostFist.png',self)
         self._icon.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
 
+        self._power_wheel = Image(w=self.get_w()*0.32,h=self.get_h()*0.32,path='_Textures\\PowerWheel.png',parent=self)
+        self._power_wheel.set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPLEFT,x_offset=self.get_w()*0.0424,y_offset=self.get_h()*0.0424)
+
+        self._power_text = TextField(parent=self._power_wheel,font_size=30,text='1',font_path=FONT_PATH_NUMBERS)
+        self._power_text.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+
+        self._power_text.resize(self.get_w()*0.24,self.get_h()*0.24)
+
+        self._power_wheel.set_visible(False)
 
 class WeaponSlot(Image):
     _icon: Image
@@ -21,6 +30,16 @@ class WeaponSlot(Image):
         self._icon = Image(self.get_w()*0.8,self.get_h()*0.8,'_Textures\\Items\\Retextured\\Axe.png' ,self)
         self._icon.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
 
+        self._power_wheel = Image(w=self.get_w()*0.32,h=self.get_h()*0.32,path='_Textures\\PowerWheel.png',parent=self)
+        self._power_wheel.set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPLEFT,x_offset=self.get_w()*0.0424,y_offset=self.get_h()*0.0424)
+
+        self._power_text = TextField(parent=self._power_wheel,font_size=30,text='1',font_path=FONT_PATH_NUMBERS)
+        self._power_text.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+
+        self._power_text.resize(self.get_w()*0.24,self.get_h()*0.24)
+
+        self._power_wheel.set_visible(False)
+
 
 class KeySlot(Image):
     _icon: Image
@@ -29,6 +48,16 @@ class KeySlot(Image):
 
         self._icon = Image(self.get_w()*0.8,self.get_h()*0.8,'_Textures\\Items\\Retextured\\Key.png',self)
         self._icon.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+
+        self._power_wheel = Image(w=self.get_w()*0.32,h=self.get_h()*0.32,path='_Textures\\PowerWheel.png',parent=self)
+        self._power_wheel.set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPLEFT,x_offset=self.get_w()*0.0424,y_offset=self.get_h()*0.0424)
+
+        self._power_text = TextField(parent=self._power_wheel,font_size=30,text='10',font_path=FONT_PATH_NUMBERS)
+        self._power_text.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+
+        self._power_text.resize(self.get_w()*0.24,self.get_h()*0.24)
+
+        self._power_wheel.set_visible(False)
 
 class HealthSlot(Image):
     _icon: Image
@@ -106,9 +135,44 @@ class PlayerPanel(Image):
         self._hero_widget.load_hero(player.get_hero())
         self._player_name_text.set_text(player.get_name())
 
-        hs: HealthSlot
         for i,hs in enumerate(self._health_slots):
             if i >= player.get_hero().get_hit_points():
                 hs.set_negative()
             else:
                 hs.set_positive()
+
+        for i,k in enumerate(player.get_hero().get_keys()):
+            if k is not None:
+                self._key_slot._icon.set_texture(k.get_icon())
+                self._key_slot._icon.set_visible(True)
+                if k.get_stacks() > 1:
+                    self._key_slot._power_wheel.set_visible(True)
+                    self._key_slot._power_text.set_text(k.get_stacks())
+                else:
+                    self._key_slot._power_wheel.set_visible(False)
+            else:
+                self._key_slot._icon.set_visible(False)
+
+        for i,k in enumerate(player.get_hero().get_weapons()):
+            if k is not None:
+                self._weapon_slots[i]._icon.set_texture(k.get_icon())
+                self._weapon_slots[i]._icon.set_visible(True)
+                if k.get_stacks() > 1:
+                    self._weapon_slots[i]._power_wheel.set_visible(True)
+                    self._weapon_slots[i]._power_text.set_text(k.get_stacks())
+                else:
+                    self._weapon_slots[i]._power_wheel.set_visible(False)
+            else:
+                self._weapon_slots[i]._icon.set_visible(False)
+
+        for i,k in enumerate(player.get_hero().get_scrolls()):
+            if k is not None:
+                self._scroll_slots[i]._icon.set_texture(k.get_icon())
+                self._scroll_slots[i]._icon.set_visible(True)
+                if k.get_stacks() > 1:
+                    self._scroll_slots[i]._power_wheel.set_visible(True)
+                    self._scroll_slots[i]._power_text.set_text(k.get_stacks())
+                else:
+                    self._scroll_slots[i]._power_wheel.set_visible(False)
+            else:
+                self._scroll_slots[i]._icon.set_visible(False)

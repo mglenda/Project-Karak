@@ -9,7 +9,8 @@ class Minion(Placeable):
     _agressive: bool
 
     def __init__(self) -> None:
-        pass
+        if self.__class__._reward is not None:
+            self._reward = self.__class__._reward()
 
     def get_power(self) -> int:
         return self._power
@@ -25,7 +26,7 @@ class Minion(Placeable):
 
 class Rat(Minion):
     _power: int = 5
-    _reward: Items.Item = Items.Dagger()
+    _reward: Items.Item = Items.Dagger
     _background:str = PATH + 'Rat.png'
     _agressive: bool = True
 
@@ -34,7 +35,7 @@ class Rat(Minion):
 
 class Dragon(Minion):
     _power: int = 15
-    _reward: Items.Item = Items.DragonChest()
+    _reward: Items.Item = Items.DragonChest
     _background:str = PATH + 'Dragon.png'
     _agressive: bool = True
 
@@ -43,7 +44,7 @@ class Dragon(Minion):
 
 class Fiend(Minion):
     _power: int = 12
-    _reward: Items.Item = Items.Chest()
+    _reward: Items.Item = Items.Chest
     _background:str = PATH + 'Fiend.png'
     _agressive: bool = True
 
@@ -52,7 +53,7 @@ class Fiend(Minion):
 
 class GiantBat(Minion):
     _power: int = 6
-    _reward: Items.Item = Items.ThornOfDarkness()
+    _reward: Items.Item = Items.ThornOfDarkness
     _background:str = PATH + 'GiantBat.png'
     _agressive: bool = True
 
@@ -61,7 +62,7 @@ class GiantBat(Minion):
 
 class GiantSpider(Minion):
     _power: int = 6
-    _reward: Items.Item = Items.HealingPortal()
+    _reward: Items.Item = Items.HealingPortal
     _background:str = PATH + 'GiantSpider.png'
     _agressive: bool = True
 
@@ -70,7 +71,7 @@ class GiantSpider(Minion):
 
 class ChestClosed(Minion):
     _power: int = 0
-    _reward: Items.Item = Items.Chest()
+    _reward: Items.Item = Items.Chest
     _background:str = PATH + 'ChestClosed.png'
     _agressive: bool = False
 
@@ -79,7 +80,7 @@ class ChestClosed(Minion):
 
 class Mummy(Minion):
     _power: int = 7
-    _reward: Items.Item = Items.MagicBolt()
+    _reward: Items.Item = Items.MagicBolt
     _background:str = PATH + 'Mummy.png'
     _agressive: bool = True
 
@@ -88,7 +89,7 @@ class Mummy(Minion):
 
 class SkeletonKeymaster(Minion):
     _power: int = 8
-    _reward: Items.Item = Items.Key()
+    _reward: Items.Item = Items.Key
     _background:str = PATH + 'SkeletonKeymaster.png'
     _agressive: bool = True
 
@@ -97,7 +98,7 @@ class SkeletonKeymaster(Minion):
 
 class SkeletonKing(Minion):
     _power: int = 10
-    _reward: Items.Item = Items.Axe()
+    _reward: Items.Item = Items.Axe
     _background:str = PATH + 'SkeletonKing.png'
     _agressive: bool = True
 
@@ -106,7 +107,7 @@ class SkeletonKing(Minion):
 
 class SkeletonMage(Minion):
     _power: int = 11
-    _reward: Items.Item = Items.FrostFist()
+    _reward: Items.Item = Items.FrostFist
     _background:str = PATH + 'SkeletonMage.png'
     _agressive: bool = True
 
@@ -115,7 +116,7 @@ class SkeletonMage(Minion):
 
 class SkeletonWarrior(Minion):
     _power: int = 9
-    _reward: Items.Item = Items.Sword()
+    _reward: Items.Item = Items.Sword
     _background:str = PATH + 'SkeletonWarrior.png'
     _agressive: bool = True
 

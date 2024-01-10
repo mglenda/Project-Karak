@@ -30,6 +30,15 @@ class Hero():
         self._tile = None
         self.reload_abilities()
 
+    def get_weapons(self) -> list[Items.Item]:
+        return self._inventory.get_weapons()
+    
+    def get_scrolls(self) -> list[Items.Item]:
+        return self._inventory.get_scrolls()
+    
+    def get_keys(self) -> list[Items.Item]:
+        return self._inventory.get_keys()
+
     def set_tile(self, tile: TileInterface):
         if self._tile is not None:
             self._tile.remove_hero(self)
@@ -71,12 +80,6 @@ class Hero():
             self._chests += item.get_bonus()
             return True
         return self._inventory.add(item)
-    
-    def get_item(self,item_type:Items.Item):
-        return self._inventory.get(item_type=item_type)
-    
-    def remove_item(self,item:Items.Item):
-        self._inventory.remove(item)
 
     def is_cursed(self) -> bool:
         return self._cursed

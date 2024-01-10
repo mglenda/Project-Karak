@@ -66,7 +66,6 @@ class CastleScreen(Rect,KeyBoardListener):
             self.load_action_options()
 
     def player_turn_end(self):
-        self.get_current_hero().hurt()
         p = self._player_order[0]
         self._player_order.remove(p)
         self._player_order.append(p)
