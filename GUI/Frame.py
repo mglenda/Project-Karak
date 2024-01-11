@@ -79,7 +79,7 @@ class Frame(FrameInterface):
     _attachet_point_parent: int
     _parent: FrameInterface
     _attached_parent: FrameInterface
-    _alpha: int
+    _alpha: int = 255
     def __init__(self,parent: FrameInterface) -> None:
         super().__init__()
         self._components = []
@@ -87,7 +87,6 @@ class Frame(FrameInterface):
         self._attached_parent = None
         self._attached_point = None
         self._attachet_point_parent = None
-        self._alpha = 255
         if parent is not None:
             parent.add(self)
         else:
@@ -298,7 +297,7 @@ class Frame(FrameInterface):
 
     def set_alpha(self, alpha: int, refresh:bool = True):
         if alpha != self._alpha:
-            self._surface.set_alpha(alpha)
+            self._alpha = alpha
             for e in self._components:
                 e.set_alpha(alpha)
             

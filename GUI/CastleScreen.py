@@ -65,6 +65,20 @@ class CastleScreen(Rect,KeyBoardListener):
             self.center_camera(self._cur_player)
             self.load_action_options()
 
+    def load_action_options(self):
+        hero: Hero = self.get_current_hero()
+
+        if isinstance(hero.get_tile().get_placeable(),Minions.Minion) and hero.get_tile().get_placeable().is_aggresive():
+            GAME.get_combat_screen().set_visible(True)
+
+        else:
+            tile: Tile
+            for _,tile in self._tilemap.items():
+                if self.are_tiles_accesible(hero.get_tile(),tile):
+                    tile.set_active(True)
+                else:
+                    tile.set_active(False)
+
     def player_turn_end(self):
         p = self._player_order[0]
         self._player_order.remove(p)
@@ -91,16 +105,6 @@ class CastleScreen(Rect,KeyBoardListener):
 
     def roll_end(self):
         print(self._dr.roll())
-
-    def load_action_options(self):
-        hero: Hero = self.get_current_hero()
-
-        tile: Tile
-        for _,tile in self._tilemap.items():
-            if self.are_tiles_accesible(hero.get_tile(),tile):
-                tile.set_active(True)
-            else:
-                tile.set_active(False)
 
     def disable_all_tiles(self):
         tile: Tile
@@ -258,6 +262,7 @@ class CastleScreen(Rect,KeyBoardListener):
 
     def _on_mouse_left_click(self, x, y):
         self._is_pressed = False
+        self.dice_roll(DICE_NORMAL,DICE_NORMAL,DICE_NORMAL,DICE_WARLOCK,DICE_WARLOCK)
 
     def _on_mouse_leave(self):
         self._is_pressed = False

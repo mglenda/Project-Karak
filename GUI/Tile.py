@@ -33,11 +33,13 @@ class Tile(TileInterface):
             self._placeable = None
             self._placed = False
 
-        self._active_layer = Image(self.get_w(),self.get_h(),PATH + 'FocusedLayer.png',self)
+        self._active_layer = Rect(self.get_w(),self.get_h(),(0,150,0),self)
         self._active_layer.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+        self._active_layer.set_alpha(100)
 
-        self._press_layer = Image(self.get_w(),self.get_h(),PATH + 'FocusedLayer.png',self)
+        self._press_layer = Rect(self.get_w(),self.get_h(),(0,150,0),self)
         self._press_layer.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+        self._press_layer.set_alpha(100)
 
         self._press_layer.set_visible(False)
         self._active_layer.set_visible(False)

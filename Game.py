@@ -36,7 +36,13 @@ class Game():
         self.castle = CastleScreen()
         self.screen.set_focus(self.castle)
 
-        from GUI.PlayerPanel import PlayerPanel,FRAMEPOINT
+        from GUI.CombatScreen import CombatScreen,FRAMEPOINT
+
+        self.combat_screen = CombatScreen(self.screen.get_h(),self.screen.get_h(),self.screen)
+        self.combat_screen.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+        self.combat_screen.set_visible(False)
+
+        from GUI.PlayerPanel import PlayerPanel
         h = self.screen.get_h() * 0.24
         w = h * 1.58
         for pl in self.players.get_all():
@@ -58,6 +64,9 @@ class Game():
                     p.set_point(FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMRIGHT,p.get_w() / 5,0,self.player_panels[i-1])
 
         self.screen.draw()
+
+    def get_combat_screen(self):
+        return self.combat_screen
 
     def get_player_panels(self) -> list:
         return self.player_panels

@@ -1,6 +1,7 @@
 import pygame
 from pygame.surface import Surface as Surface
 from GUI.Frame import Frame,FRAMEPOINT
+from GameLogic.Placeable import Placeable
 
 FONT_PATH_NUMBERS = 'Fonts\\Carre-JWja.ttf'
 FONT_PATH_REGULAR = 'Fonts\\BreatheFireIii-PKLOB.ttf'
@@ -24,6 +25,9 @@ class Rect(Frame):
     def refresh(self):
         self._surface = pygame.Surface((self._w,self._h))
         self._surface.fill(self._color)
+        if self._alpha < 255:
+            self._surface.convert_alpha()
+            self._surface.set_alpha(self._alpha)
 
     def get_tilesize(self) -> int:
         pass
@@ -120,6 +124,9 @@ class TextField(Frame):
         self.set_w(self._surface.get_width())
         self.set_h(self._surface.get_height())
         self._attach()
+        if self._alpha < 255:
+            self._surface.convert_alpha()
+            self._surface.set_alpha(self._alpha)
 
     def resize(self, w: int, h: int):
         if w != self.get_w() or h != self.get_h():
@@ -129,6 +136,9 @@ class TextField(Frame):
             self.set_h(h)
             self._surface = pygame.transform.scale(self._stored,(self._w,self._h))
             self._attach()
+            if self._alpha < 255:
+                self._surface.convert_alpha()
+                self._surface.set_alpha(self._alpha)
 
 class TileInterface(Image):
     _texture: str
@@ -168,4 +178,34 @@ class TileInterface(Image):
         pass
 
     def remove_hero(self, hero):
+        pass
+
+    def add_hero(self, hero):
+        pass
+
+    def remove_hero(self, hero):
+        pass
+
+    def reattach_hero_icons(self):
+        pass
+                
+    def get_icon_size(self) -> int:
+        pass
+
+    def add_placeable(self, placeable: Placeable):
+        pass
+
+    def get_placeable(self) -> Placeable:
+        pass
+    
+    def remove_placeable(self):
+        pass
+
+    def is_placed(self) -> bool:
+        pass
+    
+    def set_placed(self, placed: bool):
+        pass
+
+    def is_spawn(self) -> bool:
         pass
