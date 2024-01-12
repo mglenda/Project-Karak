@@ -1,9 +1,10 @@
 import GameLogic.Items as Items
 from GameLogic.Placeable import Placeable
+from GameLogic.Combatiant import Combatiant
 
 PATH = '_Textures\\Minions\\Retextured\\'
 
-class Minion(Placeable):
+class Minion(Placeable,Combatiant):
     _power: int
     _reward: Items.Item
     _agressive: bool
@@ -23,6 +24,9 @@ class Minion(Placeable):
     
     def is_aggresive(self) -> bool:
         return self._agressive
+    
+    def get_icon(self) -> str:
+        return self._background
 
 class Rat(Minion):
     _power: int = 5

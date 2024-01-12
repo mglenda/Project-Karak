@@ -19,7 +19,8 @@ class HeroWidget(Image):
 
         a: Ability
         for a in hero._abilities:
-            self.load_ability(a)
+            if a._hero_card:
+                self.load_ability(a)
         
         self.attach_ability_widgets()
 

@@ -16,8 +16,9 @@ class Item(Placeable):
     _stacks: int
 
     def __init__(self) -> None:
+        self._user = None
         if self.__class__._ability is not None:
-            self._ability = self.__class__._ability()
+            self._ability = self.__class__._ability(self)
             self._stacks = 1
 
     def get_type(self) -> int:
@@ -34,6 +35,16 @@ class Item(Placeable):
     
     def get_stacks(self) -> int:
         return self._stacks
+    
+    def set_stacks(self, stacks: int):
+        self._stacks = stacks
+
+    def set_hero(self, hero):
+        self._hero = hero
+
+    def get_hero(self):
+        return self._hero
+
 
 class Dagger(Item):
     _type: int = TYPE_WEAPON

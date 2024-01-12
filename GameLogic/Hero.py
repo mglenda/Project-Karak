@@ -2,15 +2,16 @@ from GameLogic.Inventory import Inventory
 import GameLogic.Ability as Ability
 import GameLogic.Items as Items
 from GUI.GraphicComponents import TileInterface
+from GameLogic.Combatiant import Combatiant
 
 MAX_HP = 5
 DEF_MOVE_POINTS = 4
 PATH = '_Textures\\Heroes\\Retextured\\'
 ICON_PATH = '_Textures\\Heroes\\MyIcons\\'
 
-class Hero():
+class Hero(Combatiant):
     _inventory: Inventory
-    _abilities: list
+    _abilities: list[Ability.Ability]
     _cursed: bool
     _hit_points: int
     _alive: bool
@@ -21,7 +22,7 @@ class Hero():
     _tile: TileInterface
 
     def __init__(self) -> None:
-        self._inventory = Inventory()
+        self._inventory = Inventory(self)
         self._cursed = False
         self._hit_points = MAX_HP
         self._alive = True
@@ -29,6 +30,36 @@ class Hero():
         self._move_points = DEF_MOVE_POINTS
         self._tile = None
         self.reload_abilities()
+
+    def get_abilities(self) -> list[Ability.Ability]:
+        abilities = []
+
+        if not self.is_cursed():
+            for a in self._abilities:
+                abilities.append(a)
+        
+        for i in self._inventory.get_weapons():
+            if i is not None:
+                if i.get_ability() != None:
+                    abilities.append(i.get_ability())
+
+        for i in self._inventory.get_keys():
+            if i is not None:
+                if i.get_ability() != None:
+                    abilities.append(i.get_ability())
+        
+        for i in self._inventory.get_scrolls():
+            if i is not None:
+                if i.get_ability() != None:
+                    abilities.append(i.get_ability())
+
+        return abilities
+
+    def get_icon(self) -> str:
+        return self._icon
+
+    def get_power(self) -> int:
+        return 0
 
     def get_weapons(self) -> list[Items.Item]:
         return self._inventory.get_weapons()
@@ -50,9 +81,9 @@ class Hero():
 
     def reload_abilities(self):
         self._abilities = []
-        a:Ability.Ability
+        self._abilities.append(Ability.RollDice(self))
         for a in self.__class__._abilities:
-            self._abilities.append(a())
+            self._abilities.append(a(self))
 
     def add_ability(self,ability:Ability.Ability):
         if ability not in self._abilities:
@@ -64,16 +95,29 @@ class Hero():
             if isinstance(a,ability):
                 self._abilities.remove(a)
 
-    def has_ability(self,ability:Ability.Ability):
-        if not self._cursed:
+    def has_ability(self,ability:Ability.Ability) -> bool:
+        if not self.is_cursed():
             for a in self._abilities:
-                if type(a) == ability:
+                if isinstance(a,ability):
                     return True
-        i:Items.Item
-        for i in self._inventory.get_items():
-            if type(i.get_ability()) == ability:
-                return True            
+        
+        for i in self._inventory.get_keys():
+            if i is not None:
+                if isinstance(i.get_ability(),ability):
+                    return True
+        
+        for i in self._inventory.get_weapons():
+            if i is not None:
+                if isinstance(i.get_ability(),ability):
+                    return True
+            
+        for i in self._inventory.get_scrolls():
+            if i is not None:
+                if isinstance(i.get_ability(),ability):
+                    return True
+            
         return False
+            
 
     def add_item(self,item:Items.Item) -> bool:
         if item.get_type() == Items.TYPE_CHEST:
@@ -83,9 +127,6 @@ class Hero():
 
     def is_cursed(self) -> bool:
         return self._cursed
-    
-    def get_abilities(self) -> list:
-        return self._abilities
     
     def is_alive(self) -> bool:
         return self._alive

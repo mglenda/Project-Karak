@@ -9,12 +9,12 @@ class Inventory():
     _weapons = list[Item]
     _scrolls = list[Item]
     _stacks_allowed = dict
-
-    def __init__(self) -> None:
+    def __init__(self, hero) -> None:
         self._weapons: list[Item] = [None,None]
         self._keys: list[Item] = [None]
         self._scrolls: list[Item] = [None,None,None]
         self._stacks_allowed = {}
+        self._hero = hero
 
     def set_allowed_stacks(self, item: Item, stacks: int):
         item = item if not isinstance(item,Item) else item.__class__
@@ -34,6 +34,7 @@ class Inventory():
                 self.add_scroll(item)
             elif item.get_type() == TYPE_WEAPON:
                 self.add_weapon(item)
+            item.set_hero(self._hero)
             return True
         return False
     

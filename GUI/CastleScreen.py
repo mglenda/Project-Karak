@@ -10,6 +10,7 @@ from GameLogic.DiceRoller import DiceRoller,DICE_NORMAL,DICE_WARLOCK
 from GameLogic.Player import Player
 from GameLogic.Hero import Hero
 from GameLogic.Placeable import Placeable
+from GameLogic.Ability import STAGE_ALWAYS,STAGE_EXPLORING,STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH,STAGE_TURNBEGIN
 import GameLogic.Items as Items
 import GameLogic.Minion as Minions
 from Game import GAME
@@ -21,13 +22,14 @@ class CastleScreen(Rect,KeyBoardListener):
     _motion_y: int
     _is_pressed: bool
     _zoom: float
-    _player_order: list
+    _player_order: list[Player]
     _cur_player: Player
     _tilemap: dict
     _tilepack: TilePack
     _minionpack: MinionPack
     _tilesize: int
     _dr: DiceRoller
+    _stage: int
     def __init__(self) -> None:
         super().__init__(GAME.screen.get_w(), GAME.screen.get_h(), (40,40,40), GAME.screen)
         self._tilesize = self.get_h() * 0.12
@@ -54,30 +56,41 @@ class CastleScreen(Rect,KeyBoardListener):
 
         self.place_tile(self._start_tile,False)
         self.load_action_options()
+        self._stage = STAGE_TURNBEGIN
+        self._cur_player.get_hero().add_item(Items.MagicBolt())
+        self._cur_player.get_hero().add_item(Items.FrostFist())
+        self._cur_player.get_hero().add_item(Items.MagicBolt())
+
+    def get_stage(self) -> int:
+        return self._stage
+    
+    def set_stage(self, stage: int):
+        self._stage = stage
+        GAME.get_abilities_panel().reload()
 
     def move_to_tile(self, tile: Tile):
         hero: Hero = self.get_current_hero()
         hero.move(tile)
 
-        if hero.get_move_points() <= 0:
-            self.player_turn_end()
+        if isinstance(hero.get_tile().get_placeable(),Minions.Minion) and tile.get_placeable().is_aggresive():
+            GAME.get_combat_screen().set_visible(True)
+            GAME.get_combat_screen()._load(hero,tile.get_placeable())
         else:
-            self.center_camera(self._cur_player)
-            self.load_action_options()
+            if hero.get_move_points() <= 0:
+                self.player_turn_end()
+            else:
+                self.center_camera(self._cur_player)
+                self.load_action_options()
 
     def load_action_options(self):
         hero: Hero = self.get_current_hero()
 
-        if isinstance(hero.get_tile().get_placeable(),Minions.Minion) and hero.get_tile().get_placeable().is_aggresive():
-            GAME.get_combat_screen().set_visible(True)
-
-        else:
-            tile: Tile
-            for _,tile in self._tilemap.items():
-                if self.are_tiles_accesible(hero.get_tile(),tile):
-                    tile.set_active(True)
-                else:
-                    tile.set_active(False)
+        tile: Tile
+        for _,tile in self._tilemap.items():
+            if self.are_tiles_accesible(hero.get_tile(),tile):
+                tile.set_active(True)
+            else:
+                tile.set_active(False)
 
     def player_turn_end(self):
         p = self._player_order[0]
@@ -262,7 +275,6 @@ class CastleScreen(Rect,KeyBoardListener):
 
     def _on_mouse_left_click(self, x, y):
         self._is_pressed = False
-        self.dice_roll(DICE_NORMAL,DICE_NORMAL,DICE_NORMAL,DICE_WARLOCK,DICE_WARLOCK)
 
     def _on_mouse_leave(self):
         self._is_pressed = False
