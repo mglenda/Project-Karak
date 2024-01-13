@@ -59,6 +59,14 @@ class RollDice(Ability):
     def __init__(self, user) -> None:
         super().__init__(user)
 
+    def is_usable(self) -> bool:
+        return GAME.get_castle().get_stage() == STAGE_FIGHT_START and self._active
+    
+    def use(self):
+        GAME.get_combat_screen().dice_roll()
+        self._active = False
+        super().use()
+
 class MagicalAffinity(Ability):
     _passive: bool = True
     _background: str = PATH + 'MagicalAffinity.png'
@@ -130,6 +138,14 @@ class DoubleAttack(Ability):
 
     def __init__(self, user) -> None:
         super().__init__(user)
+
+    def is_usable(self) -> bool:
+        return GAME.get_castle().get_stage() == STAGE_FIGHT_END and self._active
+    
+    def use(self):
+        GAME.get_combat_screen().dice_roll()
+        self._active = False
+        super().use()
 
 class Eavesdropping(Ability):
     _passive: bool = False
@@ -300,11 +316,11 @@ class MagicBolt(Ability):
     def use(self):
         from GameLogic.Items import Item
         if isinstance(self._user,Item):
-            GAME.get_combat_screen().set_modifier(1,MODIFIER_SCROLL,self._user.get_hero())
+            GAME.get_combat_screen().inc_modifier(1,MODIFIER_SCROLL,self._user.get_hero())
             if not self._user.get_hero().has_ability(MagicalAffinity):
                 self._user.set_stacks(self._user.get_stacks() - 1)
         else:
-            GAME.get_combat_screen().set_modifier(1,MODIFIER_SCROLL,self._user)
+            GAME.get_combat_screen().inc_modifier(1,MODIFIER_SCROLL,self._user)
         self._active = False
         super().use()
 
@@ -348,10 +364,10 @@ class FrostFist(Ability):
     def use(self):
         from GameLogic.Items import Item
         if isinstance(self._user,Item):
-            GAME.get_combat_screen().set_modifier(2,MODIFIER_SCROLL,self._user.get_hero())
+            GAME.get_combat_screen().inc_modifier(2,MODIFIER_SCROLL,self._user.get_hero())
             if not self._user.get_hero().has_ability(MagicalAffinity):
                 self._user.set_stacks(self._user.get_stacks() - 1)
         else:
-            GAME.get_combat_screen().set_modifier(2,MODIFIER_SCROLL,self._user)
+            GAME.get_combat_screen().inc_modifier(2,MODIFIER_SCROLL,self._user)
         self._active = False
         super().use()

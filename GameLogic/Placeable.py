@@ -5,3 +5,6 @@ class Placeable():
 
     def get_path(self) -> str:
         return self._background
+    
+    def is_aggresive(self) -> bool:
+        pass

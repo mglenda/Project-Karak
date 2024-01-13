@@ -54,6 +54,25 @@ class Hero(Combatiant):
                     abilities.append(i.get_ability())
 
         return abilities
+    
+    def refresh_abilities(self):
+        for a in self._abilities:
+                a.set_active(True)
+        
+        for i in self._inventory.get_weapons():
+            if i is not None:
+                if i.get_ability() != None:
+                    i.get_ability().set_active(True)
+
+        for i in self._inventory.get_keys():
+            if i is not None:
+                if i.get_ability() != None:
+                    i.get_ability().set_active(True)
+        
+        for i in self._inventory.get_scrolls():
+            if i is not None:
+                if i.get_ability() != None:
+                    i.get_ability().set_active(True)
 
     def get_icon(self) -> str:
         return self._icon

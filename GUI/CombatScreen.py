@@ -1,10 +1,13 @@
 from GUI.Frame import Frame,FRAMEPOINT
 from GUI.GraphicComponents import Rect,Image,TextField
+from GUI.Button import Button,BUTTON_CLASSIC_YELLOW
+from GUI._const_mouseevents import LEFTCLICK
 from GUI._const_combat_modifiers import MODIFIER_ABILITY,MODIFIER_BASE,MODIFIER_DICE,MODIFIER_SCROLL
-from GameLogic.Hero import Warrior,Hero
-from GameLogic.Minion import SkeletonMage,Minion
+from GameLogic.Hero import Hero
+from GameLogic.Minion import Minion
 from GameLogic.Combatiant import Combatiant
-from GameLogic.Ability import STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH
+from GameLogic.Ability import STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH,STAGE_FIGHT_AFTERMATH
+from GameLogic.DiceRoller import DiceRoller,DICE_NORMAL,DICE_WARLOCK
 from Game import GAME
 
 PATH = '_Textures\\CombatScreen\\'
@@ -47,8 +50,11 @@ class CombatModifier(Rect):
         self._text.set_point(FRAMEPOINT.LEFT,FRAMEPOINT.RIGHT,w*0.3,0,self._icon)
 
     def set_power(self, power: int):
-        self._power += power
+        self._power = power
         self._text.set_text(str(self._power))
+
+    def get_power(self) -> int:
+        return self._power
 
 class CombatScreen(Rect):
     _modifiers_1: list[CombatModifier]
@@ -61,6 +67,7 @@ class CombatScreen(Rect):
     _combatiant_1: Combatiant
     _combatiant_2: Combatiant
     _active_combatant: Combatiant
+    _end_turn_button: Button
 
     def __init__(self, w: int, h: int, parent: Frame) -> None:
         self._alpha = 230
@@ -69,10 +76,10 @@ class CombatScreen(Rect):
         self._combat_icon = Image(self.get_h()*0.10,self.get_h()*0.10,PATH + 'CombatIcon.png',self)
         self._combat_icon.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER,0,-self.get_h()*0.3)
 
-        self._combatant1_icon = Image(self.get_h()*0.15,self.get_h()*0.15,Warrior._icon,self)
+        self._combatant1_icon = Image(self.get_h()*0.15,self.get_h()*0.15,PATH + 'CombatIcon.png',self)
         self._combatant1_icon.set_point(FRAMEPOINT.RIGHT,FRAMEPOINT.LEFT,-self.get_h()*0.05,0,self._combat_icon)
 
-        self._combatant2_icon = Image(self.get_h()*0.15,self.get_h()*0.15,SkeletonMage._background,self)
+        self._combatant2_icon = Image(self.get_h()*0.15,self.get_h()*0.15,PATH + 'CombatIcon.png',self)
         self._combatant2_icon.set_point(FRAMEPOINT.LEFT,FRAMEPOINT.RIGHT,self.get_h()*0.05,0,self._combat_icon)
 
         self._combatant_1_power_text = TextField(parent=self,font_size=70,text='10')
@@ -81,23 +88,51 @@ class CombatScreen(Rect):
         self._combatant_2_power_text = TextField(parent=self,font_size=70,text='10')
         self._combatant_2_power_text.set_point(FRAMEPOINT.TOP,FRAMEPOINT.BOTTOM,0,self.get_h()*0.025,self._combatant2_icon)
 
+        self._end_turn_button = Button(self.get_h()*0.25,self.get_h()*0.12,BUTTON_CLASSIC_YELLOW,self,'End Turn',50)
+        self._end_turn_button.set_point(FRAMEPOINT.BOTTOMRIGHT,FRAMEPOINT.BOTTOMRIGHT,-self.get_h()*0.025,-self.get_h()*0.025)
+        self._end_turn_button.register_mouse_event(LEFTCLICK,self._end_turn)
+
         self._modifiers_1 = []
         self._modifiers_2 = []
 
         self._active_combatant = None
 
+    def _end_turn(self):
+        self._dice_roller.destroy()
+        if self._active_combatant == self._combatiant_1 and isinstance(self._combatiant_2,Hero):
+            self._active_combatant = self._combatiant_2
+            GAME.get_castle().set_stage(STAGE_FIGHT_START)
+            GAME.get_abilities_panel().reload(self._combatiant_2)
+            GAME.get_abilities_panel().use_passives()
+
+            self._dice_roller = DiceRoller(DICE_NORMAL,DICE_NORMAL)
+        else:
+            result = self._recalculate()
+            victor = self._combatiant_1
+            if result[0] < result[1]:
+                victor = self._combatiant_2
+            elif result[0] == result[1]:
+                victor = None
+
+            self._flush()
+            self.set_visible(False)
+
+            GAME.get_castle().combat_result(victor)
+
     def _recalculate(self):
-        p = 0 
+        p1 = 0 
         for m in self._modifiers_1:
-            p += m._power
+            p1 += m._power
 
-        self._combatant_1_power_text.set_text(str(p))
+        self._combatant_1_power_text.set_text(str(p1))
         
-        p = 0
+        p2 = 0
         for m in self._modifiers_2:
-            p += m._power
+            p2 += m._power
 
-        self._combatant_2_power_text.set_text(str(p)) 
+        self._combatant_2_power_text.set_text(str(p2)) 
+
+        return (p1,p2)
 
     def get_active_combatiant(self) -> Combatiant:
         return self._active_combatant
@@ -128,6 +163,24 @@ class CombatScreen(Rect):
         GAME.get_castle().set_stage(STAGE_FIGHT_START)
         GAME.get_abilities_panel().use_passives()
 
+        self._dice_roller = DiceRoller(DICE_NORMAL,DICE_NORMAL)
+    
+    def dice_roll(self):
+        GAME.register_timer(50,[
+            (self._dice_roller.roll,())
+        ],15,10
+        ,[
+            (self.roll_end,())
+        ])
+        self._end_turn_button.set_active(False)
+
+    def roll_end(self):
+        power = self._dice_roller.roll()
+        self.set_modifier(power,MODIFIER_DICE,self._active_combatant)
+        GAME.get_abilities_panel().use_passives()
+        GAME.get_castle().set_stage(STAGE_FIGHT_END)
+        GAME.get_abilities_panel().reload()
+        self._end_turn_button.set_active(True)
 
     def _flush(self):
         for m in self._modifiers_1:
@@ -161,9 +214,17 @@ class CombatScreen(Rect):
         else:
             self._modifiers_2.append(mod)
 
-    def set_modifier(self,power: int, type: dict, combatiant: Combatiant):
+    def set_modifier(self,power: int, type: int, combatiant: Combatiant):
         if combatiant == self._combatiant_1:
             self._modifiers_1[type].set_power(power)
         else:
             self._modifiers_2[type].set_power(power)
         self._recalculate()
+
+    def inc_modifier(self, power: int, type: int, combatiant: Combatiant):
+        if combatiant == self._combatiant_1:
+            self._modifiers_1[type].set_power(self._modifiers_1[type].get_power() + power)
+        else:
+            self._modifiers_2[type].set_power(self._modifiers_2[type].get_power() + power)
+        self._recalculate()
+        

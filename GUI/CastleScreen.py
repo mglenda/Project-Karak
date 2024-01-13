@@ -10,6 +10,7 @@ from GameLogic.DiceRoller import DiceRoller,DICE_NORMAL,DICE_WARLOCK
 from GameLogic.Player import Player
 from GameLogic.Hero import Hero
 from GameLogic.Placeable import Placeable
+from GameLogic.Combatiant import Combatiant
 from GameLogic.Ability import STAGE_ALWAYS,STAGE_EXPLORING,STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH,STAGE_TURNBEGIN
 import GameLogic.Items as Items
 import GameLogic.Minion as Minions
@@ -68,19 +69,29 @@ class CastleScreen(Rect,KeyBoardListener):
         self._stage = stage
         GAME.get_abilities_panel().reload()
 
+    def combat_result(self,victor: Combatiant):
+        self.next_action()
+
+    def next_action(self):
+        hero: Hero = self.get_current_hero()
+
+        if hero.get_move_points() <= 0:
+            self.player_turn_end()
+        else:
+            self.center_camera(self._cur_player)
+            self.load_action_options()
+            self.set_stage(STAGE_EXPLORING)
+
     def move_to_tile(self, tile: Tile):
         hero: Hero = self.get_current_hero()
         hero.move(tile)
 
         if isinstance(hero.get_tile().get_placeable(),Minions.Minion) and tile.get_placeable().is_aggresive():
             GAME.get_combat_screen().set_visible(True)
+            self.disable_all_tiles()
             GAME.get_combat_screen()._load(hero,tile.get_placeable())
         else:
-            if hero.get_move_points() <= 0:
-                self.player_turn_end()
-            else:
-                self.center_camera(self._cur_player)
-                self.load_action_options()
+            self.next_action()
 
     def load_action_options(self):
         hero: Hero = self.get_current_hero()
@@ -98,9 +109,11 @@ class CastleScreen(Rect,KeyBoardListener):
         self._player_order.append(p)
         self._cur_player = self._player_order[0]
         self.get_current_hero().refresh_move_points()
+        self.get_current_hero().refresh_abilities()
         self.refresh_player_panels()
         self.load_action_options()
         self.center_camera(self._cur_player)
+        self.set_stage(STAGE_TURNBEGIN)
 
     def refresh_player_panels(self):
         p:PlayerPanel

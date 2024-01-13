@@ -59,11 +59,12 @@ class AbilitiesPanel:
 
     def use_passives(self):
         for a in self._abilities:
-            if a.is_passive():
+            if a.is_passive() and a.is_active():
                 a.use()
 
-    def reload(self):
-        self._abilities = GAME.get_castle().get_current_hero().get_abilities()
+    def reload(self, hero: Hero = None):
+        hero = hero if hero is not None else GAME.get_castle().get_current_hero()
+        self._abilities = hero.get_abilities()
 
         for b in self._buttons:
             b.destroy()

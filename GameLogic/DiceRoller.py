@@ -49,7 +49,7 @@ class DiceRoller():
         return n
 
     def create_dice(self,roll_type: int):
-        n = self._get_number(roll_type)
+        n = self._roll_types[roll_type][0]
         dice = {
             'roll_type': roll_type
             ,'dice': DiceGraphic(n)
@@ -74,6 +74,7 @@ class DiceRoller():
             dice = d['dice']
             if i == 0:
                 x,y = dice.get_parent().get_point(FRAMEPOINT.CENTER)
+                y += dice.get_parent().get_h() * 0.1
                 w = dice.get_w() / 2
                 y -= dice.get_h() / 2
                 x -= w * (len(self._dices))
