@@ -11,6 +11,7 @@ STAGE_FIGHT_END = 3
 STAGE_FIGHT_AFTERMATH = 5
 STAGE_EXPLORING = 4
 STAGE_TURNBEGIN = 6
+STAGE_REWARD_GATHER = 7
 
 class Ability():
     _passive: bool = False

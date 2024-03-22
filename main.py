@@ -5,7 +5,6 @@ from Game import GAME
 def main():
     pygame.display.set_caption("Karak")
     pygame.font.init()
-    pygame.Surface.blits
     GAME.start()
     _unicode_pressed: str = ''
     while True:
@@ -59,7 +58,7 @@ def main():
 
         GAME.run_timers()
         GAME.get_screen().draw()
-        pygame.time.Clock().tick(120)
+        # pygame.time.Clock().tick(120)
 
 if __name__ == "__main__":
     main()

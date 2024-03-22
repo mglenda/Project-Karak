@@ -16,7 +16,6 @@ class Hero(Combatiant):
     _hit_points: int
     _alive: bool
     _move_points: int
-    _chests: float
     _background: str
     _icon: str
     _tile: TileInterface
@@ -26,7 +25,6 @@ class Hero(Combatiant):
         self._cursed = False
         self._hit_points = MAX_HP
         self._alive = True
-        self._chests = 0
         self._move_points = DEF_MOVE_POINTS
         self._tile = None
         self.reload_abilities()
@@ -78,7 +76,11 @@ class Hero(Combatiant):
         return self._icon
 
     def get_power(self) -> int:
-        return 0
+        power = 0
+        for w in self.get_weapons():
+            if w is not None:
+                power += w.get_damage_base()
+        return power
 
     def get_weapons(self) -> list[Items.Item]:
         return self._inventory.get_weapons()
@@ -88,6 +90,12 @@ class Hero(Combatiant):
     
     def get_keys(self) -> list[Items.Item]:
         return self._inventory.get_keys()
+    
+    def get_chests(self) -> list[Items.Item]:
+        return self._inventory.get_chests()
+    
+    def get_items(self) -> list[Items.Item]:
+        return self._inventory.get_items()
 
     def set_tile(self, tile: TileInterface):
         if self._tile is not None:
@@ -137,12 +145,11 @@ class Hero(Combatiant):
             
         return False
             
-
     def add_item(self,item:Items.Item) -> bool:
-        if item.get_type() == Items.TYPE_CHEST:
-            self._chests += item.get_bonus()
-            return True
         return self._inventory.add(item)
+    
+    def remove_item(self, item:Items.Item):
+        self._inventory.remove(item)
 
     def is_cursed(self) -> bool:
         return self._cursed

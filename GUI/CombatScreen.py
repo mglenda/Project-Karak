@@ -6,7 +6,7 @@ from GUI._const_combat_modifiers import MODIFIER_ABILITY,MODIFIER_BASE,MODIFIER_
 from GameLogic.Hero import Hero
 from GameLogic.Minion import Minion
 from GameLogic.Combatiant import Combatiant
-from GameLogic.Ability import STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH,STAGE_FIGHT_AFTERMATH
+from GameLogic.Ability import STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH
 from GameLogic.DiceRoller import DiceRoller,DICE_NORMAL,DICE_WARLOCK
 from Game import GAME
 
@@ -101,23 +101,27 @@ class CombatScreen(Rect):
         self._dice_roller.destroy()
         if self._active_combatant == self._combatiant_1 and isinstance(self._combatiant_2,Hero):
             self._active_combatant = self._combatiant_2
-            GAME.get_castle().set_stage(STAGE_FIGHT_START)
-            GAME.get_abilities_panel().reload(self._combatiant_2)
+            GAME.get_castle().set_stage(STAGE_FIGHT_START,self._active_combatant)
             GAME.get_abilities_panel().use_passives()
 
             self._dice_roller = DiceRoller(DICE_NORMAL,DICE_NORMAL)
         else:
             result = self._recalculate()
             victor = self._combatiant_1
+            loser = self._combatiant_2
             if result[0] < result[1]:
                 victor = self._combatiant_2
+                loser = self._combatiant_1
             elif result[0] == result[1]:
                 victor = None
+                loser = None
 
             self._flush()
             self.set_visible(False)
-
-            GAME.get_castle().combat_result(victor)
+            if victor is not None and loser is not None and isinstance(victor,Hero):
+                GAME.get_reward_screen().load(victor,loser)
+            else:
+                GAME.get_castle().next_action()
 
     def _recalculate(self):
         p1 = 0 
@@ -160,15 +164,15 @@ class CombatScreen(Rect):
         self._attach_modifiers()
         self._recalculate()
 
-        GAME.get_castle().set_stage(STAGE_FIGHT_START)
+        GAME.get_castle().set_stage(STAGE_FIGHT_START,self._active_combatant)
         GAME.get_abilities_panel().use_passives()
 
         self._dice_roller = DiceRoller(DICE_NORMAL,DICE_NORMAL)
     
     def dice_roll(self):
-        GAME.register_timer(50,[
+        GAME.register_timer(10,[
             (self._dice_roller.roll,())
-        ],15,10
+        ],30,5
         ,[
             (self.roll_end,())
         ])
@@ -177,9 +181,8 @@ class CombatScreen(Rect):
     def roll_end(self):
         power = self._dice_roller.roll()
         self.set_modifier(power,MODIFIER_DICE,self._active_combatant)
+        GAME.get_castle().set_stage(STAGE_FIGHT_END,self._active_combatant)
         GAME.get_abilities_panel().use_passives()
-        GAME.get_castle().set_stage(STAGE_FIGHT_END)
-        GAME.get_abilities_panel().reload()
         self._end_turn_button.set_active(True)
 
     def _flush(self):

@@ -33,4 +33,11 @@ class PlaceableWidget(Image):
             self._power_wheel.set_visible(False)
 
     def _load_item(self, item: Item):
-        pass
+        self.set_texture(item.get_icon())
+
+        pv = item.get_power_wheel_value()
+        if pv is not None:
+            self._power_wheel.set_visible(True)
+            self._power_text.set_text(pv)
+        else:
+            self._power_wheel.set_visible(False)

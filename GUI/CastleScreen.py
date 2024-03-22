@@ -61,16 +61,14 @@ class CastleScreen(Rect,KeyBoardListener):
         self._cur_player.get_hero().add_item(Items.MagicBolt())
         self._cur_player.get_hero().add_item(Items.FrostFist())
         self._cur_player.get_hero().add_item(Items.MagicBolt())
+        self._cur_player.get_hero().add_item(Items.Axe())
 
     def get_stage(self) -> int:
         return self._stage
     
-    def set_stage(self, stage: int):
+    def set_stage(self, stage: int, hero: Hero = None):
         self._stage = stage
-        GAME.get_abilities_panel().reload()
-
-    def combat_result(self,victor: Combatiant):
-        self.next_action()
+        GAME.get_abilities_panel().reload(hero)
 
     def next_action(self):
         hero: Hero = self.get_current_hero()

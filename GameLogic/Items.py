@@ -1,5 +1,6 @@
 import GameLogic.Ability as Ability
 from GameLogic.Placeable import Placeable
+from Game import GAME
 
 PATH = '_Textures\\Items\\Retextured\\'
 
@@ -11,12 +12,12 @@ TYPE_CHEST = 4
 class Item(Placeable):
     _ability: Ability.Ability
     _type: int
-    _bonus: float
+    _damage_base: int
     _background: str
     _stacks: int
 
     def __init__(self) -> None:
-        self._user = None
+        self._hero = None
         if self.__class__._ability is not None:
             self._ability = self.__class__._ability(self)
             self._stacks = 1
@@ -27,8 +28,8 @@ class Item(Placeable):
     def get_ability(self) -> Ability.Ability:
         return self._ability
     
-    def get_bonus(self) -> float:
-        return self._bonus * self._stacks
+    def get_damage_base(self) -> int:
+        return self._damage_base
     
     def get_icon(self) -> str:
         return self._background
@@ -36,8 +37,21 @@ class Item(Placeable):
     def get_stacks(self) -> int:
         return self._stacks
     
+    def get_power_wheel_value(self) -> str:
+        if self._type == TYPE_WEAPON:
+            return str(self.get_damage_base())
+        elif self._type in (TYPE_SCROLL,TYPE_KEY):
+            if self.get_stacks() > 1:
+                return str(self.get_stacks())
+            else:
+                return None
+        return None
+    
     def set_stacks(self, stacks: int):
         self._stacks = stacks
+        if stacks <= 0 and self._hero is not None:
+            self._hero.remove_item(self)
+            GAME.get_castle().refresh_player_panels()
 
     def set_hero(self, hero):
         self._hero = hero
@@ -48,7 +62,7 @@ class Item(Placeable):
 
 class Dagger(Item):
     _type: int = TYPE_WEAPON
-    _bonus: float = 1.0
+    _damage_base: int = 1
     _ability: Ability.Ability = None
     _background: str = PATH + 'Daggers.png'
 
@@ -57,7 +71,7 @@ class Dagger(Item):
 
 class Sword(Item):
     _type: int = TYPE_WEAPON
-    _bonus: float = 2.0
+    _damage_base: int = 2
     _ability: Ability.Ability = None
     _background: str = PATH + 'Sword.png'
 
@@ -66,7 +80,7 @@ class Sword(Item):
 
 class Axe(Item):
     _type: int = TYPE_WEAPON
-    _bonus: float = 3.0
+    _damage_base: int = 3
     _ability: Ability.Ability = None
     _background: str = PATH + 'Axe.png'
 
@@ -76,7 +90,6 @@ class Axe(Item):
 class Key(Item):
     _ability: Ability.Ability = Ability.UnlockChest
     _type:int = TYPE_KEY
-    _bonus: float = 0.0
     _background: str = PATH + 'Key.png'
 
     def __init__(self) -> None:
@@ -84,7 +97,6 @@ class Key(Item):
 
 class Chest(Item):
     _type:int = TYPE_CHEST
-    _bonus:float = 1.0
     _ability: Ability.Ability = None
     _background: str = PATH + 'ChestOpened.png'
 
@@ -93,7 +105,6 @@ class Chest(Item):
 
 class DragonChest(Item):
     _type:int = TYPE_CHEST
-    _bonus:float = 1.5
     _ability: Ability.Ability = None
     _background: str = PATH + 'ChestDragon.png'
 
@@ -103,7 +114,6 @@ class DragonChest(Item):
 class MagicBolt(Item):
     _ability: Ability.Ability = Ability.MagicBolt
     _type:int = TYPE_SCROLL
-    _bonus: float = 0.0
     _background: str = PATH + 'MagicBolt.png'
 
     def __init__(self) -> None:
@@ -112,7 +122,6 @@ class MagicBolt(Item):
 class ThornOfDarkness(Item):
     _ability: Ability.Ability = Ability.ThornOfDarkness
     _type:int = TYPE_SCROLL
-    _bonus: float = 0.0
     _background: str = PATH + 'ThornOfDarkness.png'
 
     def __init__(self) -> None:
@@ -121,7 +130,6 @@ class ThornOfDarkness(Item):
 class HealingPortal(Item):
     _ability: Ability.Ability = Ability.HealingPortal
     _type:int = TYPE_SCROLL
-    _bonus: float = 0.0
     _background: str = PATH + 'HealingPortal.png'
 
     def __init__(self) -> None:
@@ -130,7 +138,6 @@ class HealingPortal(Item):
 class FrostFist(Item):
     _ability: Ability.Ability = Ability.FrostFist
     _type:int = TYPE_SCROLL
-    _bonus: float = 0.0
     _background: str = PATH + 'FrostFist.png'
 
     def __init__(self) -> None:

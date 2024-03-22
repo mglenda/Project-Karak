@@ -12,8 +12,8 @@ class ScrollSlot(Image):
         self._icon = Image(self.get_w()*0.8,self.get_h()*0.8,'_Textures\\Items\\Retextured\\FrostFist.png',self)
         self._icon.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
 
-        self._power_wheel = Image(w=self.get_w()*0.32,h=self.get_h()*0.32,path='_Textures\\PowerWheel.png',parent=self)
-        self._power_wheel.set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPLEFT,x_offset=self.get_w()*0.0424,y_offset=self.get_h()*0.0424)
+        self._power_wheel = Image(w=self.get_w()*0.32,h=self.get_h()*0.32,path='_Textures\\PowerWheel.png',parent=self._icon)
+        self._power_wheel.set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPLEFT)
 
         self._power_text = TextField(parent=self._power_wheel,font_size=30,text='1',font_path=FONT_PATH_NUMBERS)
         self._power_text.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
@@ -30,8 +30,8 @@ class WeaponSlot(Image):
         self._icon = Image(self.get_w()*0.8,self.get_h()*0.8,'_Textures\\Items\\Retextured\\Axe.png' ,self)
         self._icon.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
 
-        self._power_wheel = Image(w=self.get_w()*0.32,h=self.get_h()*0.32,path='_Textures\\PowerWheel.png',parent=self)
-        self._power_wheel.set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPLEFT,x_offset=self.get_w()*0.0424,y_offset=self.get_h()*0.0424)
+        self._power_wheel = Image(w=self.get_w()*0.32,h=self.get_h()*0.32,path='_Textures\\PowerWheel.png',parent=self._icon)
+        self._power_wheel.set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPLEFT)
 
         self._power_text = TextField(parent=self._power_wheel,font_size=30,text='1',font_path=FONT_PATH_NUMBERS)
         self._power_text.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
@@ -49,8 +49,8 @@ class KeySlot(Image):
         self._icon = Image(self.get_w()*0.8,self.get_h()*0.8,'_Textures\\Items\\Retextured\\Key.png',self)
         self._icon.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
 
-        self._power_wheel = Image(w=self.get_w()*0.32,h=self.get_h()*0.32,path='_Textures\\PowerWheel.png',parent=self)
-        self._power_wheel.set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPLEFT,x_offset=self.get_w()*0.0424,y_offset=self.get_h()*0.0424)
+        self._power_wheel = Image(w=self.get_w()*0.32,h=self.get_h()*0.32,path='_Textures\\PowerWheel.png',parent=self._icon)
+        self._power_wheel.set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPLEFT)
 
         self._power_text = TextField(parent=self._power_wheel,font_size=30,text='10',font_path=FONT_PATH_NUMBERS)
         self._power_text.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
@@ -145,9 +145,10 @@ class PlayerPanel(Image):
             if k is not None:
                 self._key_slot._icon.set_texture(k.get_icon())
                 self._key_slot._icon.set_visible(True)
-                if k.get_stacks() > 1:
+                pv = k.get_power_wheel_value()
+                if pv is not None:
                     self._key_slot._power_wheel.set_visible(True)
-                    self._key_slot._power_text.set_text(k.get_stacks())
+                    self._key_slot._power_text.set_text(pv)
                 else:
                     self._key_slot._power_wheel.set_visible(False)
             else:
@@ -157,9 +158,10 @@ class PlayerPanel(Image):
             if k is not None:
                 self._weapon_slots[i]._icon.set_texture(k.get_icon())
                 self._weapon_slots[i]._icon.set_visible(True)
-                if k.get_stacks() > 1:
+                pv = k.get_power_wheel_value()
+                if pv is not None:
                     self._weapon_slots[i]._power_wheel.set_visible(True)
-                    self._weapon_slots[i]._power_text.set_text(k.get_stacks())
+                    self._weapon_slots[i]._power_text.set_text(pv)
                 else:
                     self._weapon_slots[i]._power_wheel.set_visible(False)
             else:
@@ -169,9 +171,10 @@ class PlayerPanel(Image):
             if k is not None:
                 self._scroll_slots[i]._icon.set_texture(k.get_icon())
                 self._scroll_slots[i]._icon.set_visible(True)
-                if k.get_stacks() > 1:
+                pv = k.get_power_wheel_value()
+                if pv is not None:
                     self._scroll_slots[i]._power_wheel.set_visible(True)
-                    self._scroll_slots[i]._power_text.set_text(k.get_stacks())
+                    self._scroll_slots[i]._power_text.set_text(pv)
                 else:
                     self._scroll_slots[i]._power_wheel.set_visible(False)
             else:

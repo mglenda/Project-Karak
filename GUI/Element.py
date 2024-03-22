@@ -70,7 +70,7 @@ class Element(MouseListener):
         return self._active
 
     def set_visible(self, visible:bool):
-            self._visible = visible
+        self._visible = visible
 
     def is_visible(self) -> bool:
         return self._visible

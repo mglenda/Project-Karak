@@ -68,11 +68,20 @@ class Game():
         self.abilities_panel = AbilitiesPanel()
         self.abilities_panel.reload()
 
+        from GUI.RewardScreen import RewardScreen
+
+        self.reward_screen = RewardScreen(self.screen.get_h(),self.screen.get_h(),self.screen)
+        self.reward_screen.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+        self.reward_screen.set_visible(False)
+
     def get_abilities_panel(self):
         return self.abilities_panel
 
     def get_combat_screen(self):
         return self.combat_screen
+    
+    def get_reward_screen(self):
+        return self.reward_screen
 
     def get_player_panels(self) -> list:
         return self.player_panels

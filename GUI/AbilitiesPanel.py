@@ -1,7 +1,7 @@
 from GUI.Frame import Frame
 from Game import GAME
 from GameLogic.Hero import Hero
-from GameLogic.Ability import Ability,STAGE_FIGHT,STAGE_EXPLORING,STAGE_ALWAYS,STAGE_FIGHT_AFTERMATH,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_TURNBEGIN
+from GameLogic.Ability import Ability,STAGE_FIGHT,STAGE_EXPLORING,STAGE_ALWAYS,STAGE_FIGHT_AFTERMATH,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_TURNBEGIN,STAGE_REWARD_GATHER
 from GUI.GraphicComponents import Rect,Image,TextField,FRAMEPOINT
 import GUI._const_mouseevents as MouseEvent
 
@@ -54,8 +54,10 @@ class AbilityButton(Image):
 class AbilitiesPanel:
     _abilities: list[Ability]
     _buttons: list[AbilityButton]
+    _visible: bool
     def __init__(self) -> None:
         self._buttons = []
+        self._visible = True
 
     def use_passives(self):
         for a in self._abilities:
@@ -77,15 +79,21 @@ class AbilitiesPanel:
                 b = AbilityButton(a)
                 b.register_mouse_event(MouseEvent.LEFTCLICK,a.use)
                 b.set_active(True)
+                b.set_visible(self._visible)
                 self._buttons.append(b)
                 if i == 0:
-                    if GAME.get_castle().get_stage() in (STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH):
+                    if GAME.get_castle().get_stage() in (STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH,STAGE_REWARD_GATHER):
                         b.set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.BOTTOM,0,-b.get_h()*1.5)
                     else:
                         b.set_point(FRAMEPOINT.TOP,FRAMEPOINT.TOP)
                 else:
-                    if GAME.get_castle().get_stage() in (STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH):
+                    if GAME.get_castle().get_stage() in (STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH,STAGE_REWARD_GATHER):
                         b.set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.TOP,0,-b.get_h()*0.1,self._buttons[i-1])
                     else:
                         b.set_point(FRAMEPOINT.TOP,FRAMEPOINT.BOTTOM,0,b.get_h()*0.1,self._buttons[i-1])
                 i += 1
+
+    def set_visible(self, visible: bool):
+        self._visible = visible
+        for b in self._buttons:
+            b.set_visible(self._visible)
