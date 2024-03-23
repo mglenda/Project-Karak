@@ -60,6 +60,7 @@ class Inventory():
             return self.has_free_scroll_slot()
         elif item.get_type() == TYPE_WEAPON:
             return self.has_free_weapon_slot()
+        return True
         
     def get_weapons(self) -> list[Item]:
         return self._weapons

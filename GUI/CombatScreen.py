@@ -112,16 +112,31 @@ class CombatScreen(Rect):
             if result[0] < result[1]:
                 victor = self._combatiant_2
                 loser = self._combatiant_1
-            elif result[0] == result[1]:
-                victor = None
-                loser = None
+
+            draw = result[0] == result[1]
 
             self._flush()
             self.set_visible(False)
-            if victor is not None and loser is not None and isinstance(victor,Hero):
-                GAME.get_reward_screen().load(victor,loser)
+
+            hero = GAME.get_castle().get_current_hero()
+            hero.set_move_points(0)
+
+            if isinstance(victor,Hero) and isinstance(loser,Hero):
+                if not draw:
+                    loser.hurt()
+                    GAME.get_reward_screen().load(victor,loser)
+                else:
+                    GAME.get_castle().next_action()
             else:
-                GAME.get_castle().next_action()
+                if isinstance(victor,Minion) or draw:
+                    #hero lost the fight
+                    if not draw:
+                        hero.hurt()
+                    hero.set_tile(hero.get_previous_tile())
+                    GAME.get_castle().next_action()
+                else:
+                    #hero won the fight
+                    GAME.get_reward_screen().load(victor,loser)
 
     def _recalculate(self):
         p1 = 0 

@@ -107,6 +107,7 @@ class Tile(TileInterface):
         self._placeable = None
         self._placeable_widget.destroy()
         self._placeable_widget = None
+        self.reattach_hero_icons()
 
     def is_placed(self) -> bool:
         return self._placed

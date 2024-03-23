@@ -172,7 +172,7 @@ class RewardScreen(Rect):
         self._selected_reward = None
         self._leftover = None
 
-    def load(self,victor: Hero, loser: Combatiant):
+    def load(self,victor: Hero, loser: Combatiant = None):
         self._victor = victor
         self._loser = loser
         self.set_visible(True)
@@ -183,6 +183,7 @@ class RewardScreen(Rect):
 
         if len(self._rewards) == 1:
             self.select_reward(self._rewards[0])
+
 
     def select_reward(self,reward: RewardButton):
         if self._selected_reward is not None:
@@ -207,10 +208,12 @@ class RewardScreen(Rect):
 
         self._victor.add_item(self._selected_reward.get_item())
 
+        self._victor.set_move_points(0)
+
         self.finalize()
 
     def reward_pass(self):
-        if isinstance(self._loser,Minion):
+        if self._loser is None or isinstance(self._loser,Minion):
             self._leftover = self._selected_reward.get_item()
         self.finalize()
 
@@ -219,7 +222,6 @@ class RewardScreen(Rect):
             self._victor.get_tile().add_placeable(self._leftover)
         else:
             self._victor.get_tile().remove_placeable()
-            self._victor.get_tile().reattach_hero_icons()
 
         GAME.get_castle().refresh_player_panels()
 
@@ -246,6 +248,8 @@ class RewardScreen(Rect):
             rewards.append(self._loser.get_reward())
         elif isinstance(self._loser,Hero):
             rewards = self._loser.get_items()
+        elif self._loser is None:
+            rewards.append(self._victor.get_tile().get_placeable())
 
         for i,r in enumerate(rewards):
             rb = RewardButton(self,r)

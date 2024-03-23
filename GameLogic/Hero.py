@@ -1,8 +1,10 @@
 from GameLogic.Inventory import Inventory
 import GameLogic.Ability as Ability
 import GameLogic.Items as Items
+from GameLogic.Minion import ChestClosed
 from GUI.GraphicComponents import TileInterface
 from GameLogic.Combatiant import Combatiant
+from Game import GAME
 
 MAX_HP = 5
 DEF_MOVE_POINTS = 4
@@ -19,15 +21,21 @@ class Hero(Combatiant):
     _background: str
     _icon: str
     _tile: TileInterface
+    _previous_tile: TileInterface
 
-    def __init__(self) -> None:
+    def __init__(self,player) -> None:
         self._inventory = Inventory(self)
         self._cursed = False
         self._hit_points = MAX_HP
         self._alive = True
         self._move_points = DEF_MOVE_POINTS
         self._tile = None
+        self._previous_tile = None
         self.reload_abilities()
+        self._player = player
+
+    def get_player(self):
+        return self._player
 
     def get_abilities(self) -> list[Ability.Ability]:
         abilities = []
@@ -80,7 +88,21 @@ class Hero(Combatiant):
         for w in self.get_weapons():
             if w is not None:
                 power += w.get_damage_base()
-        return power
+        return power   
+
+    def pick_item_from_tile(self):
+        key = self.get_keys()[0]
+        if isinstance(self.get_tile().get_placeable(),ChestClosed) and key is not None:
+            if self.add_item(Items.Chest()):
+                self.remove_item(key)
+                self.get_tile().remove_placeable()
+                GAME.get_castle().player_turn_end()
+        elif isinstance(self.get_tile().get_placeable(),Items.Item):
+            if self.add_item(self.get_tile().get_placeable()):
+                self.get_tile().remove_placeable()
+                GAME.get_castle().player_turn_end()
+            else:
+                GAME.get_reward_screen().load(self)
 
     def get_weapons(self) -> list[Items.Item]:
         return self._inventory.get_weapons()
@@ -96,15 +118,29 @@ class Hero(Combatiant):
     
     def get_items(self) -> list[Items.Item]:
         return self._inventory.get_items()
+    
+    def has_item(self, item_class: Items.Item) -> bool:
+        for i in self._inventory.get_items():
+            if isinstance(i,item_class):
+                return True
+        return False
+    
+    def move(self,tile: TileInterface):
+        self._move_points -= 1
+        self.set_tile(tile)
 
     def set_tile(self, tile: TileInterface):
         if self._tile is not None:
             self._tile.remove_hero(self)
+            self._previous_tile = self._tile
         self._tile = tile
         tile.add_hero(self)
 
     def get_tile(self) -> TileInterface:
         return self._tile
+    
+    def get_previous_tile(self) -> TileInterface:
+        return self._previous_tile
 
     def reload_abilities(self):
         self._abilities = []
@@ -177,11 +213,9 @@ class Hero(Combatiant):
         self._alive = False
 
     def ressurect(self,amnt:int):
-        self._hit_points = amnt
-
-    def move(self,tile: TileInterface):
-        self._move_points -= 1
-        self.set_tile(tile)
+        if amnt > 0:
+            self._alive = True    
+            self._hit_points = amnt
 
     def get_move_points(self) -> int:
         return self._move_points
@@ -197,108 +231,108 @@ class Wizard(Hero):
     _icon = ICON_PATH + 'Wizard.png'
     _abilities = [Ability.AstralWalking
                   ,Ability.MagicalAffinity]
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)
 
 class Warrior(Hero):
     _background = PATH + 'Warrior.png'
     _icon = ICON_PATH + 'Warrior.png'
     _abilities = [Ability.Reincarnation
                   ,Ability.DoubleAttack]
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)
 
 class Warlock(Hero):
     _background = PATH + 'Warlock.png'
     _icon = ICON_PATH + 'Warlock.png'
     _abilities = [Ability.Sacrifice
                   ,Ability.MagicSwap]
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)
 
 class Thief(Hero):
     _background = PATH + 'Thief.png'
     _icon = ICON_PATH + 'Thief.png'
     _abilities = [Ability.Backstab
                   ,Ability.Stealth]
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)
         
 class Swordsman(Hero):
     _background = PATH + 'Swordsman.png'
     _icon = ICON_PATH + 'Swordsman.png'
     _abilities = [Ability.Unstoppable
                   ,Ability.CombatTraining]
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)
 
 class Ranger(Hero):
     _background = PATH + 'Ranger.png'
     _icon = ICON_PATH + 'Ranger.png'
     _abilities = [Ability.Eavesdropping
                   ,Ability.BearAttack]
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)
 
 class Oracle(Hero):
     _background = PATH + 'Oracle.png'
     _icon = ICON_PATH + 'Oracle.png'
     _abilities = [Ability.Fateweaver
                   ,Ability.Foresight]
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)
 
 class LordOfKarak(Hero):
     _background = PATH + 'LordOfKarak.png'
     _icon = ICON_PATH + 'LordOfKarak.png'
     _abilities = []
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)
 
 class BattleMage(Hero):
     _background = PATH + 'BattleMage.png'
     _icon = ICON_PATH + 'BattleMage.png'
     _abilities = [Ability.SwordMaster
                   ,Ability.BlitzAttack]
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)
 
 class Barbarian(Hero):
     _background = PATH + 'Barbarian.png'
     _icon = ICON_PATH + 'Barbarian.png'
     _abilities = [Ability.Berserk
                   ,Ability.Perseverance]
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)
 
 class Acrobat(Hero):
     _background = PATH + 'Acrobat.png'
     _icon = ICON_PATH + 'Acrobat.png'
     _abilities = [Ability.ThrowingDaggers
                   ,Ability.Sprint]
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)
 
 class WarriorPrincess(Hero):
     _background = PATH + 'WarriorPrincess.png'
     _icon = ICON_PATH + 'WarriorPrincess.png'
     _abilities = [Ability.DualWielding
                   ,Ability.TacticalReposition]
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)
 
 class BeastHunter(Hero):
     _background = PATH + 'BeastHunter.png'
     _icon = ICON_PATH + 'BeastHunter.png'
     _abilities = [Ability.Protector
                   ,Ability.Ambush]
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)
 
 class Alchemist(Hero):
     _background = PATH + 'Alchemist.png'
     _icon = ICON_PATH + 'Alchemist.png'
     _abilities = [Ability.Stoneskin
                   ,Ability.Transformation]
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self,player) -> None:
+        super().__init__(player)

@@ -80,7 +80,7 @@ class MainMenu(Image,KeyBoardListener):
                 return
             p = Player(name)
             GAME.players.add(p)
-            p.set_hero(self._hero())
+            p.set_hero(self._hero(p))
             self.create_player_widget(p)
             self._player_name_text.set_text('Player')   
             if GAME.players.get_count() >= 2:

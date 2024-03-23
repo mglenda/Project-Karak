@@ -62,6 +62,7 @@ class CastleScreen(Rect,KeyBoardListener):
         self._cur_player.get_hero().add_item(Items.FrostFist())
         self._cur_player.get_hero().add_item(Items.MagicBolt())
         self._cur_player.get_hero().add_item(Items.Axe())
+        self._cur_player.get_hero().add_item(Items.Key())
 
     def get_stage(self) -> int:
         return self._stage
@@ -106,12 +107,17 @@ class CastleScreen(Rect,KeyBoardListener):
         self._player_order.remove(p)
         self._player_order.append(p)
         self._cur_player = self._player_order[0]
-        self.get_current_hero().refresh_move_points()
-        self.get_current_hero().refresh_abilities()
-        self.refresh_player_panels()
-        self.load_action_options()
-        self.center_camera(self._cur_player)
-        self.set_stage(STAGE_TURNBEGIN)
+        
+        if not self.get_current_hero().is_alive():
+            self.get_current_hero().ressurect(1)
+            self.player_turn_end()
+        else:
+            self.get_current_hero().refresh_move_points()
+            self.get_current_hero().refresh_abilities()
+            self.refresh_player_panels()
+            self.load_action_options()
+            self.center_camera(self._cur_player)
+            self.set_stage(STAGE_TURNBEGIN)
 
     def refresh_player_panels(self):
         p:PlayerPanel
