@@ -88,7 +88,20 @@ class Hero(Combatiant):
         for w in self.get_weapons():
             if w is not None:
                 power += w.get_damage_base()
-        return power   
+        return power
+    
+    def get_treasure_value(self) -> float:
+        value = 0
+        for c in self.get_chests():
+            value += c.get_treasure_value()
+        return value
+    
+    def get_trash_items_count(self) -> int:
+        count = 0
+        for i in self.get_items():
+            if i.get_type() not in (Items.TYPE_CHEST,Items.TYPE_WEAPON):
+                count += 1
+        return count
 
     def pick_item_from_tile(self):
         key = self.get_keys()[0]

@@ -6,7 +6,7 @@ from GUI._const_combat_modifiers import MODIFIER_ABILITY,MODIFIER_BASE,MODIFIER_
 from GameLogic.Hero import Hero
 from GameLogic.Minion import Minion
 from GameLogic.Combatiant import Combatiant
-from GameLogic.Ability import STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH
+from GameLogic.Ability import STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH,STAGE_FLEEING
 from GameLogic.DiceRoller import DiceRoller,DICE_NORMAL,DICE_WARLOCK
 from Game import GAME
 
@@ -132,8 +132,11 @@ class CombatScreen(Rect):
                     #hero lost the fight
                     if not draw:
                         hero.hurt()
-                    hero.set_tile(hero.get_previous_tile())
-                    GAME.get_castle().next_action()
+                    if hero.get_previous_tile() is not None:
+                        hero.set_tile(hero.get_previous_tile())
+                        GAME.get_castle().next_action()
+                    else:
+                        GAME.get_castle().flee()
                 else:
                     #hero won the fight
                     GAME.get_reward_screen().load(victor,loser)
@@ -194,7 +197,7 @@ class CombatScreen(Rect):
         self._end_turn_button.set_active(False)
 
     def roll_end(self):
-        power = self._dice_roller.roll()
+        power = self._dice_roller.get_result()
         self.set_modifier(power,MODIFIER_DICE,self._active_combatant)
         GAME.get_castle().set_stage(STAGE_FIGHT_END,self._active_combatant)
         GAME.get_abilities_panel().use_passives()

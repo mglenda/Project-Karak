@@ -1,6 +1,6 @@
 from GUI.Frame import Frame,FRAMEPOINT
 from GUI.GraphicComponents import Rect,Image,TextField,FONT_PATH_NUMBERS
-from GameLogic.Items import Item,TYPE_KEY,TYPE_SCROLL,TYPE_WEAPON
+from GameLogic.Items import Item,TYPE_KEY,TYPE_SCROLL,TYPE_WEAPON,TYPE_CHEST
 from GameLogic.Hero import Hero
 from GameLogic.Minion import Minion
 from GameLogic.Combatiant import Combatiant
@@ -148,6 +148,41 @@ class InventoryButton(Image):
     def on_click(self):
         self.get_parent().select_slot(self)
 
+    
+class TreasureButton(Image):
+    _focus_layer: Image
+    _active_layer: Image
+
+    def __init__(self,parent: Frame) -> None:
+        super().__init__(parent.get_h()*0.15, parent.get_h()*0.15, PATH + 'TreasureSlot.png', parent)
+
+        self._focus_layer = Image(self.get_w(),self.get_h(),PATH + 'TreasureSlot_FocusLayer.png',self)
+        self._focus_layer.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+
+        self._active_layer = Image(self.get_w(),self.get_h(),PATH + 'TreasureSlot_FocusLayer.png',self)
+        self._active_layer.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+
+        self.set_active(False)
+        self.register_mouse_event(LEFTCLICK,self.on_click)
+
+    def on_click(self):
+        self.get_parent().select_treasury()
+
+    def set_active(self, active: bool):
+        super().set_active(active)
+        self._active_layer.set_visible(active)
+        if not active:
+            self._focus_layer.set_visible(False)
+
+    def _on_mouse_enter(self):
+        self._focus_layer.set_visible(True)
+        super()._on_mouse_enter()
+    
+    def _on_mouse_leave(self):
+        self._focus_layer.set_visible(False)
+        super()._on_mouse_leave()
+
+
 
 class RewardScreen(Rect):
     _victor: Hero
@@ -156,8 +191,10 @@ class RewardScreen(Rect):
     _pass_button: Button
     _rewards: list[RewardButton] = []
     _inventory: list[InventoryButton] = []
+    _treasure_button: TreasureButton
     _selected_reward: RewardButton
     _leftover: Item
+    _item_was_picked: bool
 
     def __init__(self, w: int, h: int, parent: Frame) -> None:
         self._alpha = 230
@@ -171,8 +208,10 @@ class RewardScreen(Rect):
         self._pass_button.register_mouse_event(LEFTCLICK,self.reward_pass)
         self._selected_reward = None
         self._leftover = None
+        self._item_was_picked = False
 
     def load(self,victor: Hero, loser: Combatiant = None):
+        self._item_was_picked = False
         self._victor = victor
         self._loser = loser
         self.set_visible(True)
@@ -190,12 +229,17 @@ class RewardScreen(Rect):
             self._selected_reward.toggle(False)
         reward.toggle()
         self._selected_reward = reward
-
-        for i in self._inventory:
-            if i._type == self._selected_reward.get_item().get_type():
-                i.set_active(True)
-            else:
-                i.set_active(False)
+        
+        rtype = self._selected_reward.get_item().get_type()
+        if rtype == TYPE_CHEST:
+            self._treasure_button.set_active(True)
+        else:
+            self._treasure_button.set_active(False)
+            for i in self._inventory:
+                if i._type == rtype:
+                    i.set_active(True)
+                else:
+                    i.set_active(False)
 
     def select_slot(self,slot: InventoryButton):
         self._leftover = slot.get_item()
@@ -207,9 +251,17 @@ class RewardScreen(Rect):
             self._victor.remove_item(self._leftover)
 
         self._victor.add_item(self._selected_reward.get_item())
+        self._item_was_picked = True
+        self.finalize()
 
-        self._victor.set_move_points(0)
+    def select_treasury(self):
+        self._leftover = None
 
+        if isinstance(self._loser,Hero):
+            self._loser.remove_item(self._selected_reward.get_item())
+
+        self._victor.add_item(self._selected_reward.get_item())
+        self._item_was_picked = True
         self.finalize()
 
     def reward_pass(self):
@@ -226,7 +278,10 @@ class RewardScreen(Rect):
         GAME.get_castle().refresh_player_panels()
 
         self.close()
-        GAME.get_castle().next_action()
+        if self._item_was_picked and self._victor == GAME.get_castle().get_current_hero():
+            GAME.get_castle().player_turn_end()
+        else:
+            GAME.get_castle().next_action()
 
     def close(self):
         self.flush()
@@ -239,8 +294,11 @@ class RewardScreen(Rect):
         for ib in self._inventory:
             ib.destroy()
 
+        self._treasure_button.destroy()
+
         self._rewards: list[RewardButton] = []
         self._inventory: list[InventoryButton] = []
+        self._treasure_button = None
 
     def get_rewards(self):
         rewards: list[Item] = []
@@ -291,4 +349,7 @@ class RewardScreen(Rect):
             self._inventory.append(ib)
             ib.set_point(FRAMEPOINT.TOP,FRAMEPOINT.BOTTOM,0,0,self._inventory[i])
             i+=1
+
+        self._treasure_button = TreasureButton(self)
+        self._treasure_button.set_point(FRAMEPOINT.LEFT,FRAMEPOINT.CENTER,+ib.get_w()*1.75,self.get_h()*0.175)
             

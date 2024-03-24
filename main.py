@@ -57,6 +57,7 @@ def main():
                 GAME.get_screen()._on_key_hold(keys,_unicode_pressed)
 
         GAME.run_timers()
+        GAME.refresh()
         GAME.get_screen().draw()
         # pygame.time.Clock().tick(120)
 

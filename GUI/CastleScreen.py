@@ -11,7 +11,7 @@ from GameLogic.Player import Player
 from GameLogic.Hero import Hero
 from GameLogic.Placeable import Placeable
 from GameLogic.Combatiant import Combatiant
-from GameLogic.Ability import STAGE_ALWAYS,STAGE_EXPLORING,STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH,STAGE_TURNBEGIN
+from GameLogic.Ability import STAGE_ALWAYS,STAGE_EXPLORING,STAGE_FIGHT,STAGE_FIGHT_END,STAGE_FIGHT_START,STAGE_FIGHT_AFTERMATH,STAGE_TURNBEGIN,STAGE_FLEEING
 import GameLogic.Items as Items
 import GameLogic.Minion as Minions
 from Game import GAME
@@ -32,7 +32,7 @@ class CastleScreen(Rect,KeyBoardListener):
     _dr: DiceRoller
     _stage: int
     def __init__(self) -> None:
-        super().__init__(GAME.screen.get_w(), GAME.screen.get_h(), (40,40,40), GAME.screen)
+        super().__init__(GAME.screen.get_w(), GAME.screen.get_h(), (0,0,0), GAME.screen)
         self._tilesize = self.get_h() * 0.12
         self._tilepack = TilePack()
         self._minionpack = MinionPack()
@@ -74,7 +74,7 @@ class CastleScreen(Rect,KeyBoardListener):
     def next_action(self):
         hero: Hero = self.get_current_hero()
 
-        if hero.get_move_points() <= 0:
+        if hero.get_move_points() <= 0 or not hero.is_alive():
             self.player_turn_end()
         else:
             self.center_camera(self._cur_player)
@@ -83,24 +83,33 @@ class CastleScreen(Rect,KeyBoardListener):
 
     def move_to_tile(self, tile: Tile):
         hero: Hero = self.get_current_hero()
-        hero.move(tile)
+        is_fleeing = self.get_stage() == STAGE_FLEEING
 
-        if isinstance(hero.get_tile().get_placeable(),Minions.Minion) and tile.get_placeable().is_aggresive():
+        if is_fleeing:
+            hero.set_tile(tile)
+        else:
+            hero.move(tile)
+
+        if isinstance(hero.get_tile().get_placeable(),Minions.Minion) and tile.get_placeable().is_aggresive() and (not is_fleeing or hero.get_move_points() > 0):
             GAME.get_combat_screen().set_visible(True)
             self.disable_all_tiles()
             GAME.get_combat_screen()._load(hero,tile.get_placeable())
         else:
             self.next_action()
 
-    def load_action_options(self):
+    def load_action_options(self, explored: bool = False):
         hero: Hero = self.get_current_hero()
 
         tile: Tile
         for _,tile in self._tilemap.items():
-            if self.are_tiles_accesible(hero.get_tile(),tile):
+            if self.are_tiles_accesible(hero.get_tile(),tile) and (not explored or tile.is_revealed()):
                 tile.set_active(True)
             else:
                 tile.set_active(False)
+
+    def flee(self):
+        self.set_stage(STAGE_FLEEING)
+        self.load_action_options(explored=True)
 
     def player_turn_end(self):
         p = self._player_order[0]
@@ -123,18 +132,6 @@ class CastleScreen(Rect,KeyBoardListener):
         p:PlayerPanel
         for i,p in enumerate(GAME.get_player_panels()):
             p.load_player(self._player_order[i])
-
-    def dice_roll(self,*dices):
-        self._dr = DiceRoller(*dices)
-        GAME.register_timer(50,[
-            (self._dr.roll,())
-        ],15,10
-        ,[
-            (self.roll_end,())
-        ])
-
-    def roll_end(self):
-        print(self._dr.roll())
 
     def disable_all_tiles(self):
         tile: Tile

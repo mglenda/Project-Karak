@@ -43,7 +43,7 @@ class MainMenu(Image,KeyBoardListener):
         self._player_name_background = Image(w,h,'_Textures\\PlayerName.png',self)
         self._player_name_background.set_point(att_point=FRAMEPOINT.BOTTOM,att_point_parent=FRAMEPOINT.TOP,parent=self._hero_panel_background)
 
-        self._player_name_text = TextField(font_size=35,text='Player 1',parent=self._player_name_background,max_length=15)
+        self._player_name_text = TextField(font_size=35,text='Player 1',parent=self._player_name_background,max_length=8)
         self._player_name_text.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
 
         self._confirm_button = Button(w=w/1.39,h=h/1.74,button_style=BUTTON_CLASSIC_GREEN,parent=self,text='Confirm',font_size=45)

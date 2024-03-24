@@ -34,9 +34,12 @@ class Dice(Frame):
     _type: int
     _stored: Image
     _parent: Frame
-    def __init__(self,type: int) -> None:
+    _id: int
+    def __init__(self,type: int,id: int,roller) -> None:
         dice: Image = DiceImages.get(type)
         super().__init__(dice.get_parent())
+        self._id = id
+        self._roller = roller
         self._type = type
         self._stored = dice.get_surface()
         self.set_w(dice.get_w())
@@ -62,3 +65,9 @@ class Dice(Frame):
     
     def get_parent(self) -> Frame:
         return self._parent
+    
+    def get_id(self) -> int:
+        return self._id
+    
+    def get_roller(self):
+        return self._roller

@@ -37,6 +37,12 @@ class DiceRoller():
         for id,_ in enumerate(self._dices):
             n += self.roll_dice(id)
         return n
+    
+    def get_result(self) -> int:
+        n: int = 0
+        for id,_ in enumerate(self._dices):
+            n += self._dices[id]['last_roll']
+        return n
 
     def roll_dice(self,id: int) -> int:
         dice: DiceGraphic = self._dices[id]['dice']
@@ -52,7 +58,7 @@ class DiceRoller():
         n = self._roll_types[roll_type][0]
         dice = {
             'roll_type': roll_type
-            ,'dice': DiceGraphic(n)
+            ,'dice': DiceGraphic(n,len(self._dices),self)
             ,'last_roll': None
         }
         self._dices.append(dice)

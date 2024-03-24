@@ -140,11 +140,15 @@ class Inventory():
     def get_items(self) -> list[Item]:
         items: list[Item] = []
         for i in self._weapons:
-            items.append(i)
+            if i is not None:
+                items.append(i)
         for i in self._scrolls:
-            items.append(i)
+            if i is not None:
+                items.append(i)
         for i in self._keys:
-            items.append(i)
+            if i is not None:
+                items.append(i)
         for i in self._chests:
-            items.append(i)
+            if i is not None:
+                items.append(i)
         return items

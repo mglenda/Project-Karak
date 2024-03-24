@@ -13,6 +13,7 @@ class Item(Placeable):
     _ability: Ability.Ability
     _type: int
     _damage_base: int
+    _treasure_value: float
     _background: str
     _stacks: int
 
@@ -21,7 +22,7 @@ class Item(Placeable):
         if self.__class__._ability is not None:
             self._ability = self.__class__._ability(self)
             self._stacks = 1
-
+            
     def get_type(self) -> int:
         return self._type
     
@@ -30,6 +31,9 @@ class Item(Placeable):
     
     def get_damage_base(self) -> int:
         return self._damage_base
+    
+    def get_treasure_value(self) -> float:
+        return self._treasure_value
     
     def get_icon(self) -> str:
         return self._background
@@ -99,6 +103,7 @@ class Chest(Item):
     _type:int = TYPE_CHEST
     _ability: Ability.Ability = None
     _background: str = PATH + 'ChestOpened.png'
+    _treasure_value: float = 1.0
 
     def __init__(self) -> None:
         super().__init__()
@@ -107,6 +112,7 @@ class DragonChest(Item):
     _type:int = TYPE_CHEST
     _ability: Ability.Ability = None
     _background: str = PATH + 'ChestDragon.png'
+    _treasure_value: float = 1.5
 
     def __init__(self) -> None:
         super().__init__()  

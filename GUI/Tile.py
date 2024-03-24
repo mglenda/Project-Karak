@@ -19,6 +19,7 @@ class Tile(TileInterface):
     _placeable: Placeable
     _is_spawn: bool
     _placed: bool
+    _is_revealed: bool
     _hero_icons: list[Image]
     def __init__(self, parent: Rect,c: int,r :int, is_revealed: bool = True) -> None:
         super().__init__(parent.get_tilesize(),parent.get_tilesize(), self._texture, parent)
@@ -26,6 +27,8 @@ class Tile(TileInterface):
         self._c = c
         self._r = r
 
+        self._is_revealed = is_revealed
+        
         if is_revealed:
             self._placeable_widget = None
             self._hero_icons = []
@@ -114,6 +117,9 @@ class Tile(TileInterface):
     
     def set_placed(self, placed: bool):
         self._placed = placed
+
+    def is_revealed(self) -> bool:
+        return self._is_revealed
 
     def is_spawn(self) -> bool:
         return self._is_spawn
