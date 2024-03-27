@@ -1,192 +1,95 @@
+from Interfaces.TileObjectInterface import TileObjectInterface
+from Interfaces.HeroInterface import HeroInterface
+from GameEngine.MinionDefinition import MinionDefinition
 import pygame
-from GameLogic.Timer import Timer
-from typing import Callable, List, Tuple
-from operator import itemgetter
 
 pygame.init()
 
 class Game():
     def __init__(self) -> None:
-        self.spawned = False
+        pass
+
+    def get_tilemap(self):
+        return self.ui.get_world().get_tilemap()
 
     def start(self):
-        import GUI._const_framepoints as FRAMEPOINT
-        from GUI.MainScreen import MainScreen
-        self.screen_width = pygame.display.Info().current_w
-        self.screen_height = pygame.display.Info().current_h
-        self.screen = MainScreen()
+        from UI import UI
+        self.ui = UI()
 
-        from GUI.MainMenu import MainMenu
+        from GameEngine.MinionPack import MinionPack
+        self.minion_pack = MinionPack()
 
-        self.main_menu = MainMenu(self.screen.get_w(),self.screen.get_h(),self.screen)
-        self.main_menu.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
-        self.screen.set_focus(self.main_menu)
+        self.spawn_heroes()
 
-        from GameLogic.PlayerGroup import PlayerGroup
-        self.players = PlayerGroup()
+    def spawn_heroes(self):
+        from GameEngine.HeroDefinition import LordOfKarak,Thief
+        from GameEngine.Hero import Hero
+        self.heroes: list[Hero] = []
+        self.heroes.append(Hero(LordOfKarak,'Marek'))
+        self.heroes.append(Hero(Thief,'Katka'))
 
-        from GUI.Dice import DiceImages
-        DiceImages._load()
+        for h in self.heroes:
+            h.move_to_tile(self.get_tilemap().tiles[0])
+            h.refresh_move_points()
 
-        self.timers = []
-        self.player_panels = []
+        self.ui.get_hero_panel().set_hero(self.heroes[0])
+        self.load_actions()
 
-    def spawn(self):
-        from GUI.CastleScreen import CastleScreen
-        self.flush_main_menu()
-        self.castle = CastleScreen()
-        self.screen.set_focus(self.castle)
-
-        from GUI.PlayerPanel import PlayerPanel,FRAMEPOINT
-        h = self.screen.get_h() * 0.24
-        w = h * 1.58
-        for pl in self.players.get_all():
-            p = PlayerPanel(w*0.9,h*0.9,self.screen)
-            p.load_player(pl)
-            self.player_panels.append(p)
-
-        p: PlayerPanel
-        for i,p in enumerate(self.player_panels):
-            if i == 0:
-                p.set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.BOTTOM)
+    def choose_minion(self, tile: TileObjectInterface):
+        arr = self.minion_pack.pick()
+        if len(arr) == 0:
+            self.move_to_tile(tile)
+        else:
+            if len(arr) == 1:
+                self.spawn_minion(arr[0],tile)
+                self.move_to_tile(tile)
             else:
-                p.resize(p.get_w()*0.7,p.get_h()*0.7)
-                if i == 1 or i == 2:
-                    p.set_point(FRAMEPOINT.BOTTOMRIGHT,FRAMEPOINT.BOTTOMLEFT,-p.get_w() / 5,0,self.player_panels[i-1])
-                elif i == 3:
-                    p.set_point(FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMRIGHT,p.get_w() / 5,0,self.player_panels[0])
-                elif i == 4:
-                    p.set_point(FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMRIGHT,p.get_w() / 5,0,self.player_panels[i-1])
+                pass
 
-        from GUI.CombatScreen import CombatScreen,FRAMEPOINT
+    def spawn_minion(self, definition: MinionDefinition, tile: TileObjectInterface):
+        from GameEngine.Minion import Minion
+        tile.add_placeable(Minion(definition))
 
-        self.combat_screen = CombatScreen(self.screen.get_w(),self.screen.get_h(),self.screen)
-        self.combat_screen.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
-        self.combat_screen.set_visible(False)
-
-        from GUI.AbilitiesPanel import AbilitiesPanel
-
-        self.abilities_panel = AbilitiesPanel()
-        self.abilities_panel.reload()
-
-        from GUI.RewardScreen import RewardScreen
-
-        self.reward_screen = RewardScreen(self.screen.get_w(),self.screen.get_h(),self.screen)
-        self.reward_screen.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
-        self.reward_screen.set_visible(False)
-
-        from GUI.PlayerScoreWidget import PlayerScoreWidget
-
-        self.score_widgets: list[PlayerScoreWidget] = []
-
-        for p in self.players.get_all():
-            sw = PlayerScoreWidget(self.screen.get_w()*0.17,self.screen.get_h()*0.06,self.screen)
-            if len(self.score_widgets) > 0:
-                sw.set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.BOTTOMLEFT,0,0,self.score_widgets[len(self.score_widgets)-1])
-            else:
-                sw.set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPLEFT)
-            self.score_widgets.append(sw)
-
-        self.spawned = True
-
-    def refresh(self):
-        if self.spawned:
-            self.refresh_players_data()
-            self.reload_player_widgets()
-
-    def reload_player_widgets(self):
-        for i,d in enumerate(self._players_data):
-            self.score_widgets[i].load(d['player'],d['order'])
-
-    def get_abilities_panel(self):
-        return self.abilities_panel
-
-    def get_combat_screen(self):
-        return self.combat_screen
+    def get_current_hero(self):
+        return self.heroes[0]
     
-    def get_reward_screen(self):
-        return self.reward_screen
-
-    def get_player_panels(self) -> list:
-        return self.player_panels
-
-    def get_castle(self):
-        return self.castle
-
-    def flush_main_menu(self):
-        self.main_menu.destroy()
-        del self.main_menu
-
-    def get_screen(self):
-        return self.screen
+    def confirm_tile_placement(self, tile: TileObjectInterface):
+        tile.on_click(self.move_to_tile,tile)
+        if tile.is_spawn:
+            self.choose_minion(tile)
+        else:
+            self.move_to_tile(tile)
     
-    def get_players(self):
-        return self.players
-    
-    def run_timers(self):
-        t: Timer
-        for t in reversed(self.timers):
-            if t.is_alive():
-                t._run()
-            else:
-                self.timers.remove(t)
-                t.destroy()
+    def move_to_tile(self, tile: TileObjectInterface):
+        self.get_current_hero().move_to_tile(tile)
+        self.load_actions()
 
-    def register_timer(self,millis: int,loop_operations: List[Tuple[Callable, Tuple]], loops: int = 0, loop_inc_millis: int = 0, exit_operations: List[Tuple[Callable, Tuple]] = []):
-        self.timers.append(Timer(millis,loop_operations,loops,loop_inc_millis,exit_operations))
+    def load_actions(self):
+        hero = self.get_current_hero()
+        if hero.get_move_points() <= 0:
+            self.end_turn()
+        else:
+            tile = hero.get_tile()
+            self.get_tilemap().load_path(tile,1)
 
-    def refresh_players_data(self):
-        self._players_data = []
-        tmp_data = []
-
-        for p in self.players.get_all():
-            tmp_data.append(self.get_player_data(p))
-
-        o = 1
-        score = 0
-        for d in sorted(tmp_data, key=itemgetter('score'), reverse=True):
-            if d['score'] < score:
-                o += 1
-            d['order'] = o
-            self._players_data.append(d)
-            score = d['score']
-
-    def get_first_players(self) -> list:
-        first_players = []
-
-        for d in self._players_data:
-            if d['order'] == 1:
-                first_players.append(d)
-
-        return first_players
-
-    def get_last_players(self) -> list:
-        last_players = []
-
-        if len(self._players_data) > 0:
-            last_order = self._players_data[len(self._players_data)-1]['order']
-
-            for d in self._players_data:
-                if d['order'] == last_order:
-                    last_players.append(d)
+    def end_turn(self):
+        hero = self.get_current_hero()
+        for i,h in enumerate(self.heroes):
+            if i != 0:
+                self.heroes[i-1] = h
+        self.heroes[i] = hero
         
-        return last_players
+        self.ui.get_hero_panel().set_hero(self.heroes[0])
+        self.refresh_hero(self.heroes[0])
+        self.load_actions()
 
-    def get_players_data(self):
-        return self._players_data
-        
-    def get_player_data(self, p) -> dict:
-        from GameLogic.Player import Player
+    def refresh_hero(self, hero: HeroInterface):
+        hero.refresh_move_points()
 
-        data = {}
+    def update(self):
+        self.ui.get_hero_panel().update()
 
-        if isinstance(p,Player):
-            h = p.get_hero()
-            data['player'] = p
-            data['order'] = 1
-            data['score'] = h.get_treasure_value() * 10000 + h.get_power() * 100 + h.get_trash_items_count()
-
-        return data
-
+    def draw(self):
+        self.ui.draw()
 
 GAME = Game()

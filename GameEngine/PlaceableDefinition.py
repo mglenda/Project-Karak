@@ -1,0 +1,2 @@
+class PlaceableDefinition():
+    path: str
