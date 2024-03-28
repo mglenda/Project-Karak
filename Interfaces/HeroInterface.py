@@ -1,10 +1,13 @@
 from GameEngine.HeroDefinition import HeroDefinition
 from Interfaces.Interface import Interface
+from Interfaces.InventoryInterface import InventoryInterface
 
 class HeroInterface(Interface):
     definition: HeroDefinition
     name: str
     tile: Interface
+
+    inventory: InventoryInterface
 
     def __init__(self, definition: HeroDefinition, name: str) -> None:
         pass

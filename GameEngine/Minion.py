@@ -16,8 +16,7 @@ class Minion(MinionInterface,Placeable):
     def get_wheel_value(self) -> int:
         if self.agressive:
             return self.power
-        else:
-            return None
+        return None
     
     def set_definition(self, definition: MinionDefinition):
         super().set_definition(definition)

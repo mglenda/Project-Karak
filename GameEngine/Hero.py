@@ -1,6 +1,7 @@
 from GameEngine.HeroDefinition import HeroDefinition
 from Interfaces.HeroInterface import HeroInterface
 from Interfaces.TileObjectInterface import TileObjectInterface
+from GameEngine.Inventory import Inventory
 from GameEngine.Constants import Constants
 
 class Hero(HeroInterface):
@@ -12,6 +13,8 @@ class Hero(HeroInterface):
     move_points: int
     max_move_points: int
 
+    inventory: Inventory
+
     def __init__(self, definition: HeroDefinition, name: str) -> None:
         self.definition = definition
         self.name = name
@@ -20,6 +23,7 @@ class Hero(HeroInterface):
         self.max_move_points = getattr(self.definition,'max_move_points',Constants.HERO_MOVEPOINTS)
         self.hit_points = self.max_hit_points
         self.move_points = self.max_move_points
+        self.inventory = Inventory(self)
 
     def get_move_points(self) -> int:
         return self.move_points

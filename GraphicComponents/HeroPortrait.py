@@ -52,7 +52,7 @@ class HeroPortrait(Rect):
         self.portrait.set_texture(path)
 
     def set_hp_values(self, hp: int, hp_max: int):
-        if hp_max / hp > 2:
+        if hp <= 0 or hp_max / hp > 2:
             color = 'Red'
         else:
             color = 'Green'

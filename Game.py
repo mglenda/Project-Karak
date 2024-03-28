@@ -74,6 +74,7 @@ class Game():
 
     def end_turn(self):
         hero = self.get_current_hero()
+        hero.hurt()
         for i,h in enumerate(self.heroes):
             if i != 0:
                 self.heroes[i-1] = h

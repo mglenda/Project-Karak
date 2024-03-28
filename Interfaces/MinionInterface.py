@@ -3,3 +3,5 @@ from GameEngine.MinionDefinition import MinionDefinition
 
 class MinionInterface(PlaceableInterface):
     definition: MinionDefinition
+    power: int
+    agressive: bool
