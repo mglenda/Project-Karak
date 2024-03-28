@@ -32,7 +32,6 @@ class Game():
             h.move_to_tile(self.get_tilemap().tiles[0])
             h.refresh_move_points()
 
-        self.ui.get_hero_panel().set_hero(self.heroes[0])
         self.load_actions()
 
     def choose_minion(self, tile: TileObjectInterface):
@@ -80,7 +79,6 @@ class Game():
                 self.heroes[i-1] = h
         self.heroes[i] = hero
         
-        self.ui.get_hero_panel().set_hero(self.heroes[0])
         self.refresh_hero(self.heroes[0])
         self.load_actions()
 
