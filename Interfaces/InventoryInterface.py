@@ -1,6 +1,7 @@
 from Interfaces.Interface import Interface
 from Interfaces.ItemInterface import ItemInterface
 from GameEngine.ItemDefinition import ItemDefinition
+from Interfaces.InventorySlotInterface import InventorySlotInterface
 
 class InventoryInterface(Interface):
     max_weapons: int
@@ -8,9 +9,7 @@ class InventoryInterface(Interface):
     max_keys: int
     hero: Interface
 
-    weapons: list[ItemInterface]
-    scrolls: list[ItemInterface]
-    keys: list[ItemInterface]
+    slots: list[InventorySlotInterface]
     chests: list[ItemInterface]
 
     def has_item(self, definition: ItemDefinition) -> bool:
@@ -19,20 +18,8 @@ class InventoryInterface(Interface):
     def remove_item(self, item: ItemInterface):
         pass
 
-    def add_item(self, item: ItemDefinition, slot_type: int, slot: int = None):
+    def add_item(self, item: ItemInterface, slot: InventorySlotInterface = None) -> ItemInterface:
         pass
 
-    def get_items(self) -> list[ItemInterface]:
-        pass
-
-    def get_weapons(self) -> list[ItemInterface]:
-        pass
-    
-    def get_scrolls(self) -> list[ItemInterface]:
-        pass
-    
-    def get_keys(self) -> list[ItemInterface]:
-        pass
-    
-    def get_chests(self) -> list[ItemInterface]:
+    def get_slots_by_type(self, type: int) -> list[InventorySlotInterface]:
         pass

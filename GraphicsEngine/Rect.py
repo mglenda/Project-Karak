@@ -1,6 +1,5 @@
 from GraphicsEngine.Frame import Frame
 from core.MemoryEngine import MEMORY_ENGINE
-import pygame
 
 class Rect(Frame):
     color: tuple

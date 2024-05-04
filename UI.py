@@ -12,6 +12,7 @@ class UI(MouseController):
         super().__init__(Screen())
         self.world = World(self.screen)
         self.hero_panel = HeroPanel(self.screen)
+        self.hero_panel.portrait.resize(0.8)
 
     def get_hero_panel(self) -> HeroPanel:
         return self.hero_panel

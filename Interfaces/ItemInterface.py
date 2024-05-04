@@ -5,3 +5,6 @@ class ItemInterface(PlaceableInterface):
     definition: ItemDefinition
     power: int
     type: int
+
+    def get_power(self) -> int:
+        pass

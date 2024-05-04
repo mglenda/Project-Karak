@@ -2,8 +2,6 @@ from GraphicsEngine.Image import Image,Frame
 from GraphicsEngine.NumberImage import NumberImage
 from GraphicsEngine.Constants import Framepoint as FRAMEPOINT
 
-PATH = '_Textures\\Numbers\\Gold\\'
-
 class Placeable(Image):
     wheel_img: Image
     wheel_txt: NumberImage
@@ -25,4 +23,3 @@ class Placeable(Image):
 
     def hide_wheel(self):
         self.wheel_img.set_visible(False)
-

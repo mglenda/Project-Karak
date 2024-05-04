@@ -158,7 +158,8 @@ class Frame(FrameInterface):
         self.set_h((self.h / self.factor) * factor)
 
         self.factor = factor
-
+        
+        self.attach()
         for c in self.children:
             c.resize(factor)
             c.attach()
@@ -171,6 +172,7 @@ class Frame(FrameInterface):
         self.set_h(h)
         self.factor = 1.0
 
+        self.attach()
         for c in self.children:
             c.set_size(c.get_w()*factor_w,c.get_h()*factor_h)
             c.attach()
@@ -180,7 +182,7 @@ class Frame(FrameInterface):
             self.alpha = alpha
             self.refresh_surface()
             self.surface.set_alpha(alpha)
-
+            
             for c in self.children:
                 c.set_alpha(alpha)
 

@@ -28,9 +28,19 @@ class Game():
         self.heroes.append(Hero(LordOfKarak,'Marek'))
         self.heroes.append(Hero(Thief,'Katka'))
 
+        from GameEngine.Item import Item
+        from GameEngine.ItemDefinition import Axe,Sword,Key,FrostFist,HealingPortal,MagicBolt
+
         for h in self.heroes:
             h.move_to_tile(self.get_tilemap().tiles[0])
             h.refresh_move_points()
+
+        self.heroes[0].inventory.add_item(Item(Axe))
+        self.heroes[0].inventory.add_item(Item(FrostFist))
+        self.heroes[0].inventory.add_item(Item(Key))
+        self.heroes[0].inventory.add_item(Item(HealingPortal))
+        self.heroes[0].inventory.add_item(Item(MagicBolt))
+        self.heroes[0].inventory.add_item(Item(Sword))
 
         self.load_actions()
 
