@@ -1,6 +1,7 @@
 from Interfaces.TileObjectInterface import TileObjectInterface
 from Interfaces.HeroInterface import HeroInterface
 from GameEngine.MinionDefinition import MinionDefinition
+from Interfaces.MinionInterface import MinionInterface
 import pygame
 
 pygame.init()
@@ -75,6 +76,12 @@ class Game():
 
     def load_actions(self):
         hero = self.get_current_hero()
+        tile = hero.get_tile()
+        placeable = tile.get_placeable()
+
+        if isinstance(placeable,MinionInterface) and placeable.agressive:
+            print(placeable.definition)
+
         if hero.get_move_points() <= 0:
             self.end_turn()
         else:
