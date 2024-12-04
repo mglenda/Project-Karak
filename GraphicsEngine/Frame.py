@@ -151,7 +151,7 @@ class Frame(FrameInterface):
             s.attach()
 
     def collide(self,x: int,y: int) -> bool:
-        return x >= self.get_x() and x <= self.get_x() + self.get_w() and y >= self.get_y() and y <= self.get_y() + self.get_h()
+        return x >= self.get_x() and x <= self.get_x() + self.get_w() and y >= self.get_y() and y <= self.get_y() + self.get_h() and self.is_visible()
     
     def resize(self,factor: float):
         self.set_w((self.w / self.factor) * factor)

@@ -3,13 +3,15 @@ from GraphicsEngine.Constants import Framepoint as FRAMEPOINT
 from GraphicsEngine.Image import Image
 from GameEngine.TileMap import TileMap
 
-ZOOM_MAX = 2.0
-ZOOM_MIN = 0.8
+ZOOM_MAX = 9
+ZOOM_MIN = -2
 
 class World(Rect):
     start_tile: Image
     motion_x: int
     motion_y: int
+    center_x: int
+    center_y: int
     zoom: float
     is_motion: bool
     tilemap: TileMap
@@ -21,10 +23,13 @@ class World(Rect):
         self.motion_x = 0
         self.motion_y = 0
         self.is_motion = False
-        self.zoom = 1.0
+        self.zoom = 0
         self.set_active(True)
 
         self.tilemap = TileMap(self)
+
+        self.center_x = parent.get_w() / 2
+        self.center_y = parent.get_h() / 2
 
     def get_tilemap(self) -> TileMap:
         return self.tilemap
@@ -48,20 +53,34 @@ class World(Rect):
 
     def on_mouse_wheel_down(self, x, y):
         if self.zoom > ZOOM_MIN:
-            self.zoom -= 0.1
-            self.tilemap.set_tilesize(self.tilemap.get_tilesize() - 10)
-            for c in self.children:
-                c.set_size(self.tilemap.get_tilesize(),self.tilemap.get_tilesize())
+            self.zoom -= 1
+            val = -10
+            size_fac = ((self.tilemap.get_tilesize() + val) / self.tilemap.get_tilesize()) - 1
+            dist_x = (self.tilemap.tiles[0].g_tile.get_x() - (self.center_x - self.tilemap.get_tilesize() /2))
+            dist_y = (self.tilemap.tiles[0].g_tile.get_y() - (self.center_y - self.tilemap.get_tilesize() /2))
 
-            for c in self.get_abs_att_children():
-                c.attach()
-    
-    def on_mouse_wheel_up(self, x, y):
-        if self.zoom < ZOOM_MAX:
-            self.zoom += 0.1
-            self.tilemap.set_tilesize(self.tilemap.get_tilesize() + 10)
+            self.tilemap.set_tilesize(self.tilemap.get_tilesize() + val)
             for c in self.children:
                 c.set_size(self.tilemap.get_tilesize(),self.tilemap.get_tilesize())
             
             for c in self.get_abs_att_children():
                 c.attach()
+
+            self.tilemap.tiles[0].g_tile.move(dist_x * size_fac,dist_y * size_fac)
+    
+    def on_mouse_wheel_up(self, x, y):
+        if self.zoom < ZOOM_MAX:
+            self.zoom += 1
+            val = 10
+            size_fac = ((self.tilemap.get_tilesize() + val) / self.tilemap.get_tilesize()) - 1
+            dist_x = (self.tilemap.tiles[0].g_tile.get_x() - (self.center_x - self.tilemap.get_tilesize() / 2))
+            dist_y = (self.tilemap.tiles[0].g_tile.get_y() - (self.center_y - self.tilemap.get_tilesize() / 2))
+
+            self.tilemap.set_tilesize(self.tilemap.get_tilesize() + val)
+            for c in self.children:
+                c.set_size(self.tilemap.get_tilesize(),self.tilemap.get_tilesize())
+            
+            for c in self.get_abs_att_children():
+                c.attach()
+
+            self.tilemap.tiles[0].g_tile.move(dist_x * size_fac,dist_y * size_fac)

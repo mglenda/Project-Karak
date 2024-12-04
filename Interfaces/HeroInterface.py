@@ -1,8 +1,9 @@
 from GameEngine.HeroDefinition import HeroDefinition
+from GameEngine.Duelist import Duelist
 from Interfaces.Interface import Interface
 from Interfaces.InventoryInterface import InventoryInterface
 
-class HeroInterface(Interface):
+class HeroInterface(Interface,Duelist):
     definition: HeroDefinition
     name: str
     tile: Interface

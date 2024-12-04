@@ -23,3 +23,6 @@ class Minion(MinionInterface,Placeable):
 
         self.power = definition.power
         self.agressive = definition.agressive
+
+    def get_icon_path(self) -> str:
+        return self.definition.path

@@ -53,6 +53,7 @@ class MouseBehavior():
 
     def register_mouse_event(self,evt: int,func,*args):       
         self.mouse_events[evt] = Function(func,*args)
+        self.set_active(True)
         
     def clear_mouse_event(self,evt: int):
         self.mouse_events[evt] = None

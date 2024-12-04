@@ -29,7 +29,6 @@ class TileMap(TileMapInterface):
         dfn: TileDefinition = self.tilepack.pick()
         if dfn is not None:
             self.disable_all_tiles()
-            tile.set_active(True)
             tile.set_type(dfn)
             tile.on_click(self.confirm_tile_placement,tile)
             tile.g_tile.register_mouse_event(MouseEvent.WHEELUP,self.rotate_tile_up,start,tile)

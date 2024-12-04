@@ -23,11 +23,11 @@ class Game():
         self.spawn_heroes()
 
     def spawn_heroes(self):
-        from GameEngine.HeroDefinition import LordOfKarak,Thief
+        from GameEngine.HeroDefinition import LordOfKarak,Thief,Barbarian,BeastHunter,Wizard
         from GameEngine.Hero import Hero
         self.heroes: list[Hero] = []
-        self.heroes.append(Hero(LordOfKarak,'Marek'))
-        self.heroes.append(Hero(Thief,'Katka'))
+        self.heroes.append(Hero(Wizard,'Marek'))
+        self.heroes.append(Hero(BeastHunter,'Katka'))
 
         from GameEngine.Item import Item
         from GameEngine.ItemDefinition import Axe,Sword,Key,FrostFist,HealingPortal,MagicBolt
@@ -36,12 +36,12 @@ class Game():
             h.move_to_tile(self.get_tilemap().tiles[0])
             h.refresh_move_points()
 
-        self.heroes[0].inventory.add_item(Item(Axe))
-        self.heroes[0].inventory.add_item(Item(FrostFist))
-        self.heroes[0].inventory.add_item(Item(Key))
-        self.heroes[0].inventory.add_item(Item(HealingPortal))
-        self.heroes[0].inventory.add_item(Item(MagicBolt))
-        self.heroes[0].inventory.add_item(Item(Sword))
+        #self.heroes[0].inventory.add_item(Item(Axe))
+        #self.heroes[0].inventory.add_item(Item(FrostFist))
+        #self.heroes[0].inventory.add_item(Item(Key))
+        #self.heroes[0].inventory.add_item(Item(HealingPortal))
+        #self.heroes[0].inventory.add_item(Item(MagicBolt))
+        #self.heroes[0].inventory.add_item(Item(Sword))
 
         self.load_actions()
 
@@ -80,7 +80,8 @@ class Game():
         placeable = tile.get_placeable()
 
         if isinstance(placeable,MinionInterface) and placeable.agressive:
-            print(placeable.definition)
+            #self.ui.get_combat_panel().show()
+            print(placeable.get_path())
 
         if hero.get_move_points() <= 0:
             self.end_turn()
@@ -90,7 +91,6 @@ class Game():
 
     def end_turn(self):
         hero = self.get_current_hero()
-        hero.hurt()
         for i,h in enumerate(self.heroes):
             if i != 0:
                 self.heroes[i-1] = h
@@ -104,6 +104,7 @@ class Game():
 
     def update(self):
         self.ui.get_hero_panel().update()
+        self.ui.get_combat_panel().update()
 
     def draw(self):
         self.ui.draw()

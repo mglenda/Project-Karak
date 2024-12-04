@@ -72,7 +72,6 @@ class InventoryPanel():
 
             self.slots.append(slot)
 
-
     def update(self, hero: HeroInterface):
         if not self.verify(hero):
             self.reload(hero)
