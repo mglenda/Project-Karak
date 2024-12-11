@@ -16,3 +16,6 @@ class PlaceableInterface(Interface):
 
     def set_definition(self, definition: PlaceableDefinition):
         pass
+
+    def remove(self):
+        pass

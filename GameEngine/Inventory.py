@@ -68,3 +68,9 @@ class Inventory(InventoryInterface):
             if s.get_type() == type:
                 slots.append(s)
         return slots
+    
+    def get_power(self) -> int:
+        power: int = 0
+        for s in self.slots:
+            power += s.get_item_power()
+        return power

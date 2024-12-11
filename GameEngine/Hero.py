@@ -8,6 +8,7 @@ class Hero(HeroInterface):
     definition: HeroDefinition
     name: str
     tile: TileObjectInterface
+    former_tile: TileObjectInterface
     hit_points: int
     max_hit_points: int
     move_points: int
@@ -19,11 +20,13 @@ class Hero(HeroInterface):
         self.definition = definition
         self.name = name
         self.tile = None
+        self.former_tile = None
         self.max_hit_points = getattr(self.definition,'max_hit_points',Constants.HERO_MAX_HP)
         self.max_move_points = getattr(self.definition,'max_move_points',Constants.HERO_MOVEPOINTS)
         self.hit_points = self.max_hit_points
         self.move_points = self.max_move_points
         self.inventory = Inventory(self)
+        self.power = 0
 
     def get_move_points(self) -> int:
         return self.move_points
@@ -52,11 +55,20 @@ class Hero(HeroInterface):
             self.hit_points = self.max_hit_points if self.hit_points + amnt > self.max_hit_points else self.hit_points + amnt
     
     def move_to_tile(self, tile: TileObjectInterface):
+        self.former_tile = self.tile
         if self.tile is not None:
             self.tile.remove_hero(self)
         self.tile = tile
         tile.add_hero(self)
         self.move_points -= 1
+    
+    def move_to_former_tile(self):
+        if self.former_tile is not None:
+            if self.tile is not None:
+                self.tile.remove_hero(self)
+            self.tile = self.former_tile
+            self.tile.add_hero(self)
+            self.move_points -= 1
 
     def get_tile(self) -> TileObjectInterface:
         return self.tile
@@ -70,5 +82,11 @@ class Hero(HeroInterface):
     def get_portrait_path(self) -> str:
         return self.definition.portrait_path
     
+    def get_combat_icon_path(self) -> str:
+        return self.definition.combat_icon_path
+    
     def get_name(self) -> str:
         return self.name
+    
+    def get_weapon_power(self) -> int:
+        return self.power + self.inventory.get_power()

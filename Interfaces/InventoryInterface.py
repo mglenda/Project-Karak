@@ -23,3 +23,6 @@ class InventoryInterface(Interface):
 
     def get_slots_by_type(self, type: int) -> list[InventorySlotInterface]:
         pass
+
+    def get_power(self) -> int:
+        pass

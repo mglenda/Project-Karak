@@ -14,12 +14,12 @@ class Dagger(ItemDefinition):
 
 class Sword(ItemDefinition):
     type: int = ItemTypes.WEAPON
-    power: int = 2
+    power: int = 5
     path: str = PATH + 'Sword.png'
 
 class Axe(ItemDefinition):
     type: int = ItemTypes.WEAPON
-    power: int = 3
+    power: int = 10
     path: str = PATH + 'Axe.png'
 
 class Key(ItemDefinition):

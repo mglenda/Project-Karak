@@ -26,3 +26,6 @@ class InventorySlotInterface(Interface):
     
     def verify_type(self, type: int) -> bool:
         pass
+
+    def get_item_power(self) -> int:
+        pass

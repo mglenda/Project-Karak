@@ -36,3 +36,8 @@ class InventorySlot(InventorySlotInterface):
     
     def verify_type(self, type: int) -> bool:
         return self.type == type
+
+    def get_item_power(self) -> int:
+        if self.item is not None:
+            return self.item.get_power()
+        return 0

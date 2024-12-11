@@ -1,7 +1,7 @@
 from GameEngine.HeroDefinition import HeroDefinition
-from GameEngine.Duelist import Duelist
 from Interfaces.Interface import Interface
 from Interfaces.InventoryInterface import InventoryInterface
+from GameEngine.Duelist import Duelist
 
 class HeroInterface(Interface,Duelist):
     definition: HeroDefinition
@@ -37,6 +37,9 @@ class HeroInterface(Interface,Duelist):
     def move_to_tile(self, tile: Interface):
         pass
 
+    def move_to_former_tile(self):
+        pass
+
     def get_tile(self) -> Interface:
         pass
     
@@ -44,6 +47,9 @@ class HeroInterface(Interface,Duelist):
         pass
 
     def get_icon_path(self) -> str:
+        pass
+
+    def get_combat_icon_path(self) -> str:
         pass
     
     def get_portrait_path(self) -> str:

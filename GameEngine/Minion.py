@@ -4,7 +4,6 @@ from GameEngine.Placeable import Placeable
 
 class Minion(MinionInterface,Placeable):
     definition: MinionDefinition
-    power: int
     agressive: bool
 
     def __init__(self, definition: MinionDefinition) -> None:
@@ -25,4 +24,7 @@ class Minion(MinionInterface,Placeable):
         self.agressive = definition.agressive
 
     def get_icon_path(self) -> str:
+        return self.definition.path
+    
+    def get_combat_icon_path(self) -> str:
         return self.definition.path

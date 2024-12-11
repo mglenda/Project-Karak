@@ -12,7 +12,7 @@ class Placeable(PlaceableInterface):
 
     def set_tile(self, tile: TileObjectInterface):
         if self.tile is not None:
-            self.tile.remove_placeable(self)
+            self.tile.remove_placeable()
         self.tile = tile
         tile.add_placeable(self)
 
@@ -21,3 +21,7 @@ class Placeable(PlaceableInterface):
     
     def set_definition(self, definition: PlaceableDefinition):
         self.definition = definition
+
+    def remove(self):
+        if self.tile is not None:
+            self.tile.remove_placeable()

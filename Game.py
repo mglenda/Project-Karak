@@ -2,13 +2,16 @@ from Interfaces.TileObjectInterface import TileObjectInterface
 from Interfaces.HeroInterface import HeroInterface
 from GameEngine.MinionDefinition import MinionDefinition
 from Interfaces.MinionInterface import MinionInterface
+from Interfaces.PlaceableInterface import PlaceableInterface
+from GameEngine.Combat import Combat
+from GameEngine.Duelist import Duelist
 import pygame
 
 pygame.init()
 
 class Game():
     def __init__(self) -> None:
-        pass
+        self.combat = None
 
     def get_tilemap(self):
         return self.ui.get_world().get_tilemap()
@@ -36,12 +39,12 @@ class Game():
             h.move_to_tile(self.get_tilemap().tiles[0])
             h.refresh_move_points()
 
-        #self.heroes[0].inventory.add_item(Item(Axe))
-        #self.heroes[0].inventory.add_item(Item(FrostFist))
-        #self.heroes[0].inventory.add_item(Item(Key))
-        #self.heroes[0].inventory.add_item(Item(HealingPortal))
-        #self.heroes[0].inventory.add_item(Item(MagicBolt))
-        #self.heroes[0].inventory.add_item(Item(Sword))
+        self.heroes[0].inventory.add_item(Item(Axe))
+        self.heroes[0].inventory.add_item(Item(FrostFist))
+        self.heroes[0].inventory.add_item(Item(Key))
+        self.heroes[0].inventory.add_item(Item(HealingPortal))
+        self.heroes[0].inventory.add_item(Item(MagicBolt))
+        self.heroes[0].inventory.add_item(Item(Sword))
 
         self.load_actions()
 
@@ -58,7 +61,7 @@ class Game():
 
     def spawn_minion(self, definition: MinionDefinition, tile: TileObjectInterface):
         from GameEngine.Minion import Minion
-        tile.add_placeable(Minion(definition))
+        Minion(definition).set_tile(tile)
 
     def get_current_hero(self):
         return self.heroes[0]
@@ -80,14 +83,39 @@ class Game():
         placeable = tile.get_placeable()
 
         if isinstance(placeable,MinionInterface) and placeable.agressive:
-            #self.ui.get_combat_panel().show()
-            print(placeable.get_path())
-
-        if hero.get_move_points() <= 0:
-            self.end_turn()
+            self.start_combat(hero,placeable)
         else:
-            tile = hero.get_tile()
-            self.get_tilemap().load_path(tile,1)
+            if hero.get_move_points() <= 0:
+                self.end_turn()
+            else:
+                tile = hero.get_tile()
+                self.get_tilemap().load_path(tile,1)
+
+    def start_combat(self,attacker: Duelist,defender: Duelist):
+        self.combat = Combat(attacker,defender)
+
+    def end_combat(self):
+        if self.combat is not None:
+            if self.combat.is_finished():
+                if self.combat.is_draw():
+                    if not self.combat.is_arena_duel():
+                        self.get_current_hero().move_to_former_tile()
+                else:
+                    loser = self.combat.get_loser()
+                    winner = self.combat.get_winner()
+                    if not self.combat.is_arena_duel():
+                        if loser == self.get_current_hero():
+                            self.get_current_hero().hurt()
+                            self.get_current_hero().move_to_former_tile()
+                        elif isinstance(loser,PlaceableInterface):
+                            loser.remove()
+                self.combat = None
+                self.end_turn()
+            else:
+                self.combat.active_next()
+
+    def get_combat(self):
+        return self.combat
 
     def end_turn(self):
         hero = self.get_current_hero()
