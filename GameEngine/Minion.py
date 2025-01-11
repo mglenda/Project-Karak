@@ -1,6 +1,7 @@
 from GameEngine.MinionDefinition import MinionDefinition
 from Interfaces.MinionInterface import MinionInterface
 from GameEngine.Placeable import Placeable
+from GameEngine.Item import Item
 
 class Minion(MinionInterface,Placeable):
     definition: MinionDefinition
@@ -28,3 +29,7 @@ class Minion(MinionInterface,Placeable):
     
     def get_combat_icon_path(self) -> str:
         return self.definition.path
+    
+    def remove(self):
+        super().remove()
+        self.tile.add_placeable(Item(self.definition.reward))

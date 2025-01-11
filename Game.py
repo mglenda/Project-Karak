@@ -30,7 +30,7 @@ class Game():
         from GameEngine.Hero import Hero
         self.heroes: list[Hero] = []
         self.heroes.append(Hero(Wizard,'Marek'))
-        self.heroes.append(Hero(BeastHunter,'Katka'))
+        #self.heroes.append(Hero(BeastHunter,'Katka'))
 
         from GameEngine.Item import Item
         from GameEngine.ItemDefinition import Axe,Sword,Key,FrostFist,HealingPortal,MagicBolt
