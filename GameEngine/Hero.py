@@ -3,7 +3,7 @@ from Interfaces.HeroInterface import HeroInterface
 from Interfaces.TileObjectInterface import TileObjectInterface
 from Interfaces.MinionInterface import MinionInterface
 from GameEngine.Inventory import Inventory
-from GameEngine.Constants import Constants
+from GameEngine.Constants import Constants,CooldownScopes
 from GameEngine.Action import Action,ActionCombat,Stealth
 
 class Hero(HeroInterface):
@@ -108,3 +108,8 @@ class Hero(HeroInterface):
     def is_in_hostile_tile(self) -> bool:
         p = self.tile.get_placeable()
         return isinstance(p,MinionInterface) and p.agressive
+    
+    def reset_cooldowns(self, cooldown_scope: int):
+        for a in self.actions:
+            if a.cooldown_scope is not None and a.cooldown_scope <= cooldown_scope:
+                a.reset_cooldown()

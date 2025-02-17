@@ -11,3 +11,8 @@ class ItemTypes():
     SCROLL = 1
     KEY = 2
     CHEST = 3
+
+class CooldownScopes():
+    COOLDOWN_SCOPE_COMBAT = 0
+    COOLDOWN_SCOPE_TILEMOVE = 1
+    COOLDOWN_SCOPE_TURN = 5

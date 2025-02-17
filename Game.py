@@ -5,6 +5,7 @@ from Interfaces.MinionInterface import MinionInterface
 from Interfaces.PlaceableInterface import PlaceableInterface
 from GameEngine.Combat import Combat
 from GameEngine.Duelist import Duelist
+from GameEngine.Constants import CooldownScopes
 import pygame
 
 pygame.init()
@@ -82,6 +83,7 @@ class Game():
     def move_to_tile(self, tile: TileObjectInterface):
         self.get_current_hero().move_to_tile(tile)
         self.load_move_options()
+        self.get_current_hero().reset_cooldowns(CooldownScopes.COOLDOWN_SCOPE_TILEMOVE)
 
     def load_move_options(self, forced:bool = False):
         hero = self.get_current_hero()
@@ -103,6 +105,9 @@ class Game():
         self.combat = Combat(attacker,defender)
 
     def end_combat(self):
+        h = self.combat.get_active_duelist()
+        if isinstance(h,HeroInterface):
+            h.reset_cooldowns(CooldownScopes.COOLDOWN_SCOPE_COMBAT)
         if self.combat is not None:
             if self.combat.is_finished():
                 if self.combat.is_draw():
@@ -138,6 +143,7 @@ class Game():
 
     def refresh_hero(self, hero: HeroInterface):
         hero.refresh_move_points()
+        hero.reset_cooldowns(CooldownScopes.COOLDOWN_SCOPE_TURN)
 
     def update(self):
         self.ui.get_hero_panel().update()

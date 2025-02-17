@@ -70,3 +70,6 @@ class HeroInterface(Interface,Duelist):
 
     def is_in_hostile_tile(self) -> bool:
         pass
+
+    def reset_cooldowns(self, cooldown_scope: int):
+        pass
