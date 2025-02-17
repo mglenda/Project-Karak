@@ -4,6 +4,7 @@ from GraphicsEngine.World import World
 from GraphicComponents.DisableScreen import DisableScreen
 from UserInterface.HeroPanel import HeroPanel
 from UserInterface.CombatPanel import CombatPanel
+from UserInterface.ActionPanel import ActionPanel
 
 class UI(MouseController):
     screen: Screen
@@ -11,6 +12,7 @@ class UI(MouseController):
     hero_panel: HeroPanel
     combat_panel: CombatPanel
     disable_screen: DisableScreen
+    action_panel: ActionPanel
 
     def __init__(self) -> None:
         super().__init__(Screen())
@@ -22,6 +24,8 @@ class UI(MouseController):
 
         self.combat_panel = CombatPanel(self.screen)
 
+        self.action_panel = ActionPanel(self.screen)
+
     def get_hero_panel(self) -> HeroPanel:
         return self.hero_panel
     
@@ -30,6 +34,9 @@ class UI(MouseController):
 
     def get_world(self) -> World:
         return self.world
+    
+    def get_action_panel(self) -> ActionPanel:
+        return self.action_panel
 
     def draw(self):
         if (self.combat_panel.is_visible()):

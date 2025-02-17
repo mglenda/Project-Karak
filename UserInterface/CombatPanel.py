@@ -12,8 +12,6 @@ class CombatPanel():
         self.main.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
         self.main.set_visible(False)
 
-        self.main.combat_button.register_mouse_event(MouseEvent.LEFTCLICK,GAME.end_combat)
-
     def show(self):
         self.main.set_visible(True)
 

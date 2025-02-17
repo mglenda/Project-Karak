@@ -53,6 +53,13 @@ class Combat(CombatInterface):
         self.duelists[0].set_dice_power(randint(1,6) + randint(1,6))
         self.active_duelist = duelist_1
 
+        duelist_1.enter_comat()
+        duelist_2.enter_comat()
+
+    def end(self):
+        for d in self.duelists:
+            d.duelist.leave_combat()
+
     def get_duelist_data(self, id: int) -> DuelistData:
         return self.duelists[id]
     
@@ -61,6 +68,9 @@ class Combat(CombatInterface):
     
     def active_next(self):
         self.active_duelist = self.duelists[1].duelist
+
+    def get_active_duelist(self) -> Duelist:
+        return self.active_duelist
 
     def is_draw(self) -> bool:
         return self.duelists[0].get_total_power() == self.duelists[1].get_total_power()

@@ -1,5 +1,6 @@
 from GameEngine.HeroDefinition import HeroDefinition
 from Interfaces.Interface import Interface
+from Interfaces.ActionInterface import ActionInterface
 from Interfaces.InventoryInterface import InventoryInterface
 from GameEngine.Duelist import Duelist
 
@@ -7,6 +8,12 @@ class HeroInterface(Interface,Duelist):
     definition: HeroDefinition
     name: str
     tile: Interface
+    former_tile: Interface
+    hit_points: int
+    max_hit_points: int
+    move_points: int
+    max_move_points: int
+    actions: list[ActionInterface]
 
     inventory: InventoryInterface
 
@@ -56,4 +63,10 @@ class HeroInterface(Interface,Duelist):
         pass
     
     def get_name(self) -> str:
+        pass
+
+    def get_available_actions(self) -> list[ActionInterface]:
+        pass
+
+    def is_in_hostile_tile(self) -> bool:
         pass

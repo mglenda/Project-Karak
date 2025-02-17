@@ -3,11 +3,24 @@ from GraphicsEngine.Screen import Screen,Frame
 class MouseController():
     screen: Screen
     entered: Frame
+    mouse_x: int 
+    mouse_y: int
+
     def __init__(self, screen: Screen) -> None:
         self.screen = screen
         self.entered = None
+        self.mouse_x = 0
+        self.mouse_y = 0
+
+    def get_mouse_x(self) -> int:
+        return self.mouse_x
+    
+    def get_mouse_y(self) -> int:
+        return self.mouse_y
 
     def on_mouse_motion(self, x, y):
+        self.mouse_y = y
+        self.mouse_x = x
         for e in reversed(self.screen.get_abs_children()):
             if e.is_active() and e.collide(x,y):
                 if self.entered != e:

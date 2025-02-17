@@ -44,7 +44,7 @@ def main():
                     
         GAME.update()
         GAME.draw()
-        pygame.time.Clock().tick(240)
+        pygame.time.Clock().tick(144)
 
 if __name__ == "__main__":
     main()

@@ -36,6 +36,10 @@ class Frame(FrameInterface):
     def add(self, child: FrameInterface):
         self.children.append(child)
 
+    def destroy_children(self):
+        for c in reversed(self.children):
+            c.destroy()
+
     def destroy(self):
         self.deattach()
         for c in reversed(self.children):

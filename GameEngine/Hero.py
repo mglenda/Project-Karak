@@ -1,8 +1,10 @@
 from GameEngine.HeroDefinition import HeroDefinition
 from Interfaces.HeroInterface import HeroInterface
 from Interfaces.TileObjectInterface import TileObjectInterface
+from Interfaces.MinionInterface import MinionInterface
 from GameEngine.Inventory import Inventory
 from GameEngine.Constants import Constants
+from GameEngine.Action import Action,ActionCombat,Stealth
 
 class Hero(HeroInterface):
     definition: HeroDefinition
@@ -13,6 +15,7 @@ class Hero(HeroInterface):
     max_hit_points: int
     move_points: int
     max_move_points: int
+    actions: list[Action]
 
     inventory: Inventory
 
@@ -27,6 +30,8 @@ class Hero(HeroInterface):
         self.move_points = self.max_move_points
         self.inventory = Inventory(self)
         self.power = 0
+        self.actions = [ActionCombat(self)]
+        self.actions.append(Stealth(self))
 
     def get_move_points(self) -> int:
         return self.move_points
@@ -90,3 +95,16 @@ class Hero(HeroInterface):
     
     def get_weapon_power(self) -> int:
         return self.power + self.inventory.get_power()
+    
+    def get_available_actions(self) -> list[Action]:
+        la: list[Action] = []
+        for a in self.actions:
+            if a.is_available():
+                la.append(a)
+
+        la.sort(key=lambda x: x.prio)
+        return la
+    
+    def is_in_hostile_tile(self) -> bool:
+        p = self.tile.get_placeable()
+        return isinstance(p,MinionInterface) and p.agressive

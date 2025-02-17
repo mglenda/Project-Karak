@@ -14,6 +14,9 @@ class FrameInterface(Element):
     def add(self, child: Element):
         pass
 
+    def destroy_children(self):
+        pass
+
     def destroy(self):
         pass
 
