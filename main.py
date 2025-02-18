@@ -49,4 +49,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-#test
+#V pripade ze prehram combat a vrati ma to na policko kde je tiez prisera, tak nemam End Turn, asi vytvorit buff, ktory sa aplikuje po combate, akurat ho treba dat na miesto v combate kde sa budu vyhodnocovat kocky, vela abilit je takych
+#ze exhausted nedostane ak padla na kocke XY atd atd...
