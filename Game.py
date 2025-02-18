@@ -5,7 +5,8 @@ from Interfaces.MinionInterface import MinionInterface
 from Interfaces.PlaceableInterface import PlaceableInterface
 from GameEngine.Combat import Combat
 from GameEngine.Duelist import Duelist
-from GameEngine.Constants import CooldownScopes
+from GameEngine.Constants import DurationScopes
+from GameEngine.BuffModifier import bm_IgnoreHostiles
 import pygame
 
 pygame.init()
@@ -31,7 +32,7 @@ class Game():
         from GameEngine.Hero import Hero
         self.heroes: list[Hero] = []
         self.heroes.append(Hero(Wizard,'Marek'))
-        # self.heroes.append(Hero(BeastHunter,'Katka'))
+        self.heroes.append(Hero(BeastHunter,'Katka'))
 
         from GameEngine.Item import Item
         from GameEngine.ItemDefinition import Axe,Sword,Key,FrostFist,HealingPortal,MagicBolt
@@ -82,20 +83,21 @@ class Game():
     
     def move_to_tile(self, tile: TileObjectInterface):
         self.get_current_hero().move_to_tile(tile)
+        self.get_current_hero().reset_cooldowns(DurationScopes.DURATION_SCOPE_TILEMOVE)
+        self.get_current_hero().remove_buffs(DurationScopes.DURATION_SCOPE_TILEMOVE)
         self.load_move_options()
-        self.get_current_hero().reset_cooldowns(CooldownScopes.COOLDOWN_SCOPE_TILEMOVE)
 
-    def load_move_options(self, forced:bool = False):
+    def load_move_options(self):
         hero = self.get_current_hero()
         tile = hero.get_tile()
         placeable = tile.get_placeable()
 
-        if not(isinstance(placeable,MinionInterface) and placeable.agressive) or forced:
-            if hero.get_move_points() <= 0:
-                self.end_turn()
-            else:
+        if not(isinstance(placeable,MinionInterface) and placeable.agressive) or hero.has_modifier(bm_IgnoreHostiles):
+            if hero.get_move_points() > 0:
                 tile = hero.get_tile()
                 self.get_tilemap().load_path(tile,1)
+            else:
+                self.get_tilemap().disable_all_tiles()
         else:
             self.get_tilemap().disable_all_tiles()
 
@@ -107,7 +109,9 @@ class Game():
     def end_combat(self):
         h = self.combat.get_active_duelist()
         if isinstance(h,HeroInterface):
-            h.reset_cooldowns(CooldownScopes.COOLDOWN_SCOPE_COMBAT)
+            h.reset_cooldowns(DurationScopes.DURATION_SCOPE_COMBAT)
+            h.remove_buffs(DurationScopes.DURATION_SCOPE_COMBAT)
+
         if self.combat is not None:
             if self.combat.is_finished():
                 if self.combat.is_draw():
@@ -124,7 +128,6 @@ class Game():
                             loser.remove()
                 self.combat.end()
                 self.combat = None
-                self.end_turn()
             else:
                 self.combat.active_next()
 
@@ -143,7 +146,8 @@ class Game():
 
     def refresh_hero(self, hero: HeroInterface):
         hero.refresh_move_points()
-        hero.reset_cooldowns(CooldownScopes.COOLDOWN_SCOPE_TURN)
+        hero.reset_cooldowns(DurationScopes.DURATION_SCOPE_TURN)
+        hero.remove_buffs(DurationScopes.DURATION_SCOPE_TURN)
 
     def update(self):
         self.ui.get_hero_panel().update()

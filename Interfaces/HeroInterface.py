@@ -2,7 +2,10 @@ from GameEngine.HeroDefinition import HeroDefinition
 from Interfaces.Interface import Interface
 from Interfaces.ActionInterface import ActionInterface
 from Interfaces.InventoryInterface import InventoryInterface
+from Interfaces.BuffInterface import BuffInterface
+from Interfaces.BuffModifierInterface import BuffModifierInterface
 from GameEngine.Duelist import Duelist
+from typing import Type
 
 class HeroInterface(Interface,Duelist):
     definition: HeroDefinition
@@ -72,4 +75,22 @@ class HeroInterface(Interface,Duelist):
         pass
 
     def reset_cooldowns(self, cooldown_scope: int):
+        pass
+
+    def set_cooldown(self, action_type: Type[ActionInterface], duration_scope: int):
+        pass
+
+    def is_action_on_cooldown(self, action_type: Type[ActionInterface]) -> bool:
+        pass
+    
+    def has_an_action(self, action_type: Type[ActionInterface]) -> bool:
+        pass
+
+    def remove_buffs(self, duration_scope: int = None):
+        pass
+
+    def add_buff(self, buff_type: Type[BuffInterface], duration_scope: int = None):
+        pass
+
+    def has_modifier(self, mod_type: Type[BuffModifierInterface]) -> bool:
         pass

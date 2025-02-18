@@ -1,12 +1,13 @@
 from Interfaces.Interface import Interface
+from Interfaces.CooldownInterface import CooldownInterface
 
 class ActionInterface(Interface):
     hero: Interface
     path: str
     path_focused: str
     prio: int
-    on_cooldown: bool
-    cooldown_scope: int
+    cooldown: CooldownInterface
+    default_scope: int
 
     def is_available(self) -> bool:
         pass
@@ -15,4 +16,10 @@ class ActionInterface(Interface):
         pass
 
     def reset_cooldown(self):
+        pass
+
+    def set_cooldown(self, duration_scope: int):
+        pass
+
+    def get_cooldown(self) -> CooldownInterface:
         pass

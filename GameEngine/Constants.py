@@ -12,7 +12,8 @@ class ItemTypes():
     KEY = 2
     CHEST = 3
 
-class CooldownScopes():
-    COOLDOWN_SCOPE_COMBAT = 0
-    COOLDOWN_SCOPE_TILEMOVE = 1
-    COOLDOWN_SCOPE_TURN = 5
+class DurationScopes():
+    DURATION_SCOPE_COMBAT = 0
+    DURATION_SCOPE_TILEMOVE = 1
+    DURATION_SCOPE_TURN = 5
+    DURATION_SCOPE_FOREVER = 1000
