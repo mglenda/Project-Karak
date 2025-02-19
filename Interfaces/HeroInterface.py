@@ -5,7 +5,7 @@ from Interfaces.InventoryInterface import InventoryInterface
 from Interfaces.BuffInterface import BuffInterface
 from Interfaces.BuffModifierInterface import BuffModifierInterface
 from GameEngine.Duelist import Duelist
-from typing import Type
+from typing import Type,overload
 
 class HeroInterface(Interface,Duelist):
     definition: HeroDefinition
@@ -93,4 +93,16 @@ class HeroInterface(Interface,Duelist):
         pass
 
     def has_modifier(self, mod_type: Type[BuffModifierInterface]) -> bool:
+        pass
+
+    def remove_modifier(self, mod_type: Type[BuffModifierInterface]):
+        pass
+
+    @overload
+    def remove_buffs(self, duration_scope: int) -> None: ...
+    
+    @overload
+    def remove_buffs(self, buff_type: Type[BuffInterface]) -> None: ...
+
+    def remove_buffs(self, arg) -> None:
         pass

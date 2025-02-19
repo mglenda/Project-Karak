@@ -2,8 +2,8 @@ from Interfaces.ActionInterface import ActionInterface
 from Interfaces.HeroInterface import HeroInterface
 from GameEngine.Cooldown import Cooldown
 from GameEngine.Constants import DurationScopes
-from GameEngine.Buff import BuffStealth
-from GameEngine.BuffModifier import bm_IgnoreHostiles
+from GameEngine.Buff import buff_Stealth
+import GameEngine.BuffModifier as bMod
 
 from Game import GAME
 
@@ -63,7 +63,7 @@ class EndTurn(Action):
         super().__init__(hero)
 
     def is_available(self) -> bool:
-        return (not self.hero.is_in_hostile_tile() or self.hero.has_modifier(bm_IgnoreHostiles)) and not(self.hero.is_in_combat())
+        return (not self.hero.is_in_hostile_tile() or self.hero.has_modifier(bMod.bm_IgnoreHostiles) or self.hero.has_modifier(bMod.bm_CannotStartCombat)) and not(self.hero.is_in_combat()) and not self.hero.has_modifier(bMod.bm_CannotEndTurn)
     
     def run(self):
         GAME.end_turn()
@@ -81,11 +81,11 @@ class Stealth(Action):
         super().__init__(hero)
 
     def is_available(self) -> bool:
-        return self.hero.is_in_hostile_tile() and not(self.hero.is_in_combat()) and super().is_available()
+        return self.hero.is_in_hostile_tile() and not(self.hero.is_in_combat()) and not(self.hero.has_modifier(bMod.bm_CannotStartCombat)) and super().is_available()
     
     def run(self):
         super().run()
         if not self.hero.is_action_on_cooldown(ActionCombat):
             self.hero.set_cooldown(ActionCombat,DurationScopes.DURATION_SCOPE_TILEMOVE)
-        self.hero.add_buff(BuffStealth)
+        self.hero.add_buff(buff_Stealth)
         GAME.load_move_options()

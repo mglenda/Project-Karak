@@ -7,7 +7,7 @@ from GameEngine.Constants import Constants
 from GameEngine.Action import Action,ActionCombat,Stealth,EndTurn
 from GameEngine.Buff import Buff
 from GameEngine.BuffModifier import BuffModifier
-from typing import Type
+from typing import Type,overload
 
 class Hero(HeroInterface):
     definition: HeroDefinition
@@ -35,8 +35,11 @@ class Hero(HeroInterface):
         self.inventory = Inventory(self)
         self.power = 0
         self.actions = [EndTurn(self),ActionCombat(self)]
-        self.actions.append(Stealth(self))
         self.active_buffs = []
+
+        a_type: Type[Action] = None
+        for a_type in self.definition.default_actions:
+            self.actions.append(a_type(self))
 
     def get_move_points(self) -> int:
         return self.move_points
@@ -135,12 +138,6 @@ class Hero(HeroInterface):
             if isinstance(a,action_type):
                 return True
         return False
-    
-    def remove_buffs(self, duration_scope: int = None):
-        for b in reversed(self.active_buffs):
-            if duration_scope is None or b.get_scope() <= duration_scope:
-                b.remove()
-                self.active_buffs.remove(b)
 
     def add_buff(self, buff_type: Type[Buff], duration_scope: int = None):
         self.active_buffs.append(buff_type(self,duration_scope))
@@ -150,3 +147,28 @@ class Hero(HeroInterface):
             if b.has_modifier(mod_type):
                 return True
         return False
+    
+    def remove_modifier(self, mod_type: Type[BuffModifier]):
+        for b in reversed(self.active_buffs):
+            if b.has_modifier(mod_type):
+                b.remove()
+                self.active_buffs.remove(b)
+
+    @overload
+    def remove_buffs(self, duration_scope: int) -> None: ...
+    
+    @overload
+    def remove_buffs(self, buff_type: Type[Buff]) -> None: ...
+
+    def remove_buffs(self, arg) -> None:
+        for b in reversed(self.active_buffs):
+            remove: bool = False
+            if isinstance(arg,int):
+                remove = arg is None or b.get_scope() <= arg
+            elif issubclass(arg, Buff):
+                remove = isinstance(b,arg)
+            
+            if remove:
+                b.remove()
+                self.active_buffs.remove(b)
+                

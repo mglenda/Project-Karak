@@ -18,3 +18,13 @@ class bm_IgnoreHostiles(BuffModifier):
 
     def __init__(self, hero):
         super().__init__(hero)
+
+class bm_CannotStartCombat(BuffModifier):
+
+    def __init__(self, hero):
+        super().__init__(hero)
+
+class bm_CannotEndTurn(BuffModifier):
+
+    def __init__(self, hero):
+        super().__init__(hero)

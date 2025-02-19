@@ -7,6 +7,7 @@ from GameEngine.Combat import Combat
 from GameEngine.Duelist import Duelist
 from GameEngine.Constants import DurationScopes
 from GameEngine.BuffModifier import bm_IgnoreHostiles
+from GameEngine.Buff import buff_CannotEndTurn
 import pygame
 
 pygame.init()
@@ -28,11 +29,12 @@ class Game():
         self.spawn_heroes()
 
     def spawn_heroes(self):
-        from GameEngine.HeroDefinition import LordOfKarak,Thief,Barbarian,BeastHunter,Wizard
+        from GameEngine.HeroDefinition import LordOfKarak,Thief,Barbarian,BeastHunter,Wizard,Warrior
         from GameEngine.Hero import Hero
         self.heroes: list[Hero] = []
         self.heroes.append(Hero(Wizard,'Marek'))
-        self.heroes.append(Hero(BeastHunter,'Katka'))
+        self.heroes.append(Hero(Thief,'Katka'))
+        self.heroes.append(Hero(Warrior,'Cico'))
 
         from GameEngine.Item import Item
         from GameEngine.ItemDefinition import Axe,Sword,Key,FrostFist,HealingPortal,MagicBolt
@@ -80,6 +82,8 @@ class Game():
             self.choose_minion(tile)
         else:
             self.move_to_tile(tile)
+
+        self.get_current_hero().remove_buffs(buff_CannotEndTurn)
     
     def move_to_tile(self, tile: TileObjectInterface):
         self.get_current_hero().move_to_tile(tile)

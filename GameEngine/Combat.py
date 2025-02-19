@@ -2,6 +2,7 @@ from Interfaces.CombatInterface import CombatInterface
 from GameEngine.Duelist import Duelist
 from Interfaces.MinionInterface import MinionInterface
 from Interfaces.HeroInterface import HeroInterface
+from GameEngine.Buff import buff_Exhausted
 from random import randint
 
 class DuelistData:
@@ -57,8 +58,11 @@ class Combat(CombatInterface):
         duelist_2.enter_comat()
 
     def end(self):
-        for d in self.duelists:
-            d.duelist.leave_combat()
+        d_data: DuelistData = None
+        for d_data in self.duelists:
+            d_data.duelist.leave_combat()
+            if isinstance(d_data.duelist,HeroInterface):
+                d_data.duelist.add_buff(buff_Exhausted)
 
     def get_duelist_data(self, id: int) -> DuelistData:
         return self.duelists[id]
