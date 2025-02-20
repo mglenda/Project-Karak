@@ -5,7 +5,7 @@ from GameEngine.TilePack import TilePack
 from Interfaces.TileMapInterface import TileMapInterface
 from GraphicsEngine.Constants import MouseEvent
 from GameEngine.Constants import Constants
-from GameEngine.Buff import buff_CannotEndTurn
+import GameEngine.Buff as buff
 
 from Game import GAME
 
@@ -27,7 +27,7 @@ class TileMap(TileMapInterface):
         self.tiles[0].on_click(GAME.move_to_tile,self.tiles[0])
 
     def draw_tile_definition(self, start: TileObject, tile: TileObject):
-        GAME.get_current_hero().add_buff(buff_CannotEndTurn)
+        GAME.get_current_hero().add_buff(buff.CannotEndTurn)
         dfn: TileDefinition = self.tilepack.pick()
         if dfn is not None:
             self.disable_all_tiles()

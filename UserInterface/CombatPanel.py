@@ -1,6 +1,4 @@
 from GraphicComponents.CombatScreen import CombatScreen,Frame,FRAMEPOINT
-from GraphicsEngine.Constants import MouseEvent
-from GameEngine.Combat import DuelistData
 
 from Game import GAME
 
@@ -25,6 +23,10 @@ class CombatPanel():
         if GAME.get_combat() is not None:
             if not self.is_visible():
                 self.show()
+            
+            if GAME.get_dice_manager().get_value() != GAME.get_combat().get_active_duelist_data().get_dice_power():
+                GAME.get_combat().get_active_duelist_data().set_dice_power(GAME.get_dice_manager().get_value())
+
             for id in range(2):
                 self.main.update(id=id
                                 ,base_value = GAME.get_combat().get_duelist_data(id).get_power()

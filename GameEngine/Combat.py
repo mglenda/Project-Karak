@@ -2,7 +2,7 @@ from Interfaces.CombatInterface import CombatInterface
 from GameEngine.Duelist import Duelist
 from Interfaces.MinionInterface import MinionInterface
 from Interfaces.HeroInterface import HeroInterface
-from GameEngine.Buff import buff_Exhausted
+import GameEngine.Buff as buff
 from random import randint
 
 class DuelistData:
@@ -51,7 +51,6 @@ class Combat(CombatInterface):
             DuelistData(duelist_1)
             ,DuelistData(duelist_2)
         ]
-        self.duelists[0].set_dice_power(randint(1,6) + randint(1,6))
         self.active_duelist = duelist_1
 
         duelist_1.enter_comat()
@@ -62,7 +61,7 @@ class Combat(CombatInterface):
         for d_data in self.duelists:
             d_data.duelist.leave_combat()
             if isinstance(d_data.duelist,HeroInterface):
-                d_data.duelist.add_buff(buff_Exhausted)
+                d_data.duelist.add_buff(buff.Exhausted)
 
     def get_duelist_data(self, id: int) -> DuelistData:
         return self.duelists[id]
@@ -75,6 +74,12 @@ class Combat(CombatInterface):
 
     def get_active_duelist(self) -> Duelist:
         return self.active_duelist
+    
+    def get_active_duelist_data(self) -> DuelistData:
+        for d_data in self.duelists:
+            if d_data.duelist == self.active_duelist:
+                return d_data
+        return None
 
     def is_draw(self) -> bool:
         return self.duelists[0].get_total_power() == self.duelists[1].get_total_power()

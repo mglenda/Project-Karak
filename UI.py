@@ -5,6 +5,7 @@ from GraphicComponents.DisableScreen import DisableScreen
 from UserInterface.HeroPanel import HeroPanel
 from UserInterface.CombatPanel import CombatPanel
 from UserInterface.ActionPanel import ActionPanel
+from UserInterface.DicePanel import DicePanel
 
 class UI(MouseController):
     screen: Screen
@@ -13,6 +14,7 @@ class UI(MouseController):
     combat_panel: CombatPanel
     disable_screen: DisableScreen
     action_panel: ActionPanel
+    dice_panel: DicePanel
 
     def __init__(self) -> None:
         super().__init__(Screen())
@@ -23,6 +25,8 @@ class UI(MouseController):
         self.disable_screen = DisableScreen(self.screen)
 
         self.combat_panel = CombatPanel(self.screen)
+
+        self.dice_panel = DicePanel(self.screen)
 
         self.action_panel = ActionPanel(self.screen)
 
@@ -37,6 +41,9 @@ class UI(MouseController):
     
     def get_action_panel(self) -> ActionPanel:
         return self.action_panel
+    
+    def get_dice_panel(self) -> DicePanel:
+        return self.dice_panel
 
     def draw(self):
         if (self.combat_panel.is_visible()):

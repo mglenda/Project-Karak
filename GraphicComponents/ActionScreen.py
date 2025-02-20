@@ -46,9 +46,7 @@ class ActionButton(Image):
 class ActionScreen(Rect):
     def __init__(self,w: int, h: int, parent: Frame) -> None:
         super().__init__(w,h, (255,255,255), parent)
-        self.set_alpha(150)
+        self.set_alpha(0)
 
         self.set_visible(False)
         self.set_active(False)
-
-        self.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)

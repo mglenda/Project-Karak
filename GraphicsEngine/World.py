@@ -3,8 +3,8 @@ from GraphicsEngine.Constants import Framepoint as FRAMEPOINT
 from GraphicsEngine.Image import Image
 from GameEngine.TileMap import TileMap
 
-ZOOM_MAX = 14
-ZOOM_MIN = -4
+ZOOM_MAX = 10
+ZOOM_MIN = -2
 
 class World(Rect):
     start_tile: Image

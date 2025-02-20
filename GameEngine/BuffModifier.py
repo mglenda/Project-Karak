@@ -14,17 +14,37 @@ class BuffModifier(BuffModifierInterface):
     def remove(self):
         self.hero = None
 
-class bm_IgnoreHostiles(BuffModifier):
+class IgnoreHostiles(BuffModifier):
 
     def __init__(self, hero):
         super().__init__(hero)
 
-class bm_CannotStartCombat(BuffModifier):
+class CannotStartCombat(BuffModifier):
 
     def __init__(self, hero):
         super().__init__(hero)
 
-class bm_CannotEndTurn(BuffModifier):
+class CannotEndTurn(BuffModifier):
+
+    def __init__(self, hero):
+        super().__init__(hero)
+
+class CannotRollDice(BuffModifier):
+
+    def __init__(self, hero):
+        super().__init__(hero)
+
+class CannotMove(BuffModifier):
+
+    def __init__(self, hero):
+        super().__init__(hero)
+
+class Cursed(BuffModifier):
+
+    def __init__(self, hero):
+        super().__init__(hero)
+
+class Injured(BuffModifier):
 
     def __init__(self, hero):
         super().__init__(hero)

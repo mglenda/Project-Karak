@@ -4,9 +4,10 @@ from Interfaces.TileObjectInterface import TileObjectInterface
 from Interfaces.MinionInterface import MinionInterface
 from GameEngine.Inventory import Inventory
 from GameEngine.Constants import Constants
-from GameEngine.Action import Action,ActionCombat,Stealth,EndTurn
-from GameEngine.Buff import Buff
+from GameEngine.Action import Action,ActionCombat,EndTurn,RollDice,Revitalize
+from GameEngine.Buff import Buff,Unconsciousness
 from GameEngine.BuffModifier import BuffModifier
+import GameEngine.DiceDefinition as diceType
 from typing import Type,overload
 
 class Hero(HeroInterface):
@@ -20,6 +21,7 @@ class Hero(HeroInterface):
     max_move_points: int
     actions: list[Action]
     active_buffs: list[Buff]
+    dices: list[diceType.DiceDefinition]
 
     inventory: Inventory
 
@@ -34,7 +36,9 @@ class Hero(HeroInterface):
         self.move_points = self.max_move_points
         self.inventory = Inventory(self)
         self.power = 0
-        self.actions = [EndTurn(self),ActionCombat(self)]
+        self.dices = [diceType.Normal,diceType.Normal]
+
+        self.actions = [EndTurn(self),ActionCombat(self),RollDice(self),Revitalize(self)]
         self.active_buffs = []
 
         a_type: Type[Action] = None
@@ -60,6 +64,9 @@ class Hero(HeroInterface):
         self.hit_points -= amnt
         if self.hit_points < 0:
             self.hit_points = 0
+
+        if self.hit_points == 0:
+            self.add_buff(Unconsciousness)
 
     def heal(self, amnt: int = None):
         if amnt is None:
@@ -122,6 +129,11 @@ class Hero(HeroInterface):
             if a.cooldown is not None and a.get_cooldown().get_scope() <= duration_scope:
                 a.reset_cooldown()
 
+    def reset_action_cooldown(self, action_type: Type[Action]):
+        for a in self.actions:
+            if isinstance(a,action_type):
+                a.reset_cooldown()
+
     def set_cooldown(self, action_type: Type[Action], duration_scope: int):
         for a in self.actions:
             if isinstance(a,action_type):
@@ -145,6 +157,12 @@ class Hero(HeroInterface):
     def has_modifier(self, mod_type: Type[BuffModifier]) -> bool:
         for b in self.active_buffs:
             if b.has_modifier(mod_type):
+                return True
+        return False
+    
+    def has_buff(self, buff_type: Type[Buff]) -> bool:
+        for b in self.active_buffs:
+            if isinstance(b,buff_type):
                 return True
         return False
     
@@ -172,3 +190,6 @@ class Hero(HeroInterface):
                 b.remove()
                 self.active_buffs.remove(b)
                 
+    def get_dices(self) -> list[diceType.DiceDefinition]:
+        return self.dices
+    

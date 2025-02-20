@@ -8,6 +8,7 @@ class ActionInterface(Interface):
     prio: int
     cooldown: CooldownInterface
     default_scope: int
+    action_types: list[int]
 
     def is_available(self) -> bool:
         pass
@@ -22,4 +23,7 @@ class ActionInterface(Interface):
         pass
 
     def get_cooldown(self) -> CooldownInterface:
+        pass
+
+    def is_action_type(self, action_type: int) -> bool:
         pass

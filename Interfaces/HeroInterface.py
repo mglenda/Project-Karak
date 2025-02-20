@@ -5,6 +5,7 @@ from Interfaces.InventoryInterface import InventoryInterface
 from Interfaces.BuffInterface import BuffInterface
 from Interfaces.BuffModifierInterface import BuffModifierInterface
 from GameEngine.Duelist import Duelist
+from GameEngine.DiceDefinition import DiceDefinition
 from typing import Type,overload
 
 class HeroInterface(Interface,Duelist):
@@ -77,6 +78,9 @@ class HeroInterface(Interface,Duelist):
     def reset_cooldowns(self, cooldown_scope: int):
         pass
 
+    def reset_action_cooldown(self, action_type: Type[ActionInterface]):
+        pass
+
     def set_cooldown(self, action_type: Type[ActionInterface], duration_scope: int):
         pass
 
@@ -105,4 +109,10 @@ class HeroInterface(Interface,Duelist):
     def remove_buffs(self, buff_type: Type[BuffInterface]) -> None: ...
 
     def remove_buffs(self, arg) -> None:
+        pass
+
+    def get_dices(self) -> list[DiceDefinition]:
+        pass
+
+    def has_buff(self, buff_type: Type[BuffInterface]) -> bool:
         pass

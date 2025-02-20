@@ -1,0 +1,51 @@
+Looting System
+
+1. Dvihanie predmetov, akcia ak stojim na policku s predmetom tak je available. Po pouziti stracam vsetky move pointy.
+2. Dvihanie truhiel, akcia ak stojim na policku so zavretou truhlou a mam kluc, alebo na policku s otvorenou truhlou tak je available. Po pouziti ziskavam truhlu.
+3. Reward Panel. Hore inventar hrdinu ktory prehral, dole inventar hrdinu ktory vyhral, v strede trading item. Ak som dvihal predmet zo zeme, tak sa inventar hrdinu ktory prehral nezobrazuje a je tam len trading item a inventar toho co dviha predmet.
+Trading item sa pri dvihani automaticky naloaduje a obsahuje predmet ktory bol na zemi. Klikanie na spodny inventar = umiestnenie itemu z trading slotu, do kliknuteho slotu. Uplne dole bude tlacidlo na ukoncenie lootingu. Ak sa pri ukonceni v trading 
+slote nachadza truhla, tak je automaticky pridana do truhiel. Po ukonceni, predmet z trading slotu zostava lezat na policku ak teda nebol slot prazdny. 
+
+Passive Effects:
+
+1. Do akcie dat passive_modifiers: list[buffModifier], funkciu get_passive_mods() a do funkcie has_modifier pozerat aj tieto listy kazdej akcie, ktora je available, nie len buffy.
+
+Minion: 
+
+- Minion musi dostat priznak, explored ktory je defaultne = False
+- Explored na True meni, combat, Stealth akcia, alebo ak je minon spawn vplyvom schopnosti nacuvania, tak sa rovno spawne ako explored = True
+- Nacuvanie asi dat do Game.choose_minion kontrolu ci ma modifier nacuvanie
+- Stealth a Combat jednoducho pridat funkcio na zmenu priznaku, v pripade combatu to treba dat na koniec combatu, v pripade stealthu hned ako sa pouzije stealth
+
+Ability:
+
+1. Ambush: Vzdy ked bojujes uz s objavenou priserou, tak +1 k utocnej sile. Pasivne
+
+2. Tactical Reposition: Tuna to necham jednoducho tak, ze akcia bude available pri vstupe na policko s priserou, po jej pouziti prichadza hrdina o jeden zivot, ignoruje combat a ziskava 1 pohybovy krok. V podstate ziskava stealth a za zivot traduje
+pohybovy krok. Podmienkou, ale je, ze prisera uz musi byt Explored. 
+
+3. Dual Wielding: Akcia dostupna v combate ak uz bola pouzita abilita hodenia kociek. Dice manager activuje kocky a hrac moze kliknutim na jednu z nich rerollnut.
+
+4. Stoneskin: passive, ak pri vyhodnocovani duelu ma hero modifier tak staraca zivot iba ak je rozdiel vysledku vyssi ako 2
+
+5. Transformacia, available iba v pripade, ze je prisera not Explored. Po pouziti straca hero 1 zivot a na policko sa vylosuje nova prisera z minion packu, aktualna sa do minion packu vrati.
+
+6. Magicka Strela, Bleskova Strela ? no skratka available v combate ak ma hero item. Pri pouziti zvysuje silu v combate o 1 / 2 a znici suvisiaci predmet.
+
+
+
+Teleporty:
+
+1. Uzdravovaci zvitok
+
+2. Protector: Je Available ak sa nejakemu herovi mimo seba chyba aspon 1 zivot a ma aspon 1 move point. 
+Po spusteni, treba aktivovat vsetky tiles kde sa nachadza hero ktoremu chyba aspon jeden zivot a po kliknuti na dany tile premiestnit hera a obnovit druhemu 1 zivot.
+
+V GAME treba vytvorit funkciu, ktora vyhlada taketo policka, zaktivuje ich a zaroven im hodi mouse event na presun + obnovu 1 zivota. move_with_heal ? 
+, tiez si tieto policka musi niekam stornut a po zavolani move_with_heal im zaregistrovat povodnu move_to_tile akciu. Rovnaky behavior potom implementovat
+aj na warlokovu vymenu miesta. 
+
+V pripade magoveho teleportu na priseru tam zostava move_to_tile rovnaky len zaktivujem polia, kde je prisera. Akcia tiez bude available iba ak existuje pole s objavenou priserou.
+
+Pri tychto teleportoch na priseru ci hraca, je vzdy dolezite, vynulovat former_tile na hrdinovi a musim zaimplementovat mechaniku, ze ak je suboj prehrany a former_tile je None, tak sa vyvolava akcia kde si moze hrac vybrat kam ustupi.
+Mala by to byt normalna pohybova akcia respektujuca vsetky ability, cize mag moze ustupit cez stenu atd.

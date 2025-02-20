@@ -6,8 +6,10 @@ from Interfaces.PlaceableInterface import PlaceableInterface
 from GameEngine.Combat import Combat
 from GameEngine.Duelist import Duelist
 from GameEngine.Constants import DurationScopes
-from GameEngine.BuffModifier import bm_IgnoreHostiles
-from GameEngine.Buff import buff_CannotEndTurn
+import GameEngine.BuffModifier as bMod
+import GameEngine.Buff as buff
+from GameEngine.DiceManager import DiceManager
+from GameEngine.DiceDefinition import DiceDefinition
 import pygame
 
 pygame.init()
@@ -15,6 +17,7 @@ pygame.init()
 class Game():
     def __init__(self) -> None:
         self.combat = None
+        self.dice_manager = None
 
     def get_tilemap(self):
         return self.ui.get_world().get_tilemap()
@@ -50,6 +53,14 @@ class Game():
         self.heroes[0].inventory.add_item(Item(MagicBolt))
         self.heroes[0].inventory.add_item(Item(Sword))
 
+        self.heroes[1].hit_points = 1
+
+        # self.heroes[1].inventory.add_item(Item(Axe))
+        # self.heroes[1].inventory.add_item(Item(Axe))
+
+        # self.heroes[2].inventory.add_item(Item(Axe))
+        # self.heroes[2].inventory.add_item(Item(Axe))
+
         self.load_move_options()
 
     def choose_minion(self, tile: TileObjectInterface):
@@ -83,7 +94,7 @@ class Game():
         else:
             self.move_to_tile(tile)
 
-        self.get_current_hero().remove_buffs(buff_CannotEndTurn)
+        self.get_current_hero().remove_buffs(buff.CannotEndTurn)
     
     def move_to_tile(self, tile: TileObjectInterface):
         self.get_current_hero().move_to_tile(tile)
@@ -96,8 +107,8 @@ class Game():
         tile = hero.get_tile()
         placeable = tile.get_placeable()
 
-        if not(isinstance(placeable,MinionInterface) and placeable.agressive) or hero.has_modifier(bm_IgnoreHostiles):
-            if hero.get_move_points() > 0:
+        if not(isinstance(placeable,MinionInterface) and placeable.agressive) or hero.has_modifier(bMod.IgnoreHostiles):
+            if hero.get_move_points() > 0 and not hero.has_modifier(bMod.CannotMove):
                 tile = hero.get_tile()
                 self.get_tilemap().load_path(tile,1)
             else:
@@ -109,6 +120,7 @@ class Game():
         attacker: Duelist = self.get_current_hero()
         defender: Duelist = attacker.get_tile().get_placeable()
         self.combat = Combat(attacker,defender)
+        self.create_dice_manager(self.get_current_hero().get_dices())
 
     def end_combat(self):
         h = self.combat.get_active_duelist()
@@ -130,16 +142,24 @@ class Game():
                             self.get_current_hero().move_to_former_tile()
                         elif isinstance(loser,PlaceableInterface):
                             loser.remove()
+                self.clear_dice_manager()
                 self.combat.end()
                 self.combat = None
             else:
                 self.combat.active_next()
+                self.create_dice_manager(self.get_current_hero_active().get_dices())
 
     def get_combat(self):
         return self.combat
 
     def end_turn(self):
         hero = self.get_current_hero()
+
+        for h in self.heroes:
+            if h.has_buff(buff.Unconsciousness):
+                h.remove_buffs(buff.Unconsciousness)
+                h.add_buff(buff.Injured)
+
         for i,h in enumerate(self.heroes):
             if i != 0:
                 self.heroes[i-1] = h
@@ -156,6 +176,7 @@ class Game():
     def update(self):
         self.ui.get_hero_panel().update()
         self.ui.get_combat_panel().update()
+        self.ui.get_dice_panel().update()
         self.ui.get_action_panel().update()
 
     def draw(self):
@@ -163,5 +184,14 @@ class Game():
 
     def force_mouse_motion(self):
         self.ui.on_mouse_motion(self.ui.get_mouse_x(),self.ui.get_mouse_y())
+
+    def create_dice_manager(self, dice_types: list[DiceDefinition]):
+        self.dice_manager = DiceManager(dice_types)
+
+    def get_dice_manager(self) -> DiceManager:
+        return self.dice_manager
+    
+    def clear_dice_manager(self):
+        self.dice_manager = None
 
 GAME = Game()

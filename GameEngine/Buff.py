@@ -32,23 +32,51 @@ class Buff(BuffInterface):
         return False
 
 
-class buff_Stealth(Buff):
+class Stealth(Buff):
     default_duration_scope: int = DurationScopes.DURATION_SCOPE_TILEMOVE
-    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.bm_IgnoreHostiles]
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.IgnoreHostiles]
 
     def __init__(self, hero, duration_scope = None):
         super().__init__(hero, duration_scope)
 
-class buff_Exhausted(Buff):
+class Exhausted(Buff):
     default_duration_scope: int = DurationScopes.DURATION_SCOPE_TURN
-    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.bm_CannotStartCombat]
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.CannotStartCombat]
 
     def __init__(self, hero, duration_scope = None):
         super().__init__(hero, duration_scope)
 
-class buff_CannotEndTurn(Buff):
+class CannotEndTurn(Buff):
     default_duration_scope: int = DurationScopes.DURATION_SCOPE_FOREVER
-    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.bm_CannotEndTurn]
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.CannotEndTurn]
+
+    def __init__(self, hero, duration_scope = None):
+        super().__init__(hero, duration_scope)
+
+class CannotRollDices(Buff):
+    default_duration_scope: int = DurationScopes.DURATION_SCOPE_COMBAT
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.CannotRollDice]
+
+    def __init__(self, hero, duration_scope = None):
+        super().__init__(hero, duration_scope)
+
+class Unconsciousness(Buff):
+    default_duration_scope: int = DurationScopes.DURATION_SCOPE_FOREVER
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.CannotStartCombat,bMod.Injured,bMod.CannotMove]
+
+    def __init__(self, hero, duration_scope = None):
+        super().__init__(hero, duration_scope)
+
+class Injured(Buff):
+    default_duration_scope: int = DurationScopes.DURATION_SCOPE_FOREVER
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.CannotStartCombat,bMod.Injured,bMod.CannotEndTurn,bMod.CannotMove]
+
+    def __init__(self, hero, duration_scope = None):
+        super().__init__(hero, duration_scope)
+        
+class Curse(Buff):
+    default_duration_scope: int = DurationScopes.DURATION_SCOPE_FOREVER
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.Cursed]
 
     def __init__(self, hero, duration_scope = None):
         super().__init__(hero, duration_scope)
