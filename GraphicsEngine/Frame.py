@@ -1,4 +1,4 @@
-from GraphicsEngine.FrameInterface import FrameInterface
+from GraphicsEngine.FrameInterface import FrameInterface,Element
 from GraphicsEngine.Constants import Framepoint as FRAMEPOINT
 import pygame
 
@@ -155,13 +155,15 @@ class Frame(FrameInterface):
             s.attach()
 
     def collide(self,x: int,y: int) -> bool:
-        return x >= self.get_x() and x <= self.get_x() + self.get_w() and y >= self.get_y() and y <= self.get_y() + self.get_h() and self.is_visible()
+        return self.get_x() <= x <= self.get_x() + self.get_w() and self.get_y() <= y <= self.get_y() + self.get_h() and self.is_visible()
     
-    # def is_visible(self):
-    #     if self.parent is not None:
-    #         return self.visible and self.parent.is_visible()
-    #     else:
-    #         return self.visible
+    def collides_with(self, other: Element) -> bool:
+        return not (
+            self.x + self.w <= other.x or  # Fully to the left
+            other.x + other.w <= self.x or  # Fully to the right
+            self.y + self.h <= other.y or  # Fully above
+            other.y + other.h <= self.y  # Fully below
+        )
     
     def resize(self,factor: float):
         self.set_w((self.w / self.factor) * factor)
@@ -191,14 +193,9 @@ class Frame(FrameInterface):
         if alpha != self.alpha:
             self.alpha = alpha
             self.refresh_surface()
-            self.surface.set_alpha(alpha)
             
             for c in self.children:
                 c.set_alpha(alpha)
-
-    def refresh_alpha(self):
-        if self.alpha < 255:
-            self.surface.set_alpha(self.alpha)
 
     def refresh_surface(self):
         pass

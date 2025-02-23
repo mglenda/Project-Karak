@@ -1,5 +1,7 @@
 from Interfaces.Interface import Interface
 from Interfaces.CooldownInterface import CooldownInterface
+from Interfaces.BuffModifierInterface import BuffModifierInterface
+from typing import Type
 
 class ActionInterface(Interface):
     hero: Interface
@@ -9,8 +11,21 @@ class ActionInterface(Interface):
     cooldown: CooldownInterface
     default_scope: int
     action_types: list[int]
+    modifiers_default: list[Type[BuffModifierInterface]]
+    modifiers: list[BuffModifierInterface]
+    available: bool
+    passive: bool
+
+    def get_availability(self) -> bool:
+        pass
 
     def is_available(self) -> bool:
+        pass
+    
+    def update(self):
+        pass
+
+    def has_modifier(self, mod_type: Type[BuffModifierInterface]) -> bool:
         pass
 
     def run(self):
@@ -26,4 +41,7 @@ class ActionInterface(Interface):
         pass
 
     def is_action_type(self, action_type: int) -> bool:
+        pass
+
+    def is_passive(self) -> bool:
         pass

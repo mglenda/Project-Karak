@@ -6,20 +6,7 @@ Looting System
 Trading item sa pri dvihani automaticky naloaduje a obsahuje predmet ktory bol na zemi. Klikanie na spodny inventar = umiestnenie itemu z trading slotu, do kliknuteho slotu. Uplne dole bude tlacidlo na ukoncenie lootingu. Ak sa pri ukonceni v trading 
 slote nachadza truhla, tak je automaticky pridana do truhiel. Po ukonceni, predmet z trading slotu zostava lezat na policku ak teda nebol slot prazdny. 
 
-Passive Effects:
-
-1. Do akcie dat passive_modifiers: list[buffModifier], funkciu get_passive_mods() a do funkcie has_modifier pozerat aj tieto listy kazdej akcie, ktora je available, nie len buffy.
-
-Minion: 
-
-- Minion musi dostat priznak, explored ktory je defaultne = False
-- Explored na True meni, combat, Stealth akcia, alebo ak je minon spawn vplyvom schopnosti nacuvania, tak sa rovno spawne ako explored = True
-- Nacuvanie asi dat do Game.choose_minion kontrolu ci ma modifier nacuvanie
-- Stealth a Combat jednoducho pridat funkcio na zmenu priznaku, v pripade combatu to treba dat na koniec combatu, v pripade stealthu hned ako sa pouzije stealth
-
 Ability:
-
-1. Ambush: Vzdy ked bojujes uz s objavenou priserou, tak +1 k utocnej sile. Pasivne
 
 2. Tactical Reposition: Tuna to necham jednoducho tak, ze akcia bude available pri vstupe na policko s priserou, po jej pouziti prichadza hrdina o jeden zivot, ignoruje combat a ziskava 1 pohybovy krok. V podstate ziskava stealth a za zivot traduje
 pohybovy krok. Podmienkou, ale je, ze prisera uz musi byt Explored. 

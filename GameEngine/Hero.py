@@ -4,9 +4,9 @@ from Interfaces.TileObjectInterface import TileObjectInterface
 from Interfaces.MinionInterface import MinionInterface
 from GameEngine.Inventory import Inventory
 from GameEngine.Constants import Constants
-from GameEngine.Action import Action,ActionCombat,EndTurn,RollDice,Revitalize
-from GameEngine.Buff import Buff,Unconsciousness
-from GameEngine.BuffModifier import BuffModifier
+from GameEngine.Action import Action,ActionCombat,EndTurn,RollDice,Revitalize,HealingFountain
+from GameEngine.Buff import Buff,Unconsciousness,Curse
+from GameEngine.BuffModifier import BuffModifier,CanWalkThroughWalls
 import GameEngine.DiceDefinition as diceType
 from typing import Type,overload
 
@@ -26,6 +26,7 @@ class Hero(HeroInterface):
     inventory: Inventory
 
     def __init__(self, definition: HeroDefinition, name: str) -> None:
+        super().__init__(definition,name)
         self.definition = definition
         self.name = name
         self.tile = None
@@ -38,12 +39,20 @@ class Hero(HeroInterface):
         self.power = 0
         self.dices = [diceType.Normal,diceType.Normal]
 
-        self.actions = [EndTurn(self),ActionCombat(self),RollDice(self),Revitalize(self)]
+        self.actions = [EndTurn(self),ActionCombat(self),RollDice(self),Revitalize(self),HealingFountain(self)]
         self.active_buffs = []
 
         a_type: Type[Action] = None
         for a_type in self.definition.default_actions:
             self.actions.append(a_type(self))
+
+        self.actions.sort(key=lambda x: x.prio)
+
+    def set_move_points(self,points: int):
+        self.move_points = points
+
+    def add_move_points(self,points: int):
+        self.move_points += points
 
     def get_move_points(self) -> int:
         return self.move_points
@@ -158,6 +167,11 @@ class Hero(HeroInterface):
         for b in self.active_buffs:
             if b.has_modifier(mod_type):
                 return True
+
+        for a in self.actions:
+            if a.is_available() and a.has_modifier(mod_type):
+                return True
+                    
         return False
     
     def has_buff(self, buff_type: Type[Buff]) -> bool:
@@ -193,3 +207,25 @@ class Hero(HeroInterface):
     def get_dices(self) -> list[diceType.DiceDefinition]:
         return self.dices
     
+    def is_on_fountain(self) -> bool:
+        return self.tile is not None and self.tile.get_definition().is_healing
+    
+    def is_cursed(self) -> bool:
+        return self.has_buff(Curse)
+    
+    def can_pass_walls(self) -> bool:
+        return self.has_modifier(CanWalkThroughWalls)
+    
+    def refresh_actions(self):
+        for a in self.actions:
+            a.update()
+
+    def fighting_explored(self) -> bool:
+        opp = self.get_opponent()
+        b = isinstance(opp,MinionInterface) and opp.is_explored()
+        return isinstance(opp,MinionInterface) and opp.is_explored()
+    
+    def explore_minion(self):
+        p = self.tile.get_placeable()
+        if isinstance(p,MinionInterface) and p.agressive:
+            p.explore()

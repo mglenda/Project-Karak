@@ -24,17 +24,16 @@ class CombatPanel():
             if not self.is_visible():
                 self.show()
             
-            if GAME.get_dice_manager().get_value() != GAME.get_combat().get_active_duelist_data().get_dice_power():
-                GAME.get_combat().get_active_duelist_data().set_dice_power(GAME.get_dice_manager().get_value())
+            GAME.get_combat().get_active_duelist().set_dice_power(GAME.get_dice_manager().get_value())
 
             for id in range(2):
                 self.main.update(id=id
-                                ,base_value = GAME.get_combat().get_duelist_data(id).get_power()
-                                ,dice_value = GAME.get_combat().get_duelist_data(id).get_dice_power()
-                                ,ability_value = GAME.get_combat().get_duelist_data(id).get_ability_power()
-                                ,scroll_value = GAME.get_combat().get_duelist_data(id).get_scroll_power()
-                                ,total_value = GAME.get_combat().get_duelist_data(id).get_total_power()
-                                ,portrait = GAME.get_combat().get_duelist_data(id).duelist.get_combat_icon_path()
+                                ,base_value = GAME.get_combat().get_duelist(id).get_weapon_power()
+                                ,dice_value = GAME.get_combat().get_duelist(id).get_dice_power()
+                                ,ability_value = GAME.get_combat().get_duelist(id).get_ability_power()
+                                ,scroll_value = GAME.get_combat().get_duelist(id).get_scroll_power()
+                                ,total_value = GAME.get_combat().get_duelist(id).get_total_power()
+                                ,portrait = GAME.get_combat().get_duelist(id).get_combat_icon_path()
                 )
         else:
             if self.is_visible():

@@ -18,11 +18,14 @@ class Game():
     def __init__(self) -> None:
         self.combat = None
         self.dice_manager = None
+        self.running = False
 
     def get_tilemap(self):
         return self.ui.get_world().get_tilemap()
 
     def start(self):
+        self.running = True
+
         from UI import UI
         self.ui = UI()
 
@@ -30,6 +33,12 @@ class Game():
         self.minion_pack = MinionPack()
 
         self.spawn_heroes()
+
+    def quit(self):
+        self.running = False
+
+    def is_running(self) -> bool:
+        return self.running
 
     def spawn_heroes(self):
         from GameEngine.HeroDefinition import LordOfKarak,Thief,Barbarian,BeastHunter,Wizard,Warrior
@@ -94,7 +103,7 @@ class Game():
         else:
             self.move_to_tile(tile)
 
-        self.get_current_hero().remove_buffs(buff.CannotEndTurn)
+        self.get_current_hero().remove_buffs(buff.ChoosingTile)
     
     def move_to_tile(self, tile: TileObjectInterface):
         self.get_current_hero().move_to_tile(tile)
@@ -136,12 +145,12 @@ class Game():
                 else:
                     loser = self.combat.get_loser()
                     winner = self.combat.get_winner()
-                    if not self.combat.is_arena_duel():
-                        if loser == self.get_current_hero():
-                            self.get_current_hero().hurt()
-                            self.get_current_hero().move_to_former_tile()
-                        elif isinstance(loser,PlaceableInterface):
-                            loser.remove()
+                    if isinstance(winner,MinionInterface):
+                        winner.explore()
+                        self.get_current_hero().hurt()
+                        self.get_current_hero().move_to_former_tile()
+                    elif isinstance(loser,MinionInterface):
+                        loser.remove()
                 self.clear_dice_manager()
                 self.combat.end()
                 self.combat = None
@@ -174,6 +183,10 @@ class Game():
         hero.remove_buffs(DurationScopes.DURATION_SCOPE_TURN)
 
     def update(self):
+        for h in self.heroes:
+            h.refresh_actions()
+
+    def update_gui(self):
         self.ui.get_hero_panel().update()
         self.ui.get_combat_panel().update()
         self.ui.get_dice_panel().update()

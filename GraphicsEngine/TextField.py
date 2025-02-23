@@ -12,22 +12,18 @@ class TextField(Frame):
         self.text = text
         self.font_path = font_path
         self.refresh_surface()
-        self.refresh_alpha()
 
     def set_text(self,text: str):
         self.text = text
         self.refresh_surface(w=self.w,h=self.h)
-        self.refresh_alpha()
 
     def set_color(self,font_color: tuple):
         self.font_color = font_color
         self.refresh_surface(w=self.w,h=self.h)
-        self.refresh_alpha()
 
     def set_font_size(self,font_size:int):
         self.font_size = font_size
         self.refresh_surface()
-        self.refresh_alpha()
             
     def get_text(self) -> str:
         return self.text
@@ -35,19 +31,16 @@ class TextField(Frame):
     def resize(self, factor: float):
         super().resize(factor)
         self.refresh_surface(w=self.w,h=self.h)
-        self.refresh_alpha()
 
     def set_size(self, w: int, h: int):
         super().set_size(w, h)
         self.refresh_surface(w=self.w,h=self.h)
-        self.refresh_alpha()
 
     def refresh_surface(self,w: int = None,h: int = None):
-        self.surface = MEMORY_ENGINE.get_txt_buffer().get(font_color=self.font_color,font_size=self.font_size,text=self.text,font_path=self.font_path,angle=self.angle,w=w,h=h)
+        self.surface = MEMORY_ENGINE.get_txt_buffer().get(font_color=self.font_color,font_size=self.font_size,text=self.text,font_path=self.font_path,angle=self.angle,w=w,h=h,alpha=self.alpha)
         self.w = self.surface.get_width() if w is None else w
         self.h = self.surface.get_height() if h is None else h
 
     def rotate(self, angle: int):
         super().rotate(angle)
         self.refresh_surface()
-        self.refresh_alpha()

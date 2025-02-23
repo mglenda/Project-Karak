@@ -30,15 +30,18 @@ class ActionPanel():
                 self.main.destroy_children()
                 
                 a_button: ActionButton = None
-                for i,a in enumerate(actions):
-                    if i == 0: 
-                        a_button = ActionButton(w=self.main.get_h(),h=self.main.get_h(),parent=self.main,focused_path=a.path_focused,normal_path=a.path)
-                        a_button.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
-                    else:
-                        previous = a_button
-                        a_button = ActionButton(w=self.main.get_h()*0.6,h=self.main.get_h()*0.6,parent=self.main,focused_path=a.path_focused,normal_path=a.path)
-                        a_button.set_point(FRAMEPOINT.LEFT,FRAMEPOINT.RIGHT,a_button.get_w()*0.15,0,previous)
-                    a_button.register_mouse_event(MouseEvent.LEFTCLICK,a.run)
+                i:int = 0
+                for a in actions:
+                    if not a.is_passive():
+                        if i == 0: 
+                            a_button = ActionButton(w=self.main.get_h(),h=self.main.get_h(),parent=self.main,focused_path=a.path_focused,normal_path=a.path)
+                            a_button.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+                        else:
+                            previous = a_button
+                            a_button = ActionButton(w=self.main.get_h()*0.6,h=self.main.get_h()*0.6,parent=self.main,focused_path=a.path_focused,normal_path=a.path)
+                            a_button.set_point(FRAMEPOINT.LEFT,FRAMEPOINT.RIGHT,a_button.get_w()*0.15,0,previous)
+                        a_button.register_mouse_event(MouseEvent.LEFTCLICK,a.run)
+                        i += 1
 
                 GAME.force_mouse_motion()
                     

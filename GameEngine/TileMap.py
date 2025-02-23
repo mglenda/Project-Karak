@@ -27,7 +27,7 @@ class TileMap(TileMapInterface):
         self.tiles[0].on_click(GAME.move_to_tile,self.tiles[0])
 
     def draw_tile_definition(self, start: TileObject, tile: TileObject):
-        GAME.get_current_hero().add_buff(buff.CannotEndTurn)
+        GAME.get_current_hero().add_buff(buff.ChoosingTile)
         dfn: TileDefinition = self.tilepack.pick()
         if dfn is not None:
             self.disable_all_tiles()
@@ -81,33 +81,34 @@ class TileMap(TileMapInterface):
 
     def pathfinding(self, start: TileObject, movement: int, root: TileObject):
         if movement > 0:
-            if self.is_passable_top(start):
+            can_pass_walls: bool = GAME.get_current_hero().can_pass_walls()
+            if self.is_passable_top(start) or can_pass_walls:
                 t = self.get_tile_on_top(start)
-                if t is not None and self.is_passable_bottom(t) and t != root:
+                if t is not None and ((self.is_passable_bottom(t) and self.is_passable_top(start)) or (can_pass_walls and t.get_definition() != Unknown)) and t != root:
                     t.set_active(True)
                     if t.get_definition() != Unknown:
                         self.pathfinding(t,movement - 1,root)
                     else:
                         t.on_click(self.draw_tile_definition,start,t)
-            if self.is_passable_bottom(start):
+            if self.is_passable_bottom(start) or can_pass_walls:
                 t = self.get_tile_on_bottom(start)
-                if t is not None and self.is_passable_top(t) and t != root:
+                if t is not None and ((self.is_passable_top(t) and self.is_passable_bottom(start)) or (can_pass_walls and t.get_definition() != Unknown)) and t != root:
                     t.set_active(True)
                     if t.get_definition() != Unknown:
                         self.pathfinding(t,movement - 1,root)
                     else:
                         t.on_click(self.draw_tile_definition,start,t)
-            if self.is_passable_left(start):
+            if self.is_passable_left(start) or can_pass_walls:
                 t = self.get_tile_on_left(start)
-                if t is not None and self.is_passable_right(t) and t != root:
+                if t is not None and ((self.is_passable_right(t) and self.is_passable_left(start)) or (can_pass_walls and t.get_definition() != Unknown)) and t != root:
                     t.set_active(True)
                     if t.get_definition() != Unknown:
                         self.pathfinding(t,movement - 1,root)
                     else:
                         t.on_click(self.draw_tile_definition,start,t)
-            if self.is_passable_right(start):
+            if self.is_passable_right(start) or can_pass_walls:
                 t = self.get_tile_on_right(start)
-                if t is not None and self.is_passable_left(t) and t != root:
+                if t is not None and ((self.is_passable_left(t) and self.is_passable_right(start)) or (can_pass_walls and t.get_definition() != Unknown)) and t != root:
                     t.set_active(True)
                     if t.get_definition() != Unknown:
                         self.pathfinding(t,movement - 1,root)

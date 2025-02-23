@@ -9,17 +9,14 @@ class Rect(Frame):
         self.set_h(h)
         self.color = color
         self.refresh_surface()
-        self.refresh_alpha()
 
     def resize(self, factor: float):
         super().resize(factor)
         self.refresh_surface()
-        self.refresh_alpha()
 
     def set_size(self, w: int, h: int):
         super().set_size(w, h)
         self.refresh_surface()
-        self.refresh_alpha()
 
     def refresh_surface(self):
-        self.surface = MEMORY_ENGINE.get_rect_buffer().get(self.w,self.h,self.color)
+        self.surface = MEMORY_ENGINE.get_rect_buffer().get(self.w,self.h,self.color,alpha=self.alpha)

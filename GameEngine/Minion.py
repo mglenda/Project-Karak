@@ -6,12 +6,15 @@ from GameEngine.Item import Item
 class Minion(MinionInterface,Placeable):
     definition: MinionDefinition
     agressive: bool
+    explored: bool
 
-    def __init__(self, definition: MinionDefinition) -> None:
-        super().__init__(definition)
+    def __init__(self, definition: MinionDefinition, explored: bool = False) -> None:
+        Placeable.__init__(self,definition)
+        MinionInterface.__init__(self)
 
         self.power = definition.power
         self.agressive = definition.agressive
+        self.explored = explored
 
     def get_wheel_value(self) -> int:
         if self.agressive:
@@ -31,5 +34,11 @@ class Minion(MinionInterface,Placeable):
         return self.definition.path
     
     def remove(self):
-        super().remove()
+        super(Placeable,self).remove()
         self.tile.add_placeable(Item(self.definition.reward))
+
+    def is_explored(self) -> bool:
+        return self.explored
+    
+    def explore(self):
+        self.explored = True

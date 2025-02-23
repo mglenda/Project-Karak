@@ -65,6 +65,9 @@ class FrameInterface(Element):
     def collide(self,x: int,y: int) -> bool:
         pass
 
+    def collides_with(self, other: Element) -> bool:
+        pass
+
     def resize(self,factor: float):
         pass
 
@@ -72,7 +75,4 @@ class FrameInterface(Element):
         pass
 
     def set_alpha(self, alpha: int):
-        pass
-
-    def refresh_alpha(self):
         pass

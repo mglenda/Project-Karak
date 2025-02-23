@@ -67,7 +67,3 @@ class DicePanel():
     def activate_dices(self):
         for d in self.g_dices:
             d.set_active(True)
-
-    def reroll(self):
-        for d in self.cached_dices:
-            d.roll()

@@ -8,7 +8,7 @@ from GameEngine.Duelist import Duelist
 from GameEngine.DiceDefinition import DiceDefinition
 from typing import Type,overload
 
-class HeroInterface(Interface,Duelist):
+class HeroInterface(Duelist,Interface):
     definition: HeroDefinition
     name: str
     tile: Interface
@@ -22,6 +22,12 @@ class HeroInterface(Interface,Duelist):
     inventory: InventoryInterface
 
     def __init__(self, definition: HeroDefinition, name: str) -> None:
+        Duelist.__init__(self)
+
+    def set_move_points(self,points: int):
+        pass
+    
+    def add_move_points(self,points: int):
         pass
 
     def get_move_points(self) -> int:
@@ -115,4 +121,22 @@ class HeroInterface(Interface,Duelist):
         pass
 
     def has_buff(self, buff_type: Type[BuffInterface]) -> bool:
+        pass
+
+    def is_on_fountain(self) -> bool:
+        pass
+
+    def is_cursed(self) -> bool:
+        pass
+
+    def can_pass_walls(self) -> bool:
+        pass
+
+    def refresh_actions(self):
+        pass
+
+    def fighting_explored(self) -> bool:
+        pass
+
+    def explore_minion(self):
         pass

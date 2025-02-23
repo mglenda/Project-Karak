@@ -46,9 +46,9 @@ class Exhausted(Buff):
     def __init__(self, hero, duration_scope = None):
         super().__init__(hero, duration_scope)
 
-class CannotEndTurn(Buff):
+class ChoosingTile(Buff):
     default_duration_scope: int = DurationScopes.DURATION_SCOPE_FOREVER
-    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.CannotEndTurn]
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.CannotEndTurn,bMod.CannotDoAnything]
 
     def __init__(self, hero, duration_scope = None):
         super().__init__(hero, duration_scope)
@@ -77,6 +77,20 @@ class Injured(Buff):
 class Curse(Buff):
     default_duration_scope: int = DurationScopes.DURATION_SCOPE_FOREVER
     modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.Cursed]
+
+    def __init__(self, hero, duration_scope = None):
+        super().__init__(hero, duration_scope)
+
+class HealedOnFountain(Buff):
+    default_duration_scope: int = DurationScopes.DURATION_SCOPE_TURN
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.CannotStartCombat,bMod.Injured,bMod.CannotMove]
+
+    def __init__(self, hero, duration_scope = None):
+        super().__init__(hero, duration_scope)
+
+class DisableAllActions(Buff):
+    default_duration_scope: int = DurationScopes.DURATION_SCOPE_FOREVER
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.CannotEndTurn,bMod.CannotDoAnything,bMod.CannotMove]
 
     def __init__(self, hero, duration_scope = None):
         super().__init__(hero, duration_scope)
