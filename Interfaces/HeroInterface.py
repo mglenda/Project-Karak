@@ -1,5 +1,6 @@
 from GameEngine.HeroDefinition import HeroDefinition
 from Interfaces.Interface import Interface
+from Interfaces.BuffInterface import BuffInterface
 from Interfaces.ActionInterface import ActionInterface
 from Interfaces.InventoryInterface import InventoryInterface
 from Interfaces.BuffInterface import BuffInterface
@@ -18,6 +19,7 @@ class HeroInterface(Duelist,Interface):
     move_points: int
     max_move_points: int
     actions: list[ActionInterface]
+    active_buffs: list[BuffInterface]
 
     inventory: InventoryInterface
 

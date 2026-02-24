@@ -92,7 +92,7 @@ class ActionCombat(Action):
         super().__init__(hero)
 
     def get_availability(self) -> bool:
-        return super().get_availability() and (self.hero.is_in_combat() or (self.hero.is_in_hostile_tile() and not self.hero.has_modifier(bMod.CannotStartCombat)))
+        return super().get_availability() and ((self.hero.is_in_combat() and self.hero.has_modifier(bMod.CannotRollDice)) or (self.hero.is_in_hostile_tile() and not self.hero.is_in_combat() and not self.hero.has_modifier(bMod.CannotStartCombat)))
     
     def run(self):
         if self.hero.is_in_combat():
@@ -230,7 +230,7 @@ class Ambush(Action):
     path_focused = PATH + 'Ambush.png'
     prio: int = 0
     action_types: list[int] = [ACTION_TYPE_ABILITY]
-    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.AmbushBonus]
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.AbilityPower_Plus_1]
     modifiers: list[bMod.BuffModifier]
     passive = True
 

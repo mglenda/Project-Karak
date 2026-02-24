@@ -64,7 +64,7 @@ class CanWalkThroughWalls(BuffModifier):
         super().__init__(hero)
 
 
-class AmbushBonus(BuffModifier):
+class AbilityPower_Plus_1(BuffModifier):
 
     def __init__(self, hero):
         super().__init__(hero)

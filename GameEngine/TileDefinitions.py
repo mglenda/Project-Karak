@@ -1,7 +1,7 @@
 PATH = '_Textures\\Tiles\\Retextured\\'
 
 class TileDefinition():
-    pathing: list = ()
+    pathing: tuple = ()
     path: str
     is_spawn: bool
     is_arena: bool

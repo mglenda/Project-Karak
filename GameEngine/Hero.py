@@ -21,7 +21,6 @@ class Hero(HeroInterface):
     max_move_points: int
     actions: list[Action]
     active_buffs: list[Buff]
-    dices: list[diceType.DiceDefinition]
 
     inventory: Inventory
 
@@ -37,7 +36,6 @@ class Hero(HeroInterface):
         self.move_points = self.max_move_points
         self.inventory = Inventory(self)
         self.power = 0
-        self.dices = [diceType.Normal,diceType.Normal]
 
         self.actions = [EndTurn(self),ActionCombat(self),RollDice(self),Revitalize(self),HealingFountain(self)]
         self.active_buffs = []
@@ -203,9 +201,11 @@ class Hero(HeroInterface):
             if remove:
                 b.remove()
                 self.active_buffs.remove(b)
+        #Some actions may have availability bound to specific modifiers which can be part of buffs
+        self.refresh_actions()
                 
     def get_dices(self) -> list[diceType.DiceDefinition]:
-        return self.dices
+        return [diceType.Normal,diceType.Normal,diceType.Warlock]
     
     def is_on_fountain(self) -> bool:
         return self.tile is not None and self.tile.get_definition().is_healing

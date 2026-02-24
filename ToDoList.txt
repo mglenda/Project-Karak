@@ -1,7 +1,19 @@
 Looting System
 
+Treba vytvorit UI panel kde bude bude Item a inventar hrdinu, ktory ho lootuje. Tento panel sa zobrazi po vyhre nad minionom. Bude mozne kliknut na slot kam item pojde.
+V pripade ak je item otvorena truhla tak panel nezobrazujem. Truhla bude mat na zdvihnutie vlastnu akciu, bez panelu.
+
+Dalsi UI Panel bude v pripade vyhry nad hrdinom. V takom pripade bude potrebne vybrat predmet od porazeneho hrdinu, cize panel s inventarom kde si budem vediet nakliknut predmet.
+Panel bude mat moznost zrusenia, v takom pripade sa ziadny predmet nekradne a ide sa dalej. Ak porazeny hrdina nema ziadny predmet ani truhlu, panel sa vobec nezobrazuje.
+
+Nasledne po potvrdeni sa zobrazi panel s invetnarom vyhercu, kde si vyberie slot kam chce tento predmet vlozit. Ak je predmetom truhla ta nezobrazuje tento panel ale je automaticky pridana.
+Ak je to predmet tak panel zobrazuje. Tento panel bude mat moznost zrusenia, v takom pripade predmet zostava na zemi.
+
+RewardPanel - Panel ktory sa zobrazuje po vyhre nad minionom a zaroven sa zobrazuje ako druhy panel pri vyhre nad hracom, ked uz je vybrany predmet ktory hrac ukradol.
+LootPanel - Panel ktory sa zobrazuje po vyhre nad hrdinom, v tomto panele sa vybera predmet, ktory sa porazenemu ukraden.
+
 1. Dvihanie predmetov, akcia ak stojim na policku s predmetom tak je available. Po pouziti stracam vsetky move pointy.
-2. Dvihanie truhiel, akcia ak stojim na policku so zavretou truhlou a mam kluc, alebo na policku s otvorenou truhlou tak je available. Po pouziti ziskavam truhlu.
+2. Dvihanie truhiel, akcia ak stojim na policku so zavretou truhlou a mam kluc, alebo na policku s otvorenou truhlou tak je available. Po pouziti ziskavam truhlu a stracam vsetky move pointy.
 3. Reward Panel. Hore inventar hrdinu ktory prehral, dole inventar hrdinu ktory vyhral, v strede trading item. Ak som dvihal predmet zo zeme, tak sa inventar hrdinu ktory prehral nezobrazuje a je tam len trading item a inventar toho co dviha predmet.
 Trading item sa pri dvihani automaticky naloaduje a obsahuje predmet ktory bol na zemi. Klikanie na spodny inventar = umiestnenie itemu z trading slotu, do kliknuteho slotu. Uplne dole bude tlacidlo na ukoncenie lootingu. Ak sa pri ukonceni v trading 
 slote nachadza truhla, tak je automaticky pridana do truhiel. Po ukonceni, predmet z trading slotu zostava lezat na policku ak teda nebol slot prazdny. 
@@ -28,7 +40,7 @@ Teleporty:
 2. Protector: Je Available ak sa nejakemu herovi mimo seba chyba aspon 1 zivot a ma aspon 1 move point. 
 Po spusteni, treba aktivovat vsetky tiles kde sa nachadza hero ktoremu chyba aspon jeden zivot a po kliknuti na dany tile premiestnit hera a obnovit druhemu 1 zivot.
 
-V GAME treba vytvorit funkciu, ktora vyhlada taketo policka, zaktivuje ich a zaroven im hodi mouse event na presun + obnovu 1 zivota. move_with_heal ? 
+V GAME treba vytvorit funkciu, ktora vyhlada taketo policka, zaktivuje ich a zaroven im hodi mouse event na presun + obnovu 1 zivota. move_with_heal ? (alebo to urobit cez buff)
 , tiez si tieto policka musi niekam stornut a po zavolani move_with_heal im zaregistrovat povodnu move_to_tile akciu. Rovnaky behavior potom implementovat
 aj na warlokovu vymenu miesta. 
 

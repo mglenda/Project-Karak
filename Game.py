@@ -10,6 +10,7 @@ import GameEngine.BuffModifier as bMod
 import GameEngine.Buff as buff
 from GameEngine.DiceManager import DiceManager
 from GameEngine.DiceDefinition import DiceDefinition
+from GameEngine.Loot import Loot
 import pygame
 
 pygame.init()
@@ -18,6 +19,7 @@ class Game():
     def __init__(self) -> None:
         self.combat = None
         self.dice_manager = None
+        self.loot_manager = None
         self.running = False
 
     def get_tilemap(self):
@@ -97,13 +99,12 @@ class Game():
             return self.get_current_hero()
 
     def confirm_tile_placement(self, tile: TileObjectInterface):
+        self.get_current_hero().remove_buffs(buff.ChoosingTile)
         tile.on_click(self.move_to_tile,tile)
         if tile.is_spawn:
             self.choose_minion(tile)
         else:
             self.move_to_tile(tile)
-
-        self.get_current_hero().remove_buffs(buff.ChoosingTile)
     
     def move_to_tile(self, tile: TileObjectInterface):
         self.get_current_hero().move_to_tile(tile)
@@ -206,5 +207,11 @@ class Game():
     
     def clear_dice_manager(self):
         self.dice_manager = None
+
+    def get_loot_manager(self) -> Loot:
+        return self.loot_manager
+    
+    def clear_loot_manager(self):
+        self.loot_manager = None
 
 GAME = Game()
