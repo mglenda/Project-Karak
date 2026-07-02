@@ -1,267 +1,60 @@
-from Interfaces.TileObjectInterface import TileObjectInterface
-from Interfaces.HeroInterface import HeroInterface
-from Interfaces.ItemInterface import ItemInterface
-from GameEngine.MinionDefinition import MinionDefinition
-from Interfaces.MinionInterface import MinionInterface
-from Interfaces.PlaceableInterface import PlaceableInterface
-from GameEngine.Reward import Reward
-from GameEngine.Combat import Combat
-from GameEngine.Duelist import Duelist
-from GameEngine.Constants import DurationScopes
-import GameEngine.BuffModifier as bMod
-import GameEngine.Buff as buff
-from GameEngine.DiceManager import DiceManager
-from GameEngine.DiceDefinition import DiceDefinition
+from GameEngine.DiceService import DiceService
+from GameEngine.CombatService import CombatService
+from GameEngine.MovementService import MovementService
+from GameEngine.RewardService import RewardService
+from GameEngine.GameSetupService import GameSetupService
+from GameEngine.TurnService import TurnService
+from GameContext import GameContext
+from typing import TYPE_CHECKING
 import pygame
+
+if TYPE_CHECKING:
+    from UI import UI
 
 pygame.init()
 
 class Game():
-    combat: Combat
-    dice_manager: DiceManager
-    running: bool
-    reward: Reward
-    rolling_hero: HeroInterface
-    apply_roll_lock: bool
-    
     def __init__(self) -> None:
-        self.combat = None
-        self.dice_manager = None
-        self.running = False
-        self.reward = None
-        self.rolling_hero = None
-        self.apply_roll_lock = False
-
-    def get_tilemap(self):
-        return self.ui.get_world().get_tilemap()
+        self.context = GameContext()
+        self.dice_service = DiceService(self.context)
+        self.combat_service = CombatService(self.context, self.dice_service)
+        self.movement_service = MovementService(self.context)
+        self.reward_service = RewardService(self.context)
+        self.setup_service = GameSetupService(self.context, self.movement_service, self)
+        self.turn_service = TurnService(self.context, self.movement_service)
 
     def start(self):
-        self.running = True
+        self.context.running = True
 
         from UI import UI
-        self.ui = UI()
+        self.context.ui = UI(self)
 
         from GameEngine.MinionPack import MinionPack
-        self.minion_pack = MinionPack()
+        self.context.minion_pack = MinionPack()
 
-        self.spawn_heroes()
+        self.setup_service.spawn_heroes()
 
     def quit(self):
-        self.running = False
+        self.context.running = False
 
     def is_running(self) -> bool:
-        return self.running
-
-    def spawn_heroes(self):
-        from GameEngine.HeroDefinition import LordOfKarak,Thief,Barbarian,BeastHunter,Wizard,Warrior
-        from GameEngine.Hero import Hero
-        self.heroes: list[Hero] = []
-        self.heroes.append(Hero(Wizard,'Marek'))
-        self.heroes.append(Hero(Thief,'Katka'))
-        self.heroes.append(Hero(Warrior,'Cico'))
-
-        from GameEngine.Item import Item
-        from GameEngine.ItemDefinition import Axe,Sword,Key,FrostFist,HealingPortal,MagicBolt
-
-        for h in self.heroes:
-            h.move_to_tile(self.get_tilemap().tiles[0])
-            h.refresh_move_points()
-
-        self.heroes[0].inventory.add_item(Item(Axe))
-        self.heroes[0].inventory.add_item(Item(FrostFist))
-        self.heroes[0].inventory.add_item(Item(Key))
-        self.heroes[0].inventory.add_item(Item(HealingPortal))
-        self.heroes[0].inventory.add_item(Item(MagicBolt))
-        self.heroes[0].inventory.add_item(Item(Sword))
-
-        self.heroes[1].hit_points = 1
-
-        # self.heroes[1].inventory.add_item(Item(Axe))
-        # self.heroes[1].inventory.add_item(Item(Axe))
-
-        # self.heroes[2].inventory.add_item(Item(Axe))
-        # self.heroes[2].inventory.add_item(Item(Axe))
-
-        self.load_move_options()
-
-    def choose_minion(self, tile: TileObjectInterface):
-        arr = self.minion_pack.pick()
-        if len(arr) == 0:
-            self.move_to_tile(tile)
-        else:
-            if len(arr) == 1:
-                self.spawn_minion(arr[0],tile)
-                self.move_to_tile(tile)
-            else:
-                pass
-
-    def spawn_minion(self, definition: MinionDefinition, tile: TileObjectInterface):
-        from GameEngine.Minion import Minion
-        Minion(definition).set_tile(tile)
-
-    def get_current_hero(self):
-        return self.heroes[0]
-    
-    def get_current_hero_active(self) -> HeroInterface:
-        if self.combat is not None and self.combat.is_arena_duel():
-            return self.combat.get_active_duelist()
-        else:
-            return self.get_current_hero()
-
-    def confirm_tile_placement(self, tile: TileObjectInterface):
-        self.get_current_hero().remove_buffs(buff.ChoosingTile)
-        tile.on_click(self.move_to_tile,tile)
-        if tile.is_spawn:
-            self.choose_minion(tile)
-        else:
-            self.move_to_tile(tile)
-    
-    def move_to_tile(self, tile: TileObjectInterface):
-        self.get_current_hero().move_to_tile(tile)
-        self.get_current_hero().reset_cooldowns(DurationScopes.DURATION_SCOPE_TILEMOVE)
-        self.get_current_hero().remove_buffs(DurationScopes.DURATION_SCOPE_TILEMOVE)
-        self.load_move_options()
-
-    def load_move_options(self):
-        hero = self.get_current_hero()
-        tile = hero.get_tile()
-        placeable = tile.get_placeable()
-
-        if not(isinstance(placeable,MinionInterface) and placeable.agressive) or hero.has_modifier(bMod.IgnoreHostiles):
-            if hero.get_move_points() > 0 and not hero.has_modifier(bMod.CannotMove):
-                tile = hero.get_tile()
-                self.get_tilemap().load_path(tile,1)
-            else:
-                self.get_tilemap().disable_all_tiles()
-        else:
-            self.get_tilemap().disable_all_tiles()
-
-    def start_combat(self):
-        self.get_tilemap().disable_all_tiles()
-        attacker: Duelist = self.get_current_hero()
-        defender: Duelist = attacker.get_tile().get_placeable()
-        self.combat = Combat(attacker,defender)
-        self.create_dice_manager(self.get_current_hero().get_dices())
-
-    def end_combat(self):
-        h = self.combat.get_active_duelist()
-        if isinstance(h,HeroInterface):
-            h.reset_cooldowns(DurationScopes.DURATION_SCOPE_COMBAT)
-            h.remove_buffs(DurationScopes.DURATION_SCOPE_COMBAT)
-
-        if self.combat is not None:
-            if self.combat.is_finished():
-                if self.combat.is_draw():
-                    if not self.combat.is_arena_duel():
-                        self.get_current_hero().move_to_former_tile()
-                else:
-                    loser = self.combat.get_loser()
-                    winner = self.combat.get_winner()
-                    if isinstance(winner,MinionInterface):
-                        winner.explore()
-                        self.get_current_hero().hurt()
-                        self.get_current_hero().move_to_former_tile()
-                    elif isinstance(loser,MinionInterface):
-                        loser.remove()
-                self.clear_dice_manager()
-                self.combat.end()
-                self.combat = None
-            else:
-                self.combat.active_next()
-                self.create_dice_manager(self.get_current_hero_active().get_dices())
-
-    def get_combat(self):
-        return self.combat
-
-    def end_turn(self):
-        hero = self.get_current_hero()
-
-        for h in self.heroes:
-            if h.has_buff(buff.Unconsciousness):
-                h.remove_buffs(buff.Unconsciousness)
-                h.add_buff(buff.Injured)
-
-        for i,h in enumerate(self.heroes):
-            if i != 0:
-                self.heroes[i-1] = h
-        self.heroes[i] = hero
-        
-        self.refresh_hero(self.heroes[0])
-        self.load_move_options()
-
-    def refresh_hero(self, hero: HeroInterface):
-        hero.refresh_move_points()
-        hero.reset_cooldowns(DurationScopes.DURATION_SCOPE_TURN)
-        hero.remove_buffs(DurationScopes.DURATION_SCOPE_TURN)
+        return self.context.running
 
     def update(self):
-        for h in self.heroes:
+        for h in self.context.heroes:
             h.refresh_actions()
 
     def update_gui(self):
-        self.ui.get_hero_panel().update()
-        self.ui.get_combat_panel().update()
-        self.ui.get_dice_panel().update()
-        self.ui.get_action_panel().update()
-        self.ui.get_reward_panel().update()
+        self.context.ui.get_hero_panel().update()
+        self.context.ui.get_combat_panel().update()
+        self.context.ui.get_dice_panel().update()
+        self.context.ui.get_action_panel().update()
+        self.context.ui.get_reward_panel().update()
 
     def draw(self):
-        self.ui.draw()
+        self.context.ui.draw()
 
     def force_mouse_motion(self):
-        self.ui.on_mouse_motion(self.ui.get_mouse_x(),self.ui.get_mouse_y())
-
-    def create_dice_manager(self, dice_types: list[DiceDefinition]):
-        self.dice_manager = DiceManager(dice_types)
-
-    def start_dice_roll(self, hero: HeroInterface, apply_roll_lock: bool = True):
-        if self.dice_manager is None or self.dice_manager.is_rolling():
-            return
-
-        self.rolling_hero = hero
-        self.apply_roll_lock = apply_roll_lock
-        self.dice_manager.start_roll()
-        self.ui.get_action_panel().clear_actions()
-
-    def start_dice_reroll(self, index: int):
-        if self.dice_manager is None or self.dice_manager.is_rolling():
-            return
-
-        self.rolling_hero = None
-        self.apply_roll_lock = False
-        self.dice_manager.start_reroll(index)
-        self.ui.get_action_panel().clear_actions()
-
-    def finish_dice_roll(self):
-        if self.dice_manager is None or not self.dice_manager.is_rolling():
-            return
-
-        self.dice_manager.commit_roll()
-        if self.apply_roll_lock and self.rolling_hero is not None:
-            self.rolling_hero.add_buff(buff.CannotRollDices)
-            self.rolling_hero.refresh_actions()
-
-        self.rolling_hero = None
-        self.apply_roll_lock = False
-        self.force_mouse_motion()
-
-    def is_dice_rolling(self) -> bool:
-        return self.dice_manager is not None and self.dice_manager.is_rolling()
-
-    def get_dice_manager(self) -> DiceManager:
-        return self.dice_manager
-    
-    def clear_dice_manager(self):
-        self.dice_manager = None
-
-    def get_reward(self) -> Reward:
-        return self.reward
-    
-    def create_reward(self, item: ItemInterface, hero: HeroInterface):
-        self.reward = Reward(item, hero)
-
-    def clear_reward(self):
-        self.reward = None
+        self.context.ui.on_mouse_motion(self.context.ui.get_mouse_x(),self.context.ui.get_mouse_y())
 
 GAME = Game()
-

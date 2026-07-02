@@ -2,6 +2,10 @@ from GraphicsEngine.Rect import Rect,Frame
 from GraphicsEngine.Constants import Framepoint as FRAMEPOINT
 from GraphicsEngine.Image import Image
 from GameEngine.TileMap import TileMap
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Game import Game
 
 ZOOM_MAX = 10
 ZOOM_MIN = -2
@@ -16,7 +20,7 @@ class World(Rect):
     is_motion: bool
     tilemap: TileMap
 
-    def __init__(self, parent: Frame):
+    def __init__(self, parent: Frame, game: "Game"):
         super().__init__(parent.get_w(),parent.get_h(),(0,0,0),parent)
         self.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
 
@@ -26,7 +30,7 @@ class World(Rect):
         self.zoom = 0
         self.set_active(True)
 
-        self.tilemap = TileMap(self)
+        self.tilemap = TileMap(self, game.context, game.movement_service)
 
         self.center_x = parent.get_w() / 2
         self.center_y = parent.get_h() / 2

@@ -7,6 +7,10 @@ from UserInterface.CombatPanel import CombatPanel
 from UserInterface.ActionPanel import ActionPanel
 from UserInterface.DicePanel import DicePanel
 from UserInterface.RewardPanel import RewardPanel
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Game import Game
 
 class UI(MouseController):
     screen: Screen
@@ -18,21 +22,21 @@ class UI(MouseController):
     dice_panel: DicePanel
     reward_panel: RewardPanel
 
-    def __init__(self) -> None:
+    def __init__(self, game: "Game") -> None:
         super().__init__(Screen())
-        self.world = World(self.screen)
-        self.hero_panel = HeroPanel(self.screen)
+        self.world = World(self.screen, game)
+        self.hero_panel = HeroPanel(self.screen, game)
         self.hero_panel.portrait.resize(0.8)
 
         self.disable_screen = DisableScreen(self.screen)
 
-        self.combat_panel = CombatPanel(self.screen)
+        self.combat_panel = CombatPanel(self.screen, game)
 
-        self.dice_panel = DicePanel(self.screen)
+        self.dice_panel = DicePanel(self.screen, game)
 
-        self.reward_panel = RewardPanel(self.screen)
+        self.reward_panel = RewardPanel(self.screen, game)
 
-        self.action_panel = ActionPanel(self.screen)
+        self.action_panel = ActionPanel(self.screen, game)
 
     def get_hero_panel(self) -> HeroPanel:
         return self.hero_panel

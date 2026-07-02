@@ -12,6 +12,9 @@ class TileMapInterface(Interface):
     def __init__(self, world: Frame) -> None:
         pass
 
+    def disable_all_tiles(self):
+        pass
+
     def draw_tile_definition(self, tile: TileObjectInterface):
         pass
 

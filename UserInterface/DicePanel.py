@@ -1,8 +1,10 @@
 from GraphicComponents.DiceGraphics import DiceGraphics,Frame,FRAMEPOINT,DiceScreen
 from GameEngine.DiceManager import DiceManager,Dice
 from GraphicsEngine.Constants import MouseEvent
+from typing import TYPE_CHECKING
 
-from Game import GAME
+if TYPE_CHECKING:
+    from Game import Game
 
 class DicePanel():
     main: DiceScreen
@@ -11,7 +13,8 @@ class DicePanel():
     cached_roll_ids: list[int]
     g_dices: list[DiceGraphics]
 
-    def __init__(self, screen: Frame) -> None:
+    def __init__(self, screen: Frame, game: "Game") -> None:
+        self.dice_service = game.dice_service
         self.main = DiceScreen(screen.get_w(), screen.get_h() * 0.25, screen)
         self.main.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
         self.cached_dices = []
@@ -29,7 +32,7 @@ class DicePanel():
         return self.main.is_visible()
     
     def update(self):
-        dice_manager: DiceManager = GAME.get_dice_manager()
+        dice_manager: DiceManager = self.dice_service.get_dice_manager()
         if dice_manager is not None:
             if not self.is_visible():
                 self.show()
@@ -74,7 +77,7 @@ class DicePanel():
                 self.g_dices[i].set_value(target_value)
 
         if not self.has_active_animation(dice_manager):
-            GAME.finish_dice_roll()
+            self.dice_service.finish_dice_roll()
 
     def update_committed_dices(self):
         for i,d in enumerate(self.cached_dices):
@@ -101,7 +104,7 @@ class DicePanel():
     def reroll_dice(self, g_dice: DiceGraphics):
         for i,d in enumerate(self.g_dices):
             if d == g_dice:
-                GAME.start_dice_reroll(i)
+                self.dice_service.start_dice_reroll(i)
             d.set_active(False)
 
     def activate_dices(self):

@@ -61,33 +61,33 @@ def main():
             if event.type == pygame.QUIT:
                 GAME.quit()
             elif event.type == pygame.MOUSEMOTION:
-                GAME.ui.on_mouse_motion(x=coords[0],y=coords[1])
+                GAME.context.ui.on_mouse_motion(x=coords[0],y=coords[1])
             elif event.type == pygame.MOUSEBUTTONUP:
                 #LEFT CLICK
                 if event.button == 1:
-                    GAME.ui.on_mouse_left_click(x=coords[0],y=coords[1])
+                    GAME.context.ui.on_mouse_left_click(x=coords[0],y=coords[1])
                 #WHEEL CLICK
                 if event.button == 2:
-                    GAME.ui.on_mouse_wheel_click(x=coords[0],y=coords[1])
+                    GAME.context.ui.on_mouse_wheel_click(x=coords[0],y=coords[1])
                 #RIGHT CLICK
                 if event.button == 3:
-                    GAME.ui.on_mouse_right_click(x=coords[0],y=coords[1])
+                    GAME.context.ui.on_mouse_right_click(x=coords[0],y=coords[1])
                 #WHEEL UP = 4 
                 if event.button == 4:
-                    GAME.ui.on_mouse_wheel_up(x=coords[0],y=coords[1])
+                    GAME.context.ui.on_mouse_wheel_up(x=coords[0],y=coords[1])
                 #WHEEL DOWN = 5
                 if event.button == 5:
-                    GAME.ui.on_mouse_wheel_down(x=coords[0],y=coords[1])
+                    GAME.context.ui.on_mouse_wheel_down(x=coords[0],y=coords[1])
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 #LEFT CLICK
                 if event.button == 1:
-                    GAME.ui.on_mouse_left_press(x=coords[0],y=coords[1])
+                    GAME.context.ui.on_mouse_left_press(x=coords[0],y=coords[1])
                 #WHEEL CLICK
                 if event.button == 2:
-                    GAME.ui.on_mouse_wheel_press(x=coords[0],y=coords[1])
+                    GAME.context.ui.on_mouse_wheel_press(x=coords[0],y=coords[1])
                 #RIGHT CLICK
                 if event.button == 3:
-                    GAME.ui.on_mouse_right_press(x=coords[0],y=coords[1])
+                    GAME.context.ui.on_mouse_right_press(x=coords[0],y=coords[1])
         GAME.draw()
         pygame.time.Clock().tick(120)
 

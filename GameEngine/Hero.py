@@ -8,7 +8,10 @@ from GameEngine.Action import Action,ActionCombat,EndTurn,RollDice,Revitalize,He
 from GameEngine.Buff import Buff,Unconsciousness,Curse
 from GameEngine.BuffModifier import BuffModifier,CanWalkThroughWalls
 import GameEngine.DiceDefinition as diceType
-from typing import Type,overload
+from typing import TYPE_CHECKING, Type, overload
+
+if TYPE_CHECKING:
+    from Game import Game
 
 class Hero(HeroInterface):
     definition: HeroDefinition
@@ -24,8 +27,9 @@ class Hero(HeroInterface):
 
     inventory: Inventory
 
-    def __init__(self, definition: HeroDefinition, name: str) -> None:
+    def __init__(self, definition: HeroDefinition, name: str, game: "Game") -> None:
         super().__init__(definition,name)
+        self.game = game
         self.definition = definition
         self.name = name
         self.tile = None
@@ -37,12 +41,12 @@ class Hero(HeroInterface):
         self.inventory = Inventory(self)
         self.power = 0
 
-        self.actions = [EndTurn(self),ActionCombat(self),RollDice(self),Revitalize(self),HealingFountain(self),PickUpItem(self)]
+        self.actions = [EndTurn(self, self.game),ActionCombat(self, self.game),RollDice(self, self.game),Revitalize(self, self.game),HealingFountain(self, self.game),PickUpItem(self, self.game)]
         self.active_buffs = []
 
         a_type: Type[Action] = None
         for a_type in self.definition.default_actions:
-            self.actions.append(a_type(self))
+            self.actions.append(a_type(self, self.game))
 
         self.actions.sort(key=lambda x: x.prio)
 

@@ -6,8 +6,10 @@ from GameEngine.Constants import DurationScopes
 import GameEngine.Buff as buff
 import GameEngine.BuffModifier as bMod
 from typing import Type
+from typing import TYPE_CHECKING
 
-from Game import GAME
+if TYPE_CHECKING:
+    from Game import Game
 
 PATH = '_Textures\\Abilities\\'
 
@@ -30,7 +32,8 @@ class Action(ActionInterface):
     available: bool
     passive: bool
 
-    def __init__(self,hero: HeroInterface):
+    def __init__(self, hero: HeroInterface, game: "Game"):
+        self.game = game
         self.hero = hero
         self.cooldown = None
         self.available = True
@@ -89,8 +92,8 @@ class ActionCombat(Action):
     modifiers: list[bMod.BuffModifier]
     passive = False
 
-    def __init__(self, hero):
-        super().__init__(hero)
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
 
     def get_availability(self) -> bool:
         return super().get_availability() and ((self.hero.is_in_combat() and self.hero.has_modifier(bMod.CannotRollDice)) or (self.hero.is_in_hostile_tile() and not self.hero.is_in_combat() and not self.hero.has_modifier(bMod.CannotStartCombat)))
@@ -98,9 +101,9 @@ class ActionCombat(Action):
     def run(self):
         if self.hero.is_in_combat():
             self.set_cooldown(DurationScopes.DURATION_SCOPE_TURN)
-            GAME.end_combat()
+            self.game.combat_service.end_combat()
         else:
-            GAME.start_combat()
+            self.game.combat_service.start_combat()
 
 class PickUpItem(Action):
     path = PATH + 'PickUpItem.png'
@@ -111,17 +114,17 @@ class PickUpItem(Action):
     modifiers: list[bMod.BuffModifier]
     passive = False
 
-    def __init__(self, hero):
-        super().__init__(hero)
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
 
     def get_availability(self) -> bool:
         return super().get_availability() and self.hero.get_tile().get_placeable() is not None and isinstance(self.hero.get_tile().get_placeable(),ItemInterface)
     
     def run(self):
-        if GAME.get_reward() is not None:
-            GAME.clear_reward()
+        if self.game.reward_service.get_reward() is not None:
+            self.game.reward_service.clear_reward()
         else:
-            GAME.create_reward(self.hero, self.hero.get_tile().get_placeable())
+            self.game.reward_service.create_reward(self.hero, self.hero.get_tile().get_placeable())
 
 class EndTurn(Action):
     path = PATH + 'EndTurn.png'
@@ -132,14 +135,14 @@ class EndTurn(Action):
     modifiers: list[bMod.BuffModifier]
     passive = False
 
-    def __init__(self, hero):
-        super().__init__(hero)
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
 
     def get_availability(self) -> bool:
         return (not self.hero.is_in_hostile_tile() or self.hero.has_modifier(bMod.IgnoreHostiles) or self.hero.has_modifier(bMod.CannotStartCombat)) and not(self.hero.is_in_combat()) and not self.hero.has_modifier(bMod.CannotEndTurn)
     
     def run(self):
-        GAME.end_turn()
+        self.game.turn_service.end_turn()
 
     def set_cooldown(self, cooldown_scope):
         pass
@@ -154,8 +157,8 @@ class Stealth(Action):
     modifiers: list[bMod.BuffModifier]
     passive = True
 
-    def __init__(self, hero):
-        super().__init__(hero)
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
 
     def get_availability(self) -> bool:
         # return super().get_availability() and self.hero.is_in_hostile_tile() and not(self.hero.is_in_combat()) and not(self.hero.has_modifier(bMod.CannotStartCombat))
@@ -167,7 +170,7 @@ class Stealth(Action):
         #     self.hero.set_cooldown(ActionCombat,DurationScopes.DURATION_SCOPE_TILEMOVE)
         # self.hero.add_buff(buff.Stealth)
         # self.hero.explore_minion()
-        # GAME.load_move_options()
+        # self.game.movement_service.load_move_options()
         pass
 
 class RollDice(Action):
@@ -179,14 +182,14 @@ class RollDice(Action):
     modifiers: list[bMod.BuffModifier]
     passive = False
 
-    def __init__(self, hero):
-        super().__init__(hero)
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
 
     def get_availability(self):
-        return super().get_availability() and GAME.get_dice_manager() is not None and not GAME.is_dice_rolling() and not self.hero.has_modifier(bMod.CannotRollDice)
+        return super().get_availability() and self.game.dice_service.get_dice_manager() is not None and not self.game.dice_service.is_dice_rolling() and not self.hero.has_modifier(bMod.CannotRollDice)
     
     def run(self):
-        GAME.start_dice_roll(self.hero)
+        self.game.dice_service.start_dice_roll(self.hero)
 
 class Revitalize(Action):
     path = PATH + 'Revitalize.png'
@@ -197,8 +200,8 @@ class Revitalize(Action):
     modifiers: list[bMod.BuffModifier]
     passive = False
 
-    def __init__(self, hero):
-        super().__init__(hero)
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
 
     def get_availability(self):
         return self.hero.has_buff(buff.Injured)
@@ -206,7 +209,7 @@ class Revitalize(Action):
     def run(self):
         self.hero.remove_buffs(buff.Injured)
         self.hero.heal(1)
-        GAME.end_turn()
+        self.game.turn_service.end_turn()
 
 class HealingFountain(Action):
     path = PATH + 'FountainHeal.png'
@@ -217,8 +220,8 @@ class HealingFountain(Action):
     modifiers: list[bMod.BuffModifier]
     passive = False
 
-    def __init__(self, hero):
-        super().__init__(hero)
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
 
     def get_availability(self):
         return super().get_availability() and self.hero.is_on_fountain() and (self.hero.is_cursed() or self.hero.get_hit_points() < self.hero.get_max_hit_points())
@@ -228,7 +231,7 @@ class HealingFountain(Action):
         self.hero.heal()
         self.hero.set_move_points(0)
         self.hero.add_buff(buff.HealedOnFountain)
-        GAME.load_move_options()
+        self.game.movement_service.load_move_options()
 
 class AstralWalking(Action):
     path = PATH + 'AstralWalking.png'
@@ -239,8 +242,8 @@ class AstralWalking(Action):
     modifiers: list[bMod.BuffModifier]
     passive = True
 
-    def __init__(self, hero):
-        super().__init__(hero)
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
 
     def get_availability(self):
         return super().get_availability()
@@ -257,8 +260,8 @@ class Ambush(Action):
     modifiers: list[bMod.BuffModifier]
     passive = True
 
-    def __init__(self, hero):
-        super().__init__(hero)
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
 
     def get_availability(self):
         return super().get_availability() and self.hero.fighting_explored()
@@ -275,8 +278,8 @@ class Backstab(Action):
     modifiers: list[bMod.BuffModifier]
     passive = True
 
-    def __init__(self, hero):
-        super().__init__(hero)
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
 
     def get_availability(self):
         return super().get_availability()

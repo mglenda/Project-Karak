@@ -6,8 +6,11 @@ from Interfaces.TileMapInterface import TileMapInterface
 from GraphicsEngine.Constants import MouseEvent
 from GameEngine.Constants import Constants
 import GameEngine.Buff as buff
+from typing import TYPE_CHECKING
 
-from Game import GAME
+if TYPE_CHECKING:
+    from GameContext import GameContext
+    from GameEngine.MovementService import MovementService
 
 class TileMap(TileMapInterface):
     tilesize: int
@@ -15,7 +18,9 @@ class TileMap(TileMapInterface):
     tiles: list[TileObject]
     tilepack: TilePack
 
-    def __init__(self, world: Frame) -> None:
+    def __init__(self, world: Frame, context: "GameContext", movement_service: "MovementService") -> None:
+        self.context = context
+        self.movement_service = movement_service
         self.tilesize: int = Constants.DEFAULT_TILESIZE
         self.world = world
         self.tilepack = TilePack()
@@ -24,10 +29,10 @@ class TileMap(TileMapInterface):
         ]
         self.tiles[0].g_tile.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
         self.spawn_unknowns(self.tiles[0])
-        self.tiles[0].on_click(GAME.move_to_tile,self.tiles[0])
+        self.tiles[0].on_click(self.movement_service.move_to_tile,self.tiles[0])
 
     def draw_tile_definition(self, start: TileObject, tile: TileObject):
-        GAME.get_current_hero().add_buff(buff.ChoosingTile)
+        self.context.get_current_hero().add_buff(buff.ChoosingTile)
         dfn: TileDefinition = self.tilepack.pick()
         if dfn is not None:
             self.disable_all_tiles()
@@ -69,7 +74,7 @@ class TileMap(TileMapInterface):
         else:
             self.destory_unknowns()
 
-        GAME.confirm_tile_placement(tile)
+        self.movement_service.confirm_tile_placement(tile)
 
     def load_path(self, start: TileObject, movement: int):
         self.disable_all_tiles()
@@ -81,7 +86,7 @@ class TileMap(TileMapInterface):
 
     def pathfinding(self, start: TileObject, movement: int, root: TileObject):
         if movement > 0:
-            can_pass_walls: bool = GAME.get_current_hero().can_pass_walls()
+            can_pass_walls: bool = self.context.get_current_hero().can_pass_walls()
             if self.is_passable_top(start) or can_pass_walls:
                 t = self.get_tile_on_top(start)
                 if t is not None and ((self.is_passable_bottom(t) and self.is_passable_top(start)) or (can_pass_walls and t.get_definition() != Unknown)) and t != root:

@@ -2,14 +2,17 @@ from GraphicComponents.RewardScreen import RewardScreen,Frame,FRAMEPOINT
 from GraphicsEngine.ItemImage import ItemImage
 from Interfaces.ItemInterface import ItemInterface
 from GameEngine.Constants import ItemTypes
+from typing import TYPE_CHECKING
 
-from Game import GAME
+if TYPE_CHECKING:
+    from Game import Game
 
 class RewardPanel():
     main: RewardScreen
     item_image: ItemImage
 
-    def __init__(self,screen: Frame) -> None:
+    def __init__(self,screen: Frame, game: "Game") -> None:
+        self.reward_service = game.reward_service
         height: int = screen.get_h()
         self.main = RewardScreen(height,height,screen)
         self.main.set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.BOTTOM)
@@ -28,11 +31,12 @@ class RewardPanel():
         return self.main.is_visible()
 
     def update(self):
-        if GAME.get_reward() is not None:
+        reward = self.reward_service.get_reward()
+        if reward is not None:
             if not self.is_visible():
                 self.show()
 
-            item: ItemInterface = GAME.get_reward().get_item()
+            item: ItemInterface = reward.get_item()
             if item is not None:
                 color:str = 'Red' if item.type == ItemTypes.WEAPON else 'Gold'
                 self.item_image.change(item.get_path(),color,item.get_power())

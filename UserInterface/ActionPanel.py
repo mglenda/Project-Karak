@@ -1,15 +1,20 @@
 from GraphicComponents.ActionScreen import ActionScreen,Frame,FRAMEPOINT,ActionButton
 from GraphicsEngine.Constants import MouseEvent
 from GameEngine.Action import Action
+from typing import TYPE_CHECKING
 
-from Game import GAME
+if TYPE_CHECKING:
+    from Game import Game
 
 class ActionPanel():
     main: ActionScreen
     loaded_actions: list[Action]
     hidden_by_roll: bool
 
-    def __init__(self,screen: Frame) -> None:
+    def __init__(self,screen: Frame, game: "Game") -> None:
+        self.game = game
+        self.context = game.context
+        self.dice_service = game.dice_service
         self.main = ActionScreen(screen.get_w()*0.4, screen.get_h()*0.125,screen)
         self.main.set_point(att_point=FRAMEPOINT.BOTTOM,att_point_parent=FRAMEPOINT.BOTTOM,x_offset=0,y_offset=-self.main.get_h()*0.1)
         self.loaded_actions = []
@@ -29,7 +34,7 @@ class ActionPanel():
         self.loaded_actions = []
 
     def update(self):
-        if GAME.is_dice_rolling():
+        if self.dice_service.is_dice_rolling():
             if self.main.is_visible():
                 self.hidden_by_roll = True
                 self.hide()
@@ -40,7 +45,7 @@ class ActionPanel():
             self.show()
 
         if self.main.is_visible():
-            actions: list[Action] = GAME.get_current_hero_active().get_available_actions()
+            actions: list[Action] = self.context.get_current_hero_active().get_available_actions()
             if self.loaded_actions != actions:
                 self.loaded_actions = actions
                 self.main.destroy_children()
@@ -65,4 +70,4 @@ class ActionPanel():
                     offset_x: int = ((first_button.get_w() + first_button.get_w()*0.15) / 2) * (i-1)
                     first_button.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER,-offset_x)
 
-                GAME.force_mouse_motion()
+                self.game.force_mouse_motion()
