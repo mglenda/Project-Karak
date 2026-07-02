@@ -1,5 +1,6 @@
 from Interfaces.ActionInterface import ActionInterface
 from Interfaces.HeroInterface import HeroInterface
+from Interfaces.ItemInterface import ItemInterface
 from GameEngine.Cooldown import Cooldown
 from GameEngine.Constants import DurationScopes
 import GameEngine.Buff as buff
@@ -101,6 +102,27 @@ class ActionCombat(Action):
         else:
             GAME.start_combat()
 
+class PickUpItem(Action):
+    path = PATH + 'PickUpItem.png'
+    path_focused = PATH + 'PickUpItemFocused.png'
+    prio: int = 4
+    action_types: list[int] = [ACTION_TYPE_GENERAL]
+    modifiers_default: list[Type[bMod.BuffModifier]] = []
+    modifiers: list[bMod.BuffModifier]
+    passive = False
+
+    def __init__(self, hero):
+        super().__init__(hero)
+
+    def get_availability(self) -> bool:
+        return super().get_availability() and self.hero.get_tile().get_placeable() is not None and isinstance(self.hero.get_tile().get_placeable(),ItemInterface)
+    
+    def run(self):
+        if GAME.get_reward() is not None:
+            GAME.clear_reward()
+        else:
+            GAME.create_reward(self.hero, self.hero.get_tile().get_placeable())
+
 class EndTurn(Action):
     path = PATH + 'EndTurn.png'
     path_focused = PATH + 'EndTurnFocused.png'
@@ -128,23 +150,25 @@ class Stealth(Action):
     prio: int = 5
     default_scope: int = DurationScopes.DURATION_SCOPE_TILEMOVE
     action_types: list[int] = [ACTION_TYPE_ABILITY]
-    modifiers_default: list[Type[bMod.BuffModifier]] = []
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.IgnoreHostiles]
     modifiers: list[bMod.BuffModifier]
-    passive = False
+    passive = True
 
     def __init__(self, hero):
         super().__init__(hero)
 
     def get_availability(self) -> bool:
-        return super().get_availability() and self.hero.is_in_hostile_tile() and not(self.hero.is_in_combat()) and not(self.hero.has_modifier(bMod.CannotStartCombat))
+        # return super().get_availability() and self.hero.is_in_hostile_tile() and not(self.hero.is_in_combat()) and not(self.hero.has_modifier(bMod.CannotStartCombat))
+        return super().get_availability()
     
     def run(self):
-        super().run()
-        if not self.hero.is_action_on_cooldown(ActionCombat):
-            self.hero.set_cooldown(ActionCombat,DurationScopes.DURATION_SCOPE_TILEMOVE)
-        self.hero.add_buff(buff.Stealth)
-        self.hero.explore_minion()
-        GAME.load_move_options()
+        # super().run()
+        # if not self.hero.is_action_on_cooldown(ActionCombat):
+        #     self.hero.set_cooldown(ActionCombat,DurationScopes.DURATION_SCOPE_TILEMOVE)
+        # self.hero.add_buff(buff.Stealth)
+        # self.hero.explore_minion()
+        # GAME.load_move_options()
+        pass
 
 class RollDice(Action):
     path = PATH + 'RollDice.png'
@@ -159,11 +183,10 @@ class RollDice(Action):
         super().__init__(hero)
 
     def get_availability(self):
-        return super().get_availability() and GAME.get_dice_manager() is not None and not self.hero.has_modifier(bMod.CannotRollDice)
+        return super().get_availability() and GAME.get_dice_manager() is not None and not GAME.is_dice_rolling() and not self.hero.has_modifier(bMod.CannotRollDice)
     
     def run(self):
-        self.hero.add_buff(buff.CannotRollDices)
-        GAME.get_dice_manager().roll()
+        GAME.start_dice_roll(self.hero)
 
 class Revitalize(Action):
     path = PATH + 'Revitalize.png'
@@ -260,3 +283,4 @@ class Backstab(Action):
     
     def run(self):
         pass
+

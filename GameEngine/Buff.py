@@ -41,7 +41,7 @@ class Stealth(Buff):
 
 class Exhausted(Buff):
     default_duration_scope: int = DurationScopes.DURATION_SCOPE_TURN
-    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.CannotStartCombat]
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.CannotStartCombat,bMod.CannotMove]
 
     def __init__(self, hero, duration_scope = None):
         super().__init__(hero, duration_scope)

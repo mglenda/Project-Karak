@@ -19,6 +19,5 @@ class CombatScreen(Rect):
         self.duelist_screen[0].set_point(FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPLEFT,w*0.08,h*0.1)
         self.duelist_screen[1].set_point(FRAMEPOINT.TOPRIGHT,FRAMEPOINT.TOPRIGHT,-w*0.08,h*0.1)
 
-
     def update(self,id: int, base_value: int = 0,dice_value: int = 0,ability_value: int = 0,scroll_value: int = 0,total_value: int = 0,portrait: str = None):
         self.duelist_screen[id].update(base_value,dice_value,ability_value,scroll_value,total_value,portrait)

@@ -26,6 +26,9 @@ class HeroInterface(Duelist,Interface):
     def __init__(self, definition: HeroDefinition, name: str) -> None:
         Duelist.__init__(self)
 
+    def get_inventory(self) -> InventoryInterface:
+        pass
+
     def set_move_points(self,points: int):
         pass
     

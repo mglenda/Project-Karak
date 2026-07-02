@@ -1,8 +1,10 @@
 from Interfaces.TileObjectInterface import TileObjectInterface
 from Interfaces.HeroInterface import HeroInterface
+from Interfaces.ItemInterface import ItemInterface
 from GameEngine.MinionDefinition import MinionDefinition
 from Interfaces.MinionInterface import MinionInterface
 from Interfaces.PlaceableInterface import PlaceableInterface
+from GameEngine.Reward import Reward
 from GameEngine.Combat import Combat
 from GameEngine.Duelist import Duelist
 from GameEngine.Constants import DurationScopes
@@ -10,17 +12,25 @@ import GameEngine.BuffModifier as bMod
 import GameEngine.Buff as buff
 from GameEngine.DiceManager import DiceManager
 from GameEngine.DiceDefinition import DiceDefinition
-from GameEngine.Loot import Loot
 import pygame
 
 pygame.init()
 
 class Game():
+    combat: Combat
+    dice_manager: DiceManager
+    running: bool
+    reward: Reward
+    rolling_hero: HeroInterface
+    apply_roll_lock: bool
+    
     def __init__(self) -> None:
         self.combat = None
         self.dice_manager = None
-        self.loot_manager = None
         self.running = False
+        self.reward = None
+        self.rolling_hero = None
+        self.apply_roll_lock = False
 
     def get_tilemap(self):
         return self.ui.get_world().get_tilemap()
@@ -127,6 +137,7 @@ class Game():
             self.get_tilemap().disable_all_tiles()
 
     def start_combat(self):
+        self.get_tilemap().disable_all_tiles()
         attacker: Duelist = self.get_current_hero()
         defender: Duelist = attacker.get_tile().get_placeable()
         self.combat = Combat(attacker,defender)
@@ -192,6 +203,7 @@ class Game():
         self.ui.get_combat_panel().update()
         self.ui.get_dice_panel().update()
         self.ui.get_action_panel().update()
+        self.ui.get_reward_panel().update()
 
     def draw(self):
         self.ui.draw()
@@ -202,16 +214,54 @@ class Game():
     def create_dice_manager(self, dice_types: list[DiceDefinition]):
         self.dice_manager = DiceManager(dice_types)
 
+    def start_dice_roll(self, hero: HeroInterface, apply_roll_lock: bool = True):
+        if self.dice_manager is None or self.dice_manager.is_rolling():
+            return
+
+        self.rolling_hero = hero
+        self.apply_roll_lock = apply_roll_lock
+        self.dice_manager.start_roll()
+        self.ui.get_action_panel().clear_actions()
+
+    def start_dice_reroll(self, index: int):
+        if self.dice_manager is None or self.dice_manager.is_rolling():
+            return
+
+        self.rolling_hero = None
+        self.apply_roll_lock = False
+        self.dice_manager.start_reroll(index)
+        self.ui.get_action_panel().clear_actions()
+
+    def finish_dice_roll(self):
+        if self.dice_manager is None or not self.dice_manager.is_rolling():
+            return
+
+        self.dice_manager.commit_roll()
+        if self.apply_roll_lock and self.rolling_hero is not None:
+            self.rolling_hero.add_buff(buff.CannotRollDices)
+            self.rolling_hero.refresh_actions()
+
+        self.rolling_hero = None
+        self.apply_roll_lock = False
+        self.force_mouse_motion()
+
+    def is_dice_rolling(self) -> bool:
+        return self.dice_manager is not None and self.dice_manager.is_rolling()
+
     def get_dice_manager(self) -> DiceManager:
         return self.dice_manager
     
     def clear_dice_manager(self):
         self.dice_manager = None
 
-    def get_loot_manager(self) -> Loot:
-        return self.loot_manager
+    def get_reward(self) -> Reward:
+        return self.reward
     
-    def clear_loot_manager(self):
-        self.loot_manager = None
+    def create_reward(self, item: ItemInterface, hero: HeroInterface):
+        self.reward = Reward(item, hero)
+
+    def clear_reward(self):
+        self.reward = None
 
 GAME = Game()
+

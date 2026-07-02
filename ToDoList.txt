@@ -32,7 +32,6 @@ pohybovy krok. Podmienkou, ale je, ze prisera uz musi byt Explored.
 6. Magicka Strela, Bleskova Strela ? no skratka available v combate ak ma hero item. Pri pouziti zvysuje silu v combate o 1 / 2 a znici suvisiaci predmet.
 
 
-
 Teleporty:
 
 1. Uzdravovaci zvitok

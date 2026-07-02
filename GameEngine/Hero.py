@@ -4,7 +4,7 @@ from Interfaces.TileObjectInterface import TileObjectInterface
 from Interfaces.MinionInterface import MinionInterface
 from GameEngine.Inventory import Inventory
 from GameEngine.Constants import Constants
-from GameEngine.Action import Action,ActionCombat,EndTurn,RollDice,Revitalize,HealingFountain
+from GameEngine.Action import Action,ActionCombat,EndTurn,RollDice,Revitalize,HealingFountain,PickUpItem
 from GameEngine.Buff import Buff,Unconsciousness,Curse
 from GameEngine.BuffModifier import BuffModifier,CanWalkThroughWalls
 import GameEngine.DiceDefinition as diceType
@@ -37,7 +37,7 @@ class Hero(HeroInterface):
         self.inventory = Inventory(self)
         self.power = 0
 
-        self.actions = [EndTurn(self),ActionCombat(self),RollDice(self),Revitalize(self),HealingFountain(self)]
+        self.actions = [EndTurn(self),ActionCombat(self),RollDice(self),Revitalize(self),HealingFountain(self),PickUpItem(self)]
         self.active_buffs = []
 
         a_type: Type[Action] = None
@@ -45,6 +45,9 @@ class Hero(HeroInterface):
             self.actions.append(a_type(self))
 
         self.actions.sort(key=lambda x: x.prio)
+
+    def get_inventory(self) -> Inventory:
+        return self.inventory
 
     def set_move_points(self,points: int):
         self.move_points = points
@@ -222,7 +225,6 @@ class Hero(HeroInterface):
 
     def fighting_explored(self) -> bool:
         opp = self.get_opponent()
-        b = isinstance(opp,MinionInterface) and opp.is_explored()
         return isinstance(opp,MinionInterface) and opp.is_explored()
     
     def explore_minion(self):
