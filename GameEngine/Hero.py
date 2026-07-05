@@ -125,7 +125,19 @@ class Hero(Duelist):
         return self.name
     
     def get_weapon_power(self) -> int:
-        return self.power + self.inventory.get_power()
+        return self.power + self.inventory.get_weapon_power()
+
+    def get_chest_score(self) -> float:
+        return self.inventory.get_chest_score()
+
+    def get_non_chest_non_weapon_slot_item_count(self) -> int:
+        return self.inventory.get_non_chest_non_weapon_slot_item_count()
+
+    def get_scroll_power(self) -> int:
+        power = super().get_scroll_power()
+        for modifier in self.get_active_modifiers():
+            power += modifier.get_scroll_power_bonus()
+        return power
     
     def get_available_actions(self) -> list[Action]:
         if self.has_buff(ChoosingTile):
@@ -180,15 +192,21 @@ class Hero(Duelist):
         self.active_buffs.append(buff_type(self,duration_scope))
 
     def has_modifier(self, mod_type: Type[BuffModifier]) -> bool:
-        for b in self.active_buffs:
-            if b.has_modifier(mod_type):
+        for modifier in self.get_active_modifiers():
+            if isinstance(modifier, mod_type):
                 return True
+        return False
+
+    def get_active_modifiers(self) -> list[BuffModifier]:
+        modifiers: list[BuffModifier] = []
+        for b in self.active_buffs:
+            modifiers.extend(b.active_modifiers)
 
         for a in self.actions:
-            if a.is_available() and a.has_modifier(mod_type):
-                return True
-                    
-        return False
+            if a.is_available():
+                modifiers.extend(a.modifiers)
+
+        return modifiers
     
     def has_buff(self, buff_type: Type[Buff]) -> bool:
         for b in self.active_buffs:

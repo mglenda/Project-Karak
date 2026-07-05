@@ -60,6 +60,7 @@ class Duelist(Opponent):
 
     def enter_comat(self,opponent: Opponent):
         self.dice_power = 0
+        self.scroll_power = 0
         self.opponent = opponent
         self.in_combat = True
 

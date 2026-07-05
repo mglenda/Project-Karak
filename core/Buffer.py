@@ -1,4 +1,5 @@
 import pygame
+import pygame.freetype
 
 class Texture():
     def __init__(self,w: int,h: int,angle: int,path: str, alpha: int = 255) -> None:
@@ -31,21 +32,32 @@ class ImageBuffer():
 
 class TextImage():
     def __init__(self, font_color: tuple, font_size: int, text: str, font_path: str,angle: int, w: int = None, h: int = None, alpha: int = 255) -> None:
-        self.surface = pygame.font.Font(font_path,font_size).render(text,False,font_color).convert_alpha()
+        if not pygame.freetype.get_init():
+            pygame.freetype.init()
+
+        font = pygame.freetype.Font(font_path,font_size)
+        font.antialiased = True
+        rendered_surface, _ = font.render(text,fgcolor=font_color)
+        rendered_surface = rendered_surface.convert_alpha()
         if angle != 0:
-            self.surface = pygame.transform.rotate(self.surface,angle)
+            rendered_surface = pygame.transform.rotate(rendered_surface,angle)
         if alpha < 255:
-            self.surface.set_alpha(alpha)
+            rendered_surface.set_alpha(alpha)
         self.font_color: tuple = font_color
         self.font_size: int = font_size
         self.text: str = text
         self.font_path: str = font_path
         self.angle: int = angle
-        self.w: int = self.surface.get_width() if w is None else w
-        self.h: int = self.surface.get_height() if h is None else h
+        self.w: int = rendered_surface.get_width() if w is None else w
+        self.h: int = rendered_surface.get_height() if h is None else h
         self.alpha = alpha
         if w is not None or h is not None:
-            self.surface = pygame.transform.smoothscale(self.surface,(self.w,self.h))
+            self.surface = pygame.Surface((self.w,self.h), pygame.SRCALPHA)
+            self.surface.blit(rendered_surface,(0,0))
+            if alpha < 255:
+                self.surface.set_alpha(alpha)
+        else:
+            self.surface = rendered_surface
     
 class TextImageBuffer():
     def __init__(self) -> None:

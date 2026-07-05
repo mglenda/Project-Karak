@@ -6,6 +6,7 @@ PATH = '_Textures\\Items\\Retextured\\'
 class ItemDefinition(PlaceableDefinition):
     type: int
     power: int
+    chest_score: float = 0
 
 class Dagger(ItemDefinition):
     type: int = ItemTypes.WEAPON
@@ -30,11 +31,13 @@ class Key(ItemDefinition):
 class Chest(ItemDefinition):
     type: int = ItemTypes.CHEST
     power: int = 0
+    chest_score: float = 1
     path: str = PATH + 'ChestOpened.png'
 
 class DragonChest(ItemDefinition):
     type: int = ItemTypes.CHEST
     power: int = 0
+    chest_score: float = 1.5
     path: str = PATH + 'ChestDragon.png'
 
 class MagicBolt(ItemDefinition):

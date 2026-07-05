@@ -45,6 +45,16 @@ class Inventory:
                 return True
         return False
 
+    def get_item_count(self, definition: ItemDefinition) -> int:
+        count = 0
+        for s in self.slots:
+            if s.get_item_definition() == definition:
+                count += 1
+        for i in self.chests:
+            if i is not None and i.definition == definition:
+                count += 1
+        return count
+
     def remove_item(self, item: Item):
         if item.type == ItemTypes.CHEST:
             if item in self.chests:
@@ -112,3 +122,23 @@ class Inventory:
         for s in self.slots:
             power += s.get_item_power()
         return power
+
+    def get_chest_score(self) -> float:
+        score: float = 0
+        for item in self.chests:
+            if item is not None:
+                score += item.definition.chest_score
+        return score
+
+    def get_weapon_power(self) -> int:
+        power: int = 0
+        for slot in self.get_slots_by_type(ItemTypes.WEAPON):
+            power += slot.get_item_power()
+        return power
+
+    def get_non_chest_non_weapon_slot_item_count(self) -> int:
+        count: int = 0
+        for slot in self.slots:
+            if slot.get_type() != ItemTypes.WEAPON and slot.get_item() is not None:
+                count += 1
+        return count

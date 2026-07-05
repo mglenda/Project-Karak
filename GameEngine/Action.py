@@ -3,7 +3,7 @@ from __future__ import annotations
 from GameEngine.Cooldown import Cooldown
 from GameEngine.Constants import DurationScopes, ItemTypes
 from GameEngine.Item import Item
-from GameEngine.ItemDefinition import Chest, HealingPortal, Key
+from GameEngine.ItemDefinition import Chest, FrostFist as FrostFistItem, HealingPortal, Key, MagicBolt as MagicBoltItem
 from GameEngine.Minion import Minion
 from GameEngine.MinionDefinition import ChestClosed
 import GameEngine.Buff as buff
@@ -383,6 +383,77 @@ class DoubleAttack(Action):
     def run(self):
         super().run()
         self.game.dice_service.start_dice_roll(self.hero)
+
+class ScrollPowerAction(Action):
+    item_definition = None
+    scroll_power: int = 0
+    prio: int = 10
+    action_types: list[int] = [ACTION_TYPE_SCROLL]
+    modifiers_default: list[Type[bMod.BuffModifier]] = []
+    modifiers: list[bMod.BuffModifier]
+    passive = False
+
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
+
+    def update_priority(self):
+        dice_manager = self.game.dice_service.get_dice_manager()
+        if dice_manager is None or dice_manager.get_roll_id() == 0:
+            self.prio = 10
+            return
+
+        combat = self.game.combat_service.get_combat()
+        if combat is not None and combat.get_loser() == self.hero:
+            self.prio = 4
+        else:
+            self.prio = 10
+
+    def get_availability(self):
+        return (
+            super().get_availability()
+            and self.hero.is_in_combat()
+            and self.item_definition is not None
+            and self.hero.inventory.has_item(self.item_definition)
+            and not self.hero.has_modifier(bMod.MagicalAffinity)
+        )
+
+    def run(self):
+        if self.hero.inventory.consume_item(self.item_definition) is None:
+            self.update()
+            return
+
+        self.hero.add_scroll_power(self.scroll_power)
+        self.hero.refresh_actions()
+        self.game.force_mouse_motion()
+
+class MagicBolt(ScrollPowerAction):
+    path = PATH + 'MagicBolt.png'
+    path_focused = PATH + 'MagicBolt.png'
+    item_definition = MagicBoltItem
+    scroll_power: int = 1
+    is_default = True
+
+class FrostFist(ScrollPowerAction):
+    path = PATH + 'FrostFist.png'
+    path_focused = PATH + 'FrostFist.png'
+    item_definition = FrostFistItem
+    scroll_power: int = 2
+    is_default = True
+
+class MagicalAffinity(Action):
+    path = PATH + 'MagicalAffinity.png'
+    path_focused = PATH + 'MagicalAffinity.png'
+    prio: int = 0
+    action_types: list[int] = [ACTION_TYPE_ABILITY]
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.MagicalAffinity]
+    modifiers: list[bMod.BuffModifier]
+    passive = True
+
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
+
+    def get_availability(self):
+        return super().get_availability() and self.hero.is_in_combat()
 
 class AstralWalking(Action):
     path = PATH + 'AstralWalking.png'

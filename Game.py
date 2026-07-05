@@ -57,6 +57,7 @@ class Game():
         self.context.ui.get_dice_panel().update()
         self.context.ui.get_action_panel().update()
         self.context.ui.get_reward_panel().update()
+        self.context.ui.get_ranking_panel().update()
 
     def draw(self):
         self.context.ui.draw()
