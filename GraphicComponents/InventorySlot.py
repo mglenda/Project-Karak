@@ -8,6 +8,8 @@ from Interfaces.InventorySlotInterface import InventorySlotInterface
 PATH = '_Textures\\Inventory\\'
 
 class InventorySlot(Rect):
+    selection_layer: Rect
+    hover_layer: Rect
     theme: Image
     itemimg: ItemImage
     slot: InventorySlotInterface
@@ -15,6 +17,18 @@ class InventorySlot(Rect):
     def __init__(self, w: int, h: int, color: tuple, parent: Frame, slot: InventorySlotInterface) -> None:
         super().__init__(w, h, color, parent)
         self.slot = slot
+
+        self.selection_layer = Rect(self.w,self.h,(255,215,0),self)
+        self.selection_layer.set_alpha(90)
+        self.selection_layer.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+        self.selection_layer.set_visible(False)
+        self.selection_layer.set_active(False)
+
+        self.hover_layer = Rect(self.w,self.h,(255,255,255),self)
+        self.hover_layer.set_alpha(55)
+        self.hover_layer.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
+        self.hover_layer.set_visible(False)
+        self.hover_layer.set_active(False)
 
         path = PATH + 'ScrollSlot.png'
         if slot.get_type() == ItemTypes.KEY:
@@ -29,6 +43,12 @@ class InventorySlot(Rect):
         self.itemimg = ItemImage(self.w*0.9,self.h*0.9,'_Textures\\Items\\Retextured\\Axe.png',self,"Red",0)
         self.itemimg.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
         self.itemimg.set_visible(False)
+
+    def set_selected(self, selected: bool):
+        self.selection_layer.set_visible(selected)
+
+    def set_hovered(self, hovered: bool):
+        self.hover_layer.set_visible(hovered)
 
     def update(self):
         if self.slot.get_item() is not None:

@@ -2,7 +2,7 @@ from Interfaces.ActionInterface import ActionInterface
 from Interfaces.HeroInterface import HeroInterface
 from Interfaces.ItemInterface import ItemInterface
 from GameEngine.Cooldown import Cooldown
-from GameEngine.Constants import DurationScopes
+from GameEngine.Constants import DurationScopes, ItemTypes
 import GameEngine.Buff as buff
 import GameEngine.BuffModifier as bMod
 from typing import Type
@@ -118,11 +118,23 @@ class PickUpItem(Action):
         super().__init__(hero, game)
 
     def get_availability(self) -> bool:
-        return super().get_availability() and self.hero.get_tile().get_placeable() is not None and isinstance(self.hero.get_tile().get_placeable(),ItemInterface)
+        reward = self.game.reward_service.get_reward()
+        if reward is not None and reward.get_hero() == self.hero:
+            return True
+
+        placeable = self.hero.get_tile().get_placeable()
+        return (
+            super().get_availability()
+            and placeable is not None
+            and isinstance(placeable, ItemInterface)
+            and placeable.type in (ItemTypes.WEAPON, ItemTypes.SCROLL, ItemTypes.KEY)
+        )
     
     def run(self):
-        if self.game.reward_service.get_reward() is not None:
-            self.game.reward_service.clear_reward()
+        reward = self.game.reward_service.get_reward()
+        if reward is not None:
+            selected_slot = self.game.context.ui.get_reward_panel().get_selected_slot()
+            self.game.reward_service.finish_reward(selected_slot)
         else:
             self.game.reward_service.create_reward(self.hero, self.hero.get_tile().get_placeable())
 

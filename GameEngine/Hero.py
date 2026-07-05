@@ -126,6 +126,9 @@ class Hero(HeroInterface):
         return self.power + self.inventory.get_power()
     
     def get_available_actions(self) -> list[Action]:
+        if self.game.reward_service.get_reward() is not None:
+            return [a for a in self.actions if isinstance(a,PickUpItem) and a.is_available()]
+
         la: list[Action] = []
         for a in self.actions:
             if a.is_available():

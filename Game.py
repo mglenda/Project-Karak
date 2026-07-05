@@ -31,15 +31,15 @@ class Game():
 
         from UI import UI
         self.context.ui = UI(self)
-        loading_screen = LoadingScreen(self.context.ui.screen)
-        loading_screen.draw(0, 1, "Setting up game")
+        # loading_screen = LoadingScreen(self.context.ui.screen)
+        # loading_screen.draw(0, 1, "Setting up game")
 
         from GameEngine.MinionPack import MinionPack
         self.context.minion_pack = MinionPack()
 
         self.setup_service.spawn_heroes()
-        self.texture_preload_service.preload(loading_screen.draw)
-        loading_screen.draw(1, 1, "Starting game")
+        # self.texture_preload_service.preload(loading_screen.draw)
+        # loading_screen.draw(1, 1, "Starting game")
 
     def quit(self):
         self.context.running = False
