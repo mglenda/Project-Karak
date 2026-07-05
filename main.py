@@ -1,7 +1,6 @@
 import pygame
 import sys
 from Game import GAME
-from DataLoader import DataLoader
 from threading import Thread
 
 class AppLogic():
@@ -45,7 +44,6 @@ class Graphics():
 def main():
     pygame.display.set_caption("Karak")
     pygame.font.init()
-    DataLoader.load()
 
     GAME.start()
 

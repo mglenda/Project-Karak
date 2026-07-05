@@ -3,6 +3,9 @@ from __future__ import annotations
 from GameEngine.Cooldown import Cooldown
 from GameEngine.Constants import DurationScopes, ItemTypes
 from GameEngine.Item import Item
+from GameEngine.ItemDefinition import Chest, HealingPortal, Key
+from GameEngine.Minion import Minion
+from GameEngine.MinionDefinition import ChestClosed
 import GameEngine.Buff as buff
 import GameEngine.BuffModifier as bMod
 from typing import Type
@@ -32,6 +35,7 @@ class Action:
     modifiers: list[bMod.BuffModifier]
     available: bool
     passive: bool
+    is_default: bool = False
 
     def __init__(self, hero: Hero, game: "Game"):
         self.game = game
@@ -48,8 +52,12 @@ class Action:
 
     def is_available(self) -> bool:
         return self.available
+
+    def update_priority(self):
+        pass
     
     def update(self):
+        self.update_priority()
         former_available = self.available
         self.available = self.get_availability()
 
@@ -92,6 +100,7 @@ class ActionCombat(Action):
     modifiers_default: list[Type[bMod.BuffModifier]] = []
     modifiers: list[bMod.BuffModifier]
     passive = False
+    is_default = True
 
     def __init__(self, hero, game: "Game"):
         super().__init__(hero, game)
@@ -114,6 +123,7 @@ class PickUpItem(Action):
     modifiers_default: list[Type[bMod.BuffModifier]] = []
     modifiers: list[bMod.BuffModifier]
     passive = False
+    is_default = True
 
     def __init__(self, hero, game: "Game"):
         super().__init__(hero, game)
@@ -126,9 +136,11 @@ class PickUpItem(Action):
         placeable = self.hero.get_tile().get_placeable()
         return (
             super().get_availability()
+            and not self.hero.has_buff(buff.PickedUpReward)
             and placeable is not None
             and isinstance(placeable, Item)
             and placeable.type in (ItemTypes.WEAPON, ItemTypes.SCROLL, ItemTypes.KEY)
+            and self.hero.inventory.can_pick_up_item(placeable)
         )
     
     def run(self):
@@ -139,14 +151,50 @@ class PickUpItem(Action):
         else:
             self.game.reward_service.create_reward(self.hero, self.hero.get_tile().get_placeable())
 
-class EndTurn(Action):
-    path = PATH + 'EndTurn.png'
-    path_focused = PATH + 'EndTurnFocused.png'
-    prio: int = 10
+class UnlockChest(Action):
+    path = PATH + 'UnlockChest.png'
+    path_focused = PATH + 'UnlockChest.png'
+    prio: int = 0
     action_types: list[int] = [ACTION_TYPE_GENERAL]
     modifiers_default: list[Type[bMod.BuffModifier]] = []
     modifiers: list[bMod.BuffModifier]
     passive = False
+    is_default = True
+
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
+
+    def get_availability(self) -> bool:
+        placeable = self.hero.get_tile().get_placeable()
+        return (
+            super().get_availability()
+            and not self.hero.has_buff(buff.PickedUpReward)
+            and isinstance(placeable, Minion)
+            and placeable.definition == ChestClosed
+            and self.hero.inventory.has_item(Key)
+        )
+
+    def run(self):
+        if self.hero.inventory.consume_item(Key) is None:
+            self.update()
+            return
+
+        chest = self.hero.get_tile().get_placeable()
+        if chest is not None:
+            self.hero.get_tile().remove_placeable()
+            chest.tile = None
+
+        self.game.reward_service.create_reward(self.hero, Item(Chest))
+
+class EndTurn(Action):
+    path = PATH + 'EndTurn.png'
+    path_focused = PATH + 'EndTurnFocused.png'
+    prio: int = 8
+    action_types: list[int] = [ACTION_TYPE_GENERAL]
+    modifiers_default: list[Type[bMod.BuffModifier]] = []
+    modifiers: list[bMod.BuffModifier]
+    passive = False
+    is_default = True
 
     def __init__(self, hero, game: "Game"):
         super().__init__(hero, game)
@@ -194,6 +242,7 @@ class RollDice(Action):
     modifiers_default: list[Type[bMod.BuffModifier]] = []
     modifiers: list[bMod.BuffModifier]
     passive = False
+    is_default = True
 
     def __init__(self, hero, game: "Game"):
         super().__init__(hero, game)
@@ -212,6 +261,7 @@ class Revitalize(Action):
     modifiers_default: list[Type[bMod.BuffModifier]] = []
     modifiers: list[bMod.BuffModifier]
     passive = False
+    is_default = True
 
     def __init__(self, hero, game: "Game"):
         super().__init__(hero, game)
@@ -232,6 +282,7 @@ class HealingFountain(Action):
     modifiers_default: list[Type[bMod.BuffModifier]] = []
     modifiers: list[bMod.BuffModifier]
     passive = False
+    is_default = True
 
     def __init__(self, hero, game: "Game"):
         super().__init__(hero, game)
@@ -245,6 +296,93 @@ class HealingFountain(Action):
         self.hero.set_move_points(0)
         self.hero.add_buff(buff.HealedOnFountain)
         self.game.movement_service.load_move_options()
+
+class ActionHealingPortal(Action):
+    path = PATH + 'HealingPortal.png'
+    path_focused = PATH + 'HealingPortal.png'
+    prio: int = 9
+    action_types: list[int] = [ACTION_TYPE_SCROLL]
+    modifiers_default: list[Type[bMod.BuffModifier]] = []
+    modifiers: list[bMod.BuffModifier]
+    passive = False
+    is_default = True
+
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
+
+    def update_priority(self):
+        half_hit_points = self.hero.get_max_hit_points() // 2
+        if self.hero.is_cursed() or self.hero.get_hit_points() <= half_hit_points:
+            self.prio = 2
+        else:
+            self.prio = 10
+
+    def get_availability(self):
+        return (
+            super().get_availability()
+            and self.hero.inventory.has_item(HealingPortal)
+            and not self.hero.is_in_combat()
+            and (
+                not self.hero.is_in_hostile_tile()
+                or self.hero.has_modifier(bMod.IgnoreHostiles)
+                or self.hero.has_modifier(bMod.CannotStartCombat)
+            )
+        )
+
+    def run(self):
+        if self.hero.inventory.consume_item(HealingPortal) is None:
+            self.update()
+            return
+
+        self.hero.add_buff(buff.ChoosingTile)
+        self.game.context.get_tilemap().load_healing_portal_targets(self)
+        self.game.context.ui.get_action_panel().clear_actions()
+
+    def teleport_to_healing_tile(self, tile):
+        self.hero.remove_buffs(buff.ChoosingTile)
+        self.hero.move_to_tile(tile, consume_move_points=False)
+        self.hero.remove_modifier(bMod.Cursed)
+        self.hero.heal()
+        self.game.movement_service.load_move_options()
+
+class DoubleAttack(Action):
+    path = PATH + 'DoubleAttack.png'
+    path_focused = PATH + 'DoubleAttack.png'
+    prio: int = 0
+    default_scope: int = DurationScopes.DURATION_SCOPE_COMBAT
+    action_types: list[int] = [ACTION_TYPE_ABILITY]
+    modifiers_default: list[Type[bMod.BuffModifier]] = []
+    modifiers: list[bMod.BuffModifier]
+    passive = False
+
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
+
+    def update_priority(self):
+        combat = self.game.combat_service.get_combat()
+        if combat is None:
+            self.prio = 0
+            return
+
+        if combat.get_winner() == self.hero:
+            self.prio = 10
+        else:
+            self.prio = 0
+
+    def get_availability(self):
+        dice_manager = self.game.dice_service.get_dice_manager()
+        return (
+            super().get_availability()
+            and self.hero.is_in_combat()
+            and self.hero.has_modifier(bMod.CannotRollDice)
+            and dice_manager is not None
+            and dice_manager.get_roll_id() == 1
+            and not dice_manager.is_rolling()
+        )
+
+    def run(self):
+        super().run()
+        self.game.dice_service.start_dice_roll(self.hero)
 
 class AstralWalking(Action):
     path = PATH + 'AstralWalking.png'
@@ -299,4 +437,14 @@ class Backstab(Action):
     
     def run(self):
         pass
+
+
+def _iter_action_types(action_type: Type[Action]):
+    for subclass in action_type.__subclasses__():
+        yield subclass
+        yield from _iter_action_types(subclass)
+
+
+def get_default_action_types() -> list[Type[Action]]:
+    return [action_type for action_type in _iter_action_types(Action) if action_type.is_default]
 

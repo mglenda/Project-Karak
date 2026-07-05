@@ -5,8 +5,8 @@ from GameEngine.Duelist import Duelist
 from GameEngine.Minion import Minion
 from GameEngine.Inventory import Inventory
 from GameEngine.Constants import Constants
-from GameEngine.Action import Action,ActionCombat,EndTurn,RollDice,Revitalize,HealingFountain,PickUpItem
-from GameEngine.Buff import Buff,Unconsciousness,Curse
+from GameEngine.Action import Action, PickUpItem, get_default_action_types
+from GameEngine.Buff import Buff,Unconsciousness,Curse,ChoosingTile
 from GameEngine.BuffModifier import BuffModifier,CanWalkThroughWalls
 import GameEngine.DiceDefinition as diceType
 from typing import TYPE_CHECKING, Type, overload
@@ -43,11 +43,11 @@ class Hero(Duelist):
         self.inventory = Inventory(self)
         self.power = 0
 
-        self.actions = [EndTurn(self, self.game),ActionCombat(self, self.game),RollDice(self, self.game),Revitalize(self, self.game),HealingFountain(self, self.game),PickUpItem(self, self.game)]
+        self.actions = [action_type(self, self.game) for action_type in get_default_action_types()]
         self.active_buffs = []
 
         a_type: Type[Action] = None
-        for a_type in self.definition.default_actions:
+        for a_type in self.definition.special_actions:
             self.actions.append(a_type(self, self.game))
 
         self.actions.sort(key=lambda x: x.prio)
@@ -90,13 +90,13 @@ class Hero(Duelist):
         else:
             self.hit_points = self.max_hit_points if self.hit_points + amnt > self.max_hit_points else self.hit_points + amnt
     
-    def move_to_tile(self, tile: TileObject):
+    def move_to_tile(self, tile: TileObject, consume_move_points: bool = True):
         self.former_tile = self.tile
         if self.tile is not None:
             self.tile.remove_hero(self)
         self.tile = tile
         tile.add_hero(self)
-        if self.move_points > 0:
+        if consume_move_points and self.move_points > 0:
             self.move_points -= 1
     
     def move_to_former_tile(self):
@@ -128,11 +128,17 @@ class Hero(Duelist):
         return self.power + self.inventory.get_power()
     
     def get_available_actions(self) -> list[Action]:
+        if self.has_buff(ChoosingTile):
+            return []
+
         if self.game.reward_service.get_reward() is not None:
+            for a in self.actions:
+                a.update_priority()
             return [a for a in self.actions if isinstance(a,PickUpItem) and a.is_available()]
 
         la: list[Action] = []
         for a in self.actions:
+            a.update_priority()
             if a.is_available():
                 la.append(a)
 

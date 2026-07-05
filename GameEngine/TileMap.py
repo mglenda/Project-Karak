@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from GraphicsEngine.Frame import Frame,FRAMEPOINT
 from GameEngine.TileObject import TileObject
 from GameEngine.TileDefinitions import TileDefinition,Start,Unknown
@@ -9,6 +11,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from GameContext import GameContext
+    from GameEngine.Action import ActionHealingPortal
     from GameEngine.MovementService import MovementService
 
 class TileMap:
@@ -78,10 +81,29 @@ class TileMap:
     def load_path(self, start: TileObject, movement: int):
         self.disable_all_tiles()
         self.pathfinding(start,movement,start)
+        self.load_portal_paths(start)
 
     def disable_all_tiles(self):
         for t in self.tiles:
             t.set_active(False)
+
+    def load_portal_paths(self, start: TileObject):
+        if not start.get_definition().is_portal:
+            return
+
+        for tile in self.tiles:
+            if tile == start or not tile.get_definition().is_portal:
+                continue
+
+            tile.set_active(True)
+            tile.on_click(self.movement_service.move_to_tile, tile)
+
+    def load_healing_portal_targets(self, action: ActionHealingPortal):
+        self.disable_all_tiles()
+        for tile in self.tiles:
+            if tile.get_definition().is_healing:
+                tile.set_active(True)
+                tile.on_click(action.teleport_to_healing_tile, tile)
 
     def pathfinding(self, start: TileObject, movement: int, root: TileObject):
         if movement > 0:
