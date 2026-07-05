@@ -1,20 +1,24 @@
-from Interfaces.ItemInterface import ItemInterface
-from Interfaces.InventoryInterface import InventoryInterface
-from Interfaces.HeroInterface import HeroInterface
+from __future__ import annotations
+
 from GameEngine.ItemDefinition import ItemDefinition
 from GameEngine.Constants import Constants,ItemTypes
 from GameEngine.InventorySlot import InventorySlot
+from typing import TYPE_CHECKING
 
-class Inventory(InventoryInterface):
+if TYPE_CHECKING:
+    from GameEngine.Hero import Hero
+    from GameEngine.Item import Item
+
+class Inventory:
     max_weapons: int
     max_scrolls: int
     max_keys: int
-    hero: HeroInterface
+    hero: Hero
 
     slots: list[InventorySlot]
-    chests: list[ItemInterface]
+    chests: list[Item]
 
-    def __init__(self, hero: HeroInterface) -> None:
+    def __init__(self, hero: Hero) -> None:
         self.max_weapons = Constants.MAX_WEAPONS
         self.max_keys = Constants.MAX_KEYS
         self.max_scrolls = Constants.MAX_SCROLLS
@@ -41,7 +45,7 @@ class Inventory(InventoryInterface):
                 return True
         return False
 
-    def remove_item(self, item: ItemInterface):
+    def remove_item(self, item: Item):
         if item.type == ItemTypes.CHEST:
             if item in self.chests:
                 self.chests.remove(item)
@@ -50,7 +54,7 @@ class Inventory(InventoryInterface):
                 if s.get_item() == item:
                     s.remove_item(item)
 
-    def add_item(self, item: ItemInterface, slot: InventorySlot = None) -> ItemInterface:
+    def add_item(self, item: Item, slot: InventorySlot = None) -> Item:
         if item.type == ItemTypes.CHEST:
             self.chests.append(item)
         else:

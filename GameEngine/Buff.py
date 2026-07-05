@@ -1,17 +1,20 @@
-from Interfaces.BuffInterface import BuffInterface
-import GameEngine.BuffModifier as bMod
-from Interfaces.HeroInterface import HeroInterface
-from GameEngine.Constants import DurationScopes
-from typing import Type
+from __future__ import annotations
 
-class Buff(BuffInterface):
+import GameEngine.BuffModifier as bMod
+from GameEngine.Constants import DurationScopes
+from typing import TYPE_CHECKING, Type
+
+if TYPE_CHECKING:
+    from GameEngine.Hero import Hero
+
+class Buff:
     default_duration_scope: int
-    hero: HeroInterface
+    hero: Hero
     modifiers_default: list[Type[bMod.BuffModifier]]
     active_modifiers: list[bMod.BuffModifier]
     duration_scope: int
 
-    def __init__(self, hero: HeroInterface, duration_scope: int = None):
+    def __init__(self, hero: Hero, duration_scope: int = None):
         self.active_modifiers = []
         for m_class in self.modifiers_default:
             self.active_modifiers.append(m_class(hero))

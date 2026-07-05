@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 from GameContext import GameContext
 from GameEngine.Constants import DurationScopes
 from GameEngine.MovementService import MovementService
-from Interfaces.HeroInterface import HeroInterface
 import GameEngine.Buff as buff
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from GameEngine.Hero import Hero
 
 
 class TurnService:
@@ -26,7 +31,7 @@ class TurnService:
         self.refresh_hero(self.context.heroes[0])
         self.movement_service.load_move_options()
 
-    def refresh_hero(self, hero: HeroInterface):
+    def refresh_hero(self, hero: Hero):
         hero.refresh_move_points()
         hero.reset_cooldowns(DurationScopes.DURATION_SCOPE_TURN)
         hero.remove_buffs(DurationScopes.DURATION_SCOPE_TURN)

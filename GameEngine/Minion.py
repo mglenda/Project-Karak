@@ -1,16 +1,16 @@
 from GameEngine.MinionDefinition import MinionDefinition
-from Interfaces.MinionInterface import MinionInterface
+from GameEngine.Duelist import Duelist
 from GameEngine.Placeable import Placeable
 from GameEngine.Item import Item
 
-class Minion(MinionInterface,Placeable):
+class Minion(Placeable, Duelist):
     definition: MinionDefinition
     agressive: bool
     explored: bool
 
     def __init__(self, definition: MinionDefinition, explored: bool = False) -> None:
         Placeable.__init__(self,definition)
-        MinionInterface.__init__(self)
+        Duelist.__init__(self)
 
         self.power = definition.power
         self.agressive = definition.agressive
@@ -34,7 +34,7 @@ class Minion(MinionInterface,Placeable):
         return self.definition.path
     
     def remove(self):
-        super(Placeable,self).remove()
+        Placeable.remove(self)
         self.tile.add_placeable(Item(self.definition.reward))
 
     def is_explored(self) -> bool:

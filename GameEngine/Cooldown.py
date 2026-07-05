@@ -1,6 +1,4 @@
-from Interfaces.CooldownInterface import CooldownInterface
-
-class Cooldown(CooldownInterface):
+class Cooldown:
     scope: int
 
     def __init__(self, duration_scope: int):

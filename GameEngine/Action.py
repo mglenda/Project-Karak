@@ -1,8 +1,8 @@
-from Interfaces.ActionInterface import ActionInterface
-from Interfaces.HeroInterface import HeroInterface
-from Interfaces.ItemInterface import ItemInterface
+from __future__ import annotations
+
 from GameEngine.Cooldown import Cooldown
 from GameEngine.Constants import DurationScopes, ItemTypes
+from GameEngine.Item import Item
 import GameEngine.Buff as buff
 import GameEngine.BuffModifier as bMod
 from typing import Type
@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from Game import Game
+    from GameEngine.Hero import Hero
 
 PATH = '_Textures\\Abilities\\'
 
@@ -19,8 +20,8 @@ ACTION_TYPE_SCROLL: int = 2
 ACTION_TYPE_ABILITY: int = 1
 ACTION_TYPE_GENERAL: int = 0
 
-class Action(ActionInterface):
-    hero: HeroInterface
+class Action:
+    hero: Hero
     path: str
     path_focused: str
     prio: int
@@ -32,7 +33,7 @@ class Action(ActionInterface):
     available: bool
     passive: bool
 
-    def __init__(self, hero: HeroInterface, game: "Game"):
+    def __init__(self, hero: Hero, game: "Game"):
         self.game = game
         self.hero = hero
         self.cooldown = None
@@ -126,7 +127,7 @@ class PickUpItem(Action):
         return (
             super().get_availability()
             and placeable is not None
-            and isinstance(placeable, ItemInterface)
+            and isinstance(placeable, Item)
             and placeable.type in (ItemTypes.WEAPON, ItemTypes.SCROLL, ItemTypes.KEY)
         )
     

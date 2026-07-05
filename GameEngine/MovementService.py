@@ -1,17 +1,22 @@
+from __future__ import annotations
+
 from GameContext import GameContext
 from GameEngine.Constants import DurationScopes
 from GameEngine.MinionDefinition import MinionDefinition
-from Interfaces.MinionInterface import MinionInterface
-from Interfaces.TileObjectInterface import TileObjectInterface
+from GameEngine.Minion import Minion
 import GameEngine.Buff as buff
 import GameEngine.BuffModifier as bMod
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from GameEngine.TileObject import TileObject
 
 
 class MovementService:
     def __init__(self, context: GameContext) -> None:
         self.context = context
 
-    def choose_minion(self, tile: TileObjectInterface):
+    def choose_minion(self, tile: TileObject):
         arr = self.context.minion_pack.pick()
         if len(arr) == 0:
             self.move_to_tile(tile)
@@ -22,11 +27,11 @@ class MovementService:
             else:
                 pass
 
-    def spawn_minion(self, definition: MinionDefinition, tile: TileObjectInterface):
+    def spawn_minion(self, definition: MinionDefinition, tile: TileObject):
         from GameEngine.Minion import Minion
         Minion(definition).set_tile(tile)
 
-    def confirm_tile_placement(self, tile: TileObjectInterface):
+    def confirm_tile_placement(self, tile: TileObject):
         self.context.get_current_hero().remove_buffs(buff.ChoosingTile)
         tile.on_click(self.move_to_tile, tile)
         if tile.is_spawn:
@@ -34,7 +39,7 @@ class MovementService:
         else:
             self.move_to_tile(tile)
 
-    def move_to_tile(self, tile: TileObjectInterface):
+    def move_to_tile(self, tile: TileObject):
         hero = self.context.get_current_hero()
         hero.move_to_tile(tile)
         hero.reset_cooldowns(DurationScopes.DURATION_SCOPE_TILEMOVE)
@@ -46,7 +51,7 @@ class MovementService:
         tile = hero.get_tile()
         placeable = tile.get_placeable()
 
-        if not(isinstance(placeable, MinionInterface) and placeable.agressive) or hero.has_modifier(bMod.IgnoreHostiles):
+        if not(isinstance(placeable, Minion) and placeable.agressive) or hero.has_modifier(bMod.IgnoreHostiles):
             if hero.get_move_points() > 0 and not hero.has_modifier(bMod.CannotMove):
                 tile = hero.get_tile()
                 self.context.get_tilemap().load_path(tile, 1)

@@ -1,13 +1,13 @@
-from Interfaces.CombatInterface import CombatInterface
+from __future__ import annotations
+
 from GameEngine.Duelist import Duelist
-from Interfaces.MinionInterface import MinionInterface
-from Interfaces.HeroInterface import HeroInterface
+from GameEngine.Hero import Hero
+from GameEngine.Minion import Minion
 import GameEngine.BuffModifier as bMod
 import GameEngine.Buff as buff
-from random import randint
     
 
-class Combat(CombatInterface):
+class Combat:
     duelists: list[Duelist]
     active_duelist: Duelist
 
@@ -24,14 +24,14 @@ class Combat(CombatInterface):
     def end(self):
         for d in self.duelists:
             d.leave_combat()
-            if isinstance(d,HeroInterface):
+            if isinstance(d, Hero):
                 d.add_buff(buff.Exhausted)
 
     def get_duelist(self, id: int) -> Duelist:
         return self.duelists[id]
     
     def is_finished(self) -> bool:
-        return self.active_duelist == self.duelists[1] or isinstance(self.duelists[1],MinionInterface)
+        return self.active_duelist == self.duelists[1] or isinstance(self.duelists[1], Minion)
     
     def active_next(self):
         self.active_duelist = self.duelists[1]
@@ -50,7 +50,7 @@ class Combat(CombatInterface):
         )
     
     def is_arena_duel(self) -> bool:
-        return isinstance(self.duelists[0],HeroInterface) and isinstance(self.duelists[1],HeroInterface)
+        return isinstance(self.duelists[0], Hero) and isinstance(self.duelists[1], Hero)
     
     def get_loser(self) -> Duelist:
         if self.duelists[0].get_total_power() < self.duelists[1].get_total_power():

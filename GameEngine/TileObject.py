@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 from GraphicsEngine.Tile import Tile,Frame,Image,FRAMEPOINT
 from GraphicsEngine.Placeable import Placeable as GPlaceable
 from GraphicsEngine.Constants import MouseEvent
 from GameEngine.TileDefinitions import TileDefinition
-from Interfaces.TileObjectInterface import TileObjectInterface
-from Interfaces.HeroInterface import HeroInterface
-from Interfaces.PlaceableInterface import PlaceableInterface
+from typing import TYPE_CHECKING
 
-class TileObject(TileObjectInterface):
+if TYPE_CHECKING:
+    from GameEngine.Hero import Hero
+    from GameEngine.Placeable import Placeable
+
+class TileObject:
     g_tile: Tile
     pathing: tuple
     path: str
@@ -15,9 +19,9 @@ class TileObject(TileObjectInterface):
     column: int
     row: int
     
-    heroes: list[HeroInterface]
+    heroes: list[Hero]
     hero_icons: list[Image]
-    placeable: PlaceableInterface
+    placeable: Placeable
     g_placeable: GPlaceable
 
     def __init__(self, definition: TileDefinition, size: int, world: Frame,row: int, column: int) -> None:
@@ -30,12 +34,12 @@ class TileObject(TileObjectInterface):
         self.column = column
 
         self.g_tile = Tile(size,definition.path,world)
-        self.heroes: list[HeroInterface] = []
+        self.heroes: list[Hero] = []
         self.hero_icons: list[Image] = []
         self.placeable = None
         self.g_placeable = None
 
-    def add_placeable(self, placeable: PlaceableInterface):
+    def add_placeable(self, placeable: Placeable):
         self.placeable = placeable
         self.graphics_refresh_placeable()
         self.graphics_refresh_heroes()
@@ -45,7 +49,7 @@ class TileObject(TileObjectInterface):
         self.graphics_refresh_placeable()
         self.graphics_refresh_heroes()
 
-    def get_placeable(self) -> PlaceableInterface:
+    def get_placeable(self) -> Placeable:
         return self.placeable
     
     def graphics_refresh_placeable(self):
@@ -67,12 +71,12 @@ class TileObject(TileObjectInterface):
                 self.g_placeable.set_wheel_value(value)
             
 
-    def add_hero(self, hero: HeroInterface):
+    def add_hero(self, hero: Hero):
         if hero not in self.heroes:
             self.heroes.append(hero)
             self.graphics_refresh_heroes()
 
-    def remove_hero(self, hero: HeroInterface):
+    def remove_hero(self, hero: Hero):
         if hero in self.heroes:
             self.heroes.remove(hero)
             self.graphics_refresh_heroes()

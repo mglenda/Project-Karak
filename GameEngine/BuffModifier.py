@@ -1,10 +1,14 @@
-from Interfaces.BuffModifierInterface import BuffModifierInterface
-from Interfaces.HeroInterface import HeroInterface
+from __future__ import annotations
 
-class BuffModifier(BuffModifierInterface):
-    hero: HeroInterface
+from typing import TYPE_CHECKING
 
-    def __init__(self, hero: HeroInterface):
+if TYPE_CHECKING:
+    from GameEngine.Hero import Hero
+
+class BuffModifier:
+    hero: Hero
+
+    def __init__(self, hero: Hero):
         self.hero = hero
         self.enable()
 

@@ -1,5 +1,9 @@
-import Interfaces.BuffModifierInterface as bMod
-from typing import Type
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Type
+
+if TYPE_CHECKING:
+    from GameEngine.BuffModifier import BuffModifier
 
 class Opponent():
     pass
@@ -63,5 +67,5 @@ class Duelist(Opponent):
         self.opponent = None
         self.in_combat = False
 
-    def has_modifier(self, mod_type: Type[bMod.BuffModifierInterface]) -> bool:
+    def has_modifier(self, mod_type: Type[BuffModifier]) -> bool:
         return False

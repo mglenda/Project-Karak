@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from GameContext import GameContext
 from GameEngine.Combat import Combat
 from GameEngine.DiceService import DiceService
 from GameEngine.Duelist import Duelist
 from GameEngine.Constants import DurationScopes
-from Interfaces.HeroInterface import HeroInterface
-from Interfaces.MinionInterface import MinionInterface
+from GameEngine.Hero import Hero
+from GameEngine.Minion import Minion
 
 
 class CombatService:
@@ -22,7 +24,7 @@ class CombatService:
     def end_combat(self):
         combat = self.context.combat
         h = combat.get_active_duelist()
-        if isinstance(h, HeroInterface):
+        if isinstance(h, Hero):
             h.reset_cooldowns(DurationScopes.DURATION_SCOPE_COMBAT)
             h.remove_buffs(DurationScopes.DURATION_SCOPE_COMBAT)
 
@@ -34,11 +36,11 @@ class CombatService:
                 else:
                     loser = combat.get_loser()
                     winner = combat.get_winner()
-                    if isinstance(winner, MinionInterface):
+                    if isinstance(winner, Minion):
                         winner.explore()
                         self.context.get_current_hero().hurt()
                         self.context.get_current_hero().move_to_former_tile()
-                    elif isinstance(loser, MinionInterface):
+                    elif isinstance(loser, Minion):
                         loser.remove()
                 self.dice_service.clear_dice_manager()
                 combat.end()

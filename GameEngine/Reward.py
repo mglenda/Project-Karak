@@ -1,18 +1,21 @@
-from Interfaces.RewardInterface import RewardInterface
-from Interfaces.ItemInterface import ItemInterface
-from Interfaces.HeroInterface import HeroInterface
-from Interfaces.InventoryInterface import InventoryInterface
+from __future__ import annotations
 
-class Reward(RewardInterface):
-    hero: HeroInterface
-    item: ItemInterface
+from typing import TYPE_CHECKING
 
-    def __init__(self, hero: HeroInterface, item: ItemInterface):
+if TYPE_CHECKING:
+    from GameEngine.Hero import Hero
+    from GameEngine.Item import Item
+
+class Reward:
+    hero: Hero
+    item: Item
+
+    def __init__(self, hero: Hero, item: Item):
         self.hero = hero
         self.item = item
     
-    def get_hero(self) -> HeroInterface:
+    def get_hero(self) -> Hero:
         return self.hero
     
-    def get_item(self) -> ItemInterface:
+    def get_item(self) -> Item:
         return self.item

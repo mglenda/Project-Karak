@@ -1,6 +1,11 @@
+from __future__ import annotations
+
 from GraphicComponents.InventorySlot import InventorySlot,FRAMEPOINT,Frame
 from GameEngine.Constants import ItemTypes
-from Interfaces.HeroInterface import HeroInterface
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from GameEngine.Hero import Hero
 
 class InventoryPanel():
     slots: list[InventorySlot]
@@ -18,7 +23,7 @@ class InventoryPanel():
         self.x_offset = x_offset
         self.y_offset = y_offset
 
-    def verify(self, hero: HeroInterface) -> bool:
+    def verify(self, hero: Hero) -> bool:
         slots = []
         for slot in self.slots:
             slots.append(slot.slot)
@@ -27,7 +32,7 @@ class InventoryPanel():
                 return False
         return True
     
-    def reload(self, hero: HeroInterface):
+    def reload(self, hero: Hero):
         for s in self.slots:
             s.destroy()
         self.slots.clear()
@@ -72,7 +77,7 @@ class InventoryPanel():
 
             self.slots.append(slot)
 
-    def update(self, hero: HeroInterface):
+    def update(self, hero: Hero):
         if not self.verify(hero):
             self.reload(hero)
         for s in self.slots:

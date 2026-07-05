@@ -1,21 +1,23 @@
+from __future__ import annotations
+
 from GraphicComponents.RewardScreen import RewardScreen,Frame,FRAMEPOINT
 from GraphicComponents.InventorySlot import InventorySlot
 from GraphicsEngine.ItemImage import ItemImage
 from GraphicsEngine.Constants import MouseEvent
-from Interfaces.ItemInterface import ItemInterface
-from Interfaces.InventorySlotInterface import InventorySlotInterface
 from GameEngine.Constants import ItemTypes
 from GameEngine.Reward import Reward
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from Game import Game
+    from GameEngine.Item import Item
+    from GameEngine.InventorySlot import InventorySlot as EngineInventorySlot
 
 class RewardPanel():
     main: RewardScreen
     item_image: ItemImage
     slots: list[InventorySlot]
-    selected_slot: InventorySlotInterface
+    selected_slot: EngineInventorySlot
 
     def __init__(self,screen: Frame, game: "Game") -> None:
         self.reward_service = game.reward_service
@@ -42,7 +44,7 @@ class RewardPanel():
     def is_visible(self)-> bool:
         return self.main.is_visible()
 
-    def get_selected_slot(self) -> InventorySlotInterface:
+    def get_selected_slot(self) -> EngineInventorySlot:
         return self.selected_slot
 
     def clear_slots(self):
@@ -50,7 +52,7 @@ class RewardPanel():
             slot.destroy()
         self.slots.clear()
 
-    def select_slot(self, slot: InventorySlotInterface):
+    def select_slot(self, slot: EngineInventorySlot):
         self.selected_slot = slot
         for slot_component in self.slots:
             slot_component.set_selected(slot_component.slot == slot)
@@ -94,7 +96,7 @@ class RewardPanel():
                 self.current_reward = reward
                 self.reload_slots(reward)
 
-            item: ItemInterface = reward.get_item()
+            item: Item = reward.get_item()
             if item is not None:
                 color:str = 'Red' if item.type == ItemTypes.WEAPON else 'Gold'
                 self.item_image.change(item.get_path(),color,item.get_power())

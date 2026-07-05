@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 from GameEngine.HeroDefinition import HeroDefinition
-from Interfaces.HeroInterface import HeroInterface
-from Interfaces.TileObjectInterface import TileObjectInterface
-from Interfaces.MinionInterface import MinionInterface
+from GameEngine.Duelist import Duelist
+from GameEngine.Minion import Minion
 from GameEngine.Inventory import Inventory
 from GameEngine.Constants import Constants
 from GameEngine.Action import Action,ActionCombat,EndTurn,RollDice,Revitalize,HealingFountain,PickUpItem
@@ -12,12 +13,13 @@ from typing import TYPE_CHECKING, Type, overload
 
 if TYPE_CHECKING:
     from Game import Game
+    from GameEngine.TileObject import TileObject
 
-class Hero(HeroInterface):
+class Hero(Duelist):
     definition: HeroDefinition
     name: str
-    tile: TileObjectInterface
-    former_tile: TileObjectInterface
+    tile: TileObject
+    former_tile: TileObject
     hit_points: int
     max_hit_points: int
     move_points: int
@@ -28,7 +30,7 @@ class Hero(HeroInterface):
     inventory: Inventory
 
     def __init__(self, definition: HeroDefinition, name: str, game: "Game") -> None:
-        super().__init__(definition,name)
+        Duelist.__init__(self)
         self.game = game
         self.definition = definition
         self.name = name
@@ -88,7 +90,7 @@ class Hero(HeroInterface):
         else:
             self.hit_points = self.max_hit_points if self.hit_points + amnt > self.max_hit_points else self.hit_points + amnt
     
-    def move_to_tile(self, tile: TileObjectInterface):
+    def move_to_tile(self, tile: TileObject):
         self.former_tile = self.tile
         if self.tile is not None:
             self.tile.remove_hero(self)
@@ -104,7 +106,7 @@ class Hero(HeroInterface):
             self.tile = self.former_tile
             self.tile.add_hero(self)
 
-    def get_tile(self) -> TileObjectInterface:
+    def get_tile(self) -> TileObject:
         return self.tile
 
     def get_definition(self) -> HeroDefinition:
@@ -139,7 +141,7 @@ class Hero(HeroInterface):
     
     def is_in_hostile_tile(self) -> bool:
         p = self.tile.get_placeable()
-        return isinstance(p,MinionInterface) and p.agressive
+        return isinstance(p, Minion) and p.agressive
     
     def reset_cooldowns(self, duration_scope: int):
         for a in self.actions:
@@ -232,9 +234,9 @@ class Hero(HeroInterface):
 
     def fighting_explored(self) -> bool:
         opp = self.get_opponent()
-        return isinstance(opp,MinionInterface) and opp.is_explored()
+        return isinstance(opp, Minion) and opp.is_explored()
     
     def explore_minion(self):
         p = self.tile.get_placeable()
-        if isinstance(p,MinionInterface) and p.agressive:
+        if isinstance(p, Minion) and p.agressive:
             p.explore()

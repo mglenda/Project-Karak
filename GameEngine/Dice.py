@@ -1,8 +1,7 @@
-from Interfaces.DiceInterface import DiceInterface
 from GameEngine.DiceDefinition import DiceDefinition
 from random import choice
 
-class Dice(DiceInterface):
+class Dice:
     definition: DiceDefinition
     value: int
     pending_value: int

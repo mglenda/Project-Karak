@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 from GraphicsEngine.Rect import Rect,Frame
 from GraphicsEngine.Image import Image
 from GraphicsEngine.Constants import Framepoint as FRAMEPOINT
 from GraphicsEngine.ItemImage import ItemImage
 from GameEngine.Constants import ItemTypes
-from Interfaces.InventorySlotInterface import InventorySlotInterface
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from GameEngine.InventorySlot import InventorySlot as EngineInventorySlot
 
 PATH = '_Textures\\Inventory\\'
 
@@ -12,9 +17,9 @@ class InventorySlot(Rect):
     hover_layer: Rect
     theme: Image
     itemimg: ItemImage
-    slot: InventorySlotInterface
+    slot: EngineInventorySlot
 
-    def __init__(self, w: int, h: int, color: tuple, parent: Frame, slot: InventorySlotInterface) -> None:
+    def __init__(self, w: int, h: int, color: tuple, parent: Frame, slot: EngineInventorySlot) -> None:
         super().__init__(w, h, color, parent)
         self.slot = slot
 

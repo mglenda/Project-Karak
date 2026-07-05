@@ -1,16 +1,20 @@
-from Interfaces.PlaceableInterface import PlaceableInterface
-from Interfaces.TileObjectInterface import TileObjectInterface
-from GameEngine.PlaceableDefinition import PlaceableDefinition
+from __future__ import annotations
 
-class Placeable(PlaceableInterface):
+from GameEngine.PlaceableDefinition import PlaceableDefinition
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from GameEngine.TileObject import TileObject
+
+class Placeable:
     definition: PlaceableDefinition
-    tile: TileObjectInterface
+    tile: TileObject
 
     def __init__(self, definition: PlaceableDefinition) -> None:
         self.definition = definition
         self.tile = None
 
-    def set_tile(self, tile: TileObjectInterface):
+    def set_tile(self, tile: TileObject):
         if self.tile is not None:
             self.tile.remove_placeable()
         self.tile = tile

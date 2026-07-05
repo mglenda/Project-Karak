@@ -2,7 +2,6 @@ from GraphicsEngine.Frame import Frame,FRAMEPOINT
 from GameEngine.TileObject import TileObject
 from GameEngine.TileDefinitions import TileDefinition,Start,Unknown
 from GameEngine.TilePack import TilePack
-from Interfaces.TileMapInterface import TileMapInterface
 from GraphicsEngine.Constants import MouseEvent
 from GameEngine.Constants import Constants
 import GameEngine.Buff as buff
@@ -12,7 +11,7 @@ if TYPE_CHECKING:
     from GameContext import GameContext
     from GameEngine.MovementService import MovementService
 
-class TileMap(TileMapInterface):
+class TileMap:
     tilesize: int
     world: Frame
     tiles: list[TileObject]

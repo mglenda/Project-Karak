@@ -1,8 +1,7 @@
-from Interfaces.ItemInterface import ItemInterface
 from GameEngine.ItemDefinition import ItemDefinition
 from GameEngine.Placeable import Placeable
 
-class Item(ItemInterface,Placeable):
+class Item(Placeable):
     definition: ItemDefinition
     power: int
     type: int

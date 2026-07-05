@@ -1,26 +1,30 @@
-from GameEngine.ItemDefinition import ItemDefinition
-from Interfaces.InventorySlotInterface import InventorySlotInterface
-from Interfaces.ItemInterface import ItemInterface
+from __future__ import annotations
 
-class InventorySlot(InventorySlotInterface):
+from GameEngine.ItemDefinition import ItemDefinition
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from GameEngine.Item import Item
+
+class InventorySlot:
     type: int
-    item: ItemInterface
+    item: Item
     
     def  __init__(self, type: int) -> None:
         self.type = type
         self.item = None
 
-    def add_item(self, item: ItemInterface) -> ItemInterface:
+    def add_item(self, item: Item) -> Item:
         leftover = self.item
         self.item = item
         return leftover
 
-    def remove_item(self) -> ItemInterface:
+    def remove_item(self) -> Item:
         item = self.item
         self.item = None
         return item
     
-    def get_item(self) -> ItemInterface:
+    def get_item(self) -> Item:
         return self.item
 
     def set_type(self, type: int):

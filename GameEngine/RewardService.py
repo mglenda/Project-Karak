@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 from GameContext import GameContext
 from GameEngine.Reward import Reward
-from Interfaces.HeroInterface import HeroInterface
-from Interfaces.ItemInterface import ItemInterface
-from Interfaces.InventorySlotInterface import InventorySlotInterface
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from GameEngine.Hero import Hero
+    from GameEngine.Item import Item
+    from GameEngine.InventorySlot import InventorySlot
 
 
 class RewardService:
@@ -12,10 +17,10 @@ class RewardService:
     def get_reward(self) -> Reward:
         return self.context.reward
 
-    def create_reward(self, hero: HeroInterface, item: ItemInterface):
+    def create_reward(self, hero: Hero, item: Item):
         self.context.reward = Reward(hero, item)
 
-    def finish_reward(self, slot: InventorySlotInterface = None):
+    def finish_reward(self, slot: InventorySlot = None):
         reward = self.get_reward()
         if reward is None:
             return

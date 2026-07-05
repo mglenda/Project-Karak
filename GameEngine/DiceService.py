@@ -1,8 +1,13 @@
-from Interfaces.HeroInterface import HeroInterface
+from __future__ import annotations
+
 from GameContext import GameContext
 from GameEngine.DiceDefinition import DiceDefinition
 from GameEngine.DiceManager import DiceManager
 import GameEngine.Buff as buff
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from GameEngine.Hero import Hero
 
 
 class DiceService:
@@ -12,7 +17,7 @@ class DiceService:
     def create_dice_manager(self, dice_types: list[DiceDefinition]):
         self.context.dice_manager = DiceManager(dice_types)
 
-    def start_dice_roll(self, hero: HeroInterface, apply_roll_lock: bool = True):
+    def start_dice_roll(self, hero: Hero, apply_roll_lock: bool = True):
         dice_manager = self.context.dice_manager
         if dice_manager is None or dice_manager.is_rolling():
             return
