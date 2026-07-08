@@ -21,7 +21,7 @@ class GameSetupService:
         self.context.heroes.append(Hero(Warrior, 'Cico', self.game))
 
         from GameEngine.Item import Item
-        from GameEngine.ItemDefinition import Axe, Sword, Key, FrostFist, HealingPortal, MagicBolt
+        from GameEngine.ItemDefinition import Axe, Sword, Key, FrostFist, HealingPortal, MagicBolt, DragonChest
 
         for h in self.context.heroes:
             h.move_to_tile(self.context.get_tilemap().tiles[0])
@@ -33,6 +33,7 @@ class GameSetupService:
         self.context.heroes[0].inventory.add_item(Item(HealingPortal))
         self.context.heroes[0].inventory.add_item(Item(MagicBolt))
         self.context.heroes[0].inventory.add_item(Item(Sword))
+        self.context.heroes[0].inventory.add_item(Item(DragonChest))
 
         self.context.heroes[1].hit_points = 1
 

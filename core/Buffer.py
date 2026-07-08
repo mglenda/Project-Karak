@@ -75,6 +75,73 @@ class TextImageBuffer():
     def clear(self):
         self.storage.clear()
 
+class FittedTextImage():
+    def __init__(self, font_color: tuple, text: str, font_path: str, angle: int, w: int, h: int, alpha: int = 255, padding: float = 0.92) -> None:
+        self.font_color: tuple = font_color
+        self.text: str = text
+        self.font_path: str = font_path
+        self.angle: int = angle
+        self.w: int = max(1, round(w))
+        self.h: int = max(1, round(h))
+        self.alpha: int = alpha
+        self.padding: float = padding
+        self.surface = pygame.Surface((self.w,self.h), pygame.SRCALPHA)
+
+        if text != "":
+            font_size = self._fit_font_size()
+            font = pygame.freetype.Font(font_path,font_size)
+            font.antialiased = True
+            text_surface, _ = font.render(text,fgcolor=font_color)
+            text_surface = text_surface.convert_alpha()
+            if angle != 0:
+                text_surface = pygame.transform.rotate(text_surface,angle)
+
+            x = round((self.surface.get_width() - text_surface.get_width()) / 2)
+            y = round((self.surface.get_height() - text_surface.get_height()) / 2)
+            self.surface.blit(text_surface,(x,y))
+
+        if alpha < 255:
+            self.surface.set_alpha(alpha)
+
+    def _fit_font_size(self) -> int:
+        if not pygame.freetype.get_init():
+            pygame.freetype.init()
+
+        max_w = max(1,self.w * self.padding)
+        max_h = max(1,self.h * self.padding)
+        low = 1
+        high = max(1,round(self.h * 2))
+        best = low
+
+        while low <= high:
+            mid = (low + high) // 2
+            font = pygame.freetype.Font(self.font_path,mid)
+            rect = font.get_rect(self.text)
+            if rect.width <= max_w and rect.height <= max_h:
+                best = mid
+                low = mid + 1
+            else:
+                high = mid - 1
+
+        return best
+
+class FittedTextImageBuffer():
+    def __init__(self) -> None:
+        self.storage: list[FittedTextImage] = {}
+
+    def get(self, font_color: tuple, text: str, font_path: str, angle: int, w: int, h: int, alpha: int = 255, padding: float = 0.92) -> pygame.Surface:
+        key = (text,font_path,font_color,round(w,4),round(h,4),angle,alpha,padding)
+        t: FittedTextImage = None
+        try:
+            t = self.storage[key]
+        except (KeyError):
+            t = FittedTextImage(font_color=font_color,text=text,font_path=font_path,angle=angle,w=w,h=h,alpha=alpha,padding=padding)
+            self.storage[key] = t
+        return t.surface
+
+    def clear(self):
+        self.storage.clear()
+
 class RectTexture():
     def __init__(self,w: int, h: int, color: tuple,alpha: int = 255) -> None:
         self.color = color

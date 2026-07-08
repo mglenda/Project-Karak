@@ -4,6 +4,7 @@ from GraphicsEngine.Rect import Rect,Frame
 from GraphicsEngine.Image import Image
 from GraphicsEngine.Constants import Framepoint as FRAMEPOINT
 from GraphicsEngine.ItemImage import ItemImage
+from GraphicsEngine.TextColors import TextColors
 from GameEngine.Constants import ItemTypes
 from typing import TYPE_CHECKING
 
@@ -45,7 +46,7 @@ class InventorySlot(Rect):
         self.theme.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
         self.set_alpha(200)
 
-        self.itemimg = ItemImage(self.w*0.9,self.h*0.9,'_Textures\\Items\\Retextured\\Axe.png',self,"Red",0)
+        self.itemimg = ItemImage(self.w*0.9,self.h*0.9,'_Textures\\Items\\Retextured\\Axe.png',self,TextColors.RED,0)
         self.itemimg.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
         self.itemimg.set_visible(False)
 
@@ -57,7 +58,7 @@ class InventorySlot(Rect):
 
     def update(self):
         if self.slot.get_item() is not None:
-            color = 'Red' if self.slot.get_item().type == ItemTypes.WEAPON else 'Gold'
+            color = TextColors.RED if self.slot.get_item().type == ItemTypes.WEAPON else TextColors.GOLD
             self.itemimg.change(self.slot.get_item().get_path(),color,self.slot.get_item().get_power())
             self.itemimg.set_visible(True)
         else:

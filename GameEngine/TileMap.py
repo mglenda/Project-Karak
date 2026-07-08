@@ -113,6 +113,7 @@ class TileMap:
                 if t is not None and ((self.is_passable_bottom(t) and self.is_passable_top(start)) or (can_pass_walls and t.get_definition() != Unknown)) and t != root:
                     t.set_active(True)
                     if t.get_definition() != Unknown:
+                        t.on_click(self.movement_service.move_to_tile,t)
                         self.pathfinding(t,movement - 1,root)
                     else:
                         t.on_click(self.draw_tile_definition,start,t)
@@ -121,6 +122,7 @@ class TileMap:
                 if t is not None and ((self.is_passable_top(t) and self.is_passable_bottom(start)) or (can_pass_walls and t.get_definition() != Unknown)) and t != root:
                     t.set_active(True)
                     if t.get_definition() != Unknown:
+                        t.on_click(self.movement_service.move_to_tile,t)
                         self.pathfinding(t,movement - 1,root)
                     else:
                         t.on_click(self.draw_tile_definition,start,t)
@@ -129,6 +131,7 @@ class TileMap:
                 if t is not None and ((self.is_passable_right(t) and self.is_passable_left(start)) or (can_pass_walls and t.get_definition() != Unknown)) and t != root:
                     t.set_active(True)
                     if t.get_definition() != Unknown:
+                        t.on_click(self.movement_service.move_to_tile,t)
                         self.pathfinding(t,movement - 1,root)
                     else:
                         t.on_click(self.draw_tile_definition,start,t)
@@ -137,6 +140,7 @@ class TileMap:
                 if t is not None and ((self.is_passable_left(t) and self.is_passable_right(start)) or (can_pass_walls and t.get_definition() != Unknown)) and t != root:
                     t.set_active(True)
                     if t.get_definition() != Unknown:
+                        t.on_click(self.movement_service.move_to_tile,t)
                         self.pathfinding(t,movement - 1,root)
                     else:
                         t.on_click(self.draw_tile_definition,start,t)

@@ -91,9 +91,9 @@ class HealedOnFountain(Buff):
     def __init__(self, hero, duration_scope = None):
         super().__init__(hero, duration_scope)
 
-class PickedUpReward(Buff):
+class ObtainedItem(Buff):
     default_duration_scope: int = DurationScopes.DURATION_SCOPE_TURN
-    modifiers_default: list[Type[bMod.BuffModifier]] = []
+    modifiers_default: list[Type[bMod.BuffModifier]] = [bMod.CannotDoAnything,bMod.CannotMove]
 
     def __init__(self, hero, duration_scope = None):
         super().__init__(hero, duration_scope)

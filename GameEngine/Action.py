@@ -136,7 +136,7 @@ class PickUpItem(Action):
         placeable = self.hero.get_tile().get_placeable()
         return (
             super().get_availability()
-            and not self.hero.has_buff(buff.PickedUpReward)
+            and not self.hero.has_buff(buff.ObtainedItem)
             and placeable is not None
             and isinstance(placeable, Item)
             and placeable.type in (ItemTypes.WEAPON, ItemTypes.SCROLL, ItemTypes.KEY)
@@ -168,7 +168,8 @@ class UnlockChest(Action):
         placeable = self.hero.get_tile().get_placeable()
         return (
             super().get_availability()
-            and not self.hero.has_buff(buff.PickedUpReward)
+            and not self.hero.has_buff(buff.ObtainedItem)
+            and not self.hero.has_buff(buff.Exhausted)
             and isinstance(placeable, Minion)
             and placeable.definition == ChestClosed
             and self.hero.inventory.has_item(Key)
@@ -321,6 +322,7 @@ class ActionHealingPortal(Action):
         return (
             super().get_availability()
             and self.hero.inventory.has_item(HealingPortal)
+            and not self.hero.has_buff(buff.Exhausted)
             and not self.hero.is_in_combat()
             and (
                 not self.hero.is_in_hostile_tile()

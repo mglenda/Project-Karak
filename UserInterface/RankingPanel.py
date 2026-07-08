@@ -6,6 +6,7 @@ from GraphicsEngine.Image import Image
 from GraphicsEngine.Rect import Rect
 from GraphicsEngine.TextField import TextField
 from GraphicsEngine.NumberImage import NumberImage
+from GraphicsEngine.TextColors import TextColors
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -24,9 +25,9 @@ class RankingRow:
 
         padding = h * 0.12
         rank_w = w * 0.14
-        icon_size = h * 0.74
+        icon_size = h * 0.95
 
-        self.rank_text = NumberImage(rank_w,h*0.65,rank,'White',self.main)
+        self.rank_text = NumberImage(rank_w,h*0.65,rank,TextColors.WHITE,self.main)
         self.rank_text.set_point(FRAMEPOINT.LEFT, FRAMEPOINT.LEFT, padding, 0)
 
         self.icon = Image(icon_size, icon_size, PLACEHOLDER_ICON_PATH, self.main)
@@ -35,7 +36,7 @@ class RankingRow:
         self.name_text = TextField(self.main, font_color=(255, 255, 255), font_size=35, text='HeroName')
         self.name_text.set_point(FRAMEPOINT.LEFT, FRAMEPOINT.RIGHT, padding*3, 0, self.icon)
 
-        self.score_text = NumberImage(rank_w,h*0.65,rank,'White',self.main)
+        self.score_text = NumberImage(rank_w,h*0.65,rank,TextColors.WHITE,self.main)
         self.score_text.set_point(FRAMEPOINT.RIGHT, FRAMEPOINT.RIGHT, -padding, 0)
 
         self.chest_icon = Image(icon_size, icon_size, CHEST_ICON_PATH, self.main)
@@ -60,7 +61,7 @@ class RankingRow:
 
         if self.score != score:
             self.score = score
-            self.score_text.set_value(int(score))
+            self.score_text.set_value(score)
 
 
 class RankingPanel:

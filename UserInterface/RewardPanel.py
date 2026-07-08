@@ -4,6 +4,7 @@ from GraphicComponents.RewardScreen import RewardScreen,Frame,FRAMEPOINT
 from GraphicComponents.InventorySlot import InventorySlot
 from GraphicsEngine.ItemImage import ItemImage
 from GraphicsEngine.Constants import MouseEvent
+from GraphicsEngine.TextColors import TextColors
 from GameEngine.Constants import ItemTypes
 from GameEngine.Reward import Reward
 from typing import TYPE_CHECKING
@@ -29,7 +30,7 @@ class RewardPanel():
         self.main.set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.BOTTOM)
         self.main.set_visible(False)
 
-        self.item_image = ItemImage(height*0.15,height*0.15,'_Textures\\Heroes\\Combat\\BeastHunter.png',self.main,'Red',0)
+        self.item_image = ItemImage(height*0.15,height*0.15,'_Textures\\Heroes\\Combat\\BeastHunter.png',self.main,TextColors.RED,0)
         self.item_image.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER,0,-height*0.2,self.main.background)
 
     def show(self):
@@ -98,7 +99,7 @@ class RewardPanel():
 
             item: Item = reward.get_item()
             if item is not None:
-                color:str = 'Red' if item.type == ItemTypes.WEAPON else 'Gold'
+                color = TextColors.RED if item.type == ItemTypes.WEAPON else TextColors.GOLD
                 self.item_image.change(item.get_path(),color,item.get_power())
             for slot in self.slots:
                 slot.update()

@@ -3,12 +3,13 @@ from GraphicsEngine.Rect import Rect,Frame
 from GraphicsEngine.Image import Image
 from GraphicsEngine.TextField import TextField
 from GraphicsEngine.NumberImage import NumberImage
+from GraphicsEngine.TextColors import TextColors
 from GraphicsEngine.Constants import Framepoint as FRAMEPOINT
 
 class DamageIndicator(Rect):
     icon: Image
     text: NumberImage
-    def __init__(self, w: int, h: int,img_path: str,font_color: str, parent: Frame, type_id: int) -> None:
+    def __init__(self, w: int, h: int,img_path: str,font_color: tuple, parent: Frame, type_id: int) -> None:
         super().__init__(w, h, (80,80,80), parent)
 
         self.icon = Image(h,h,img_path,self)
@@ -42,22 +43,22 @@ class DuelistScreen(Rect):
         self.portrait = Image(h,h,'_Textures\\Heroes\\Combat\\BeastHunter.png',self)
         self.portrait.set_point(FRAMEPOINT.LEFT if type_id == 0 else FRAMEPOINT.RIGHT,FRAMEPOINT.LEFT if type_id == 0 else FRAMEPOINT.RIGHT)
 
-        self.dice_indicator = DamageIndicator(w*0.3,h*0.1,'_Textures\\Combat\\Modifier_Dice.png','White',self,type_id)
+        self.dice_indicator = DamageIndicator(w*0.3,h*0.1,'_Textures\\Combat\\Modifier_Dice.png',TextColors.WHITE,self,type_id)
         self.dice_indicator.set_point(FRAMEPOINT.TOPRIGHT if type_id == 0 else FRAMEPOINT.TOPLEFT,FRAMEPOINT.TOPRIGHT if type_id == 0 else FRAMEPOINT.TOPLEFT,w*(-0.08 if type_id == 0 else 0.08),h*0.08)
 
-        self.base_indicator = DamageIndicator(w*0.3,h*0.1,'_Textures\\Combat\\Modifier_Base.png','Red',self,type_id)
+        self.base_indicator = DamageIndicator(w*0.3,h*0.1,'_Textures\\Combat\\Modifier_Base.png',TextColors.RED,self,type_id)
         self.base_indicator.set_point(FRAMEPOINT.TOP,FRAMEPOINT.BOTTOM,0,h*0.02,self.dice_indicator)
 
-        self.ability_indicator = DamageIndicator(w*0.3,h*0.1,'_Textures\\Combat\\Modifier_Ability.png','Green',self,type_id)
+        self.ability_indicator = DamageIndicator(w*0.3,h*0.1,'_Textures\\Combat\\Modifier_Ability.png',TextColors.GREEN,self,type_id)
         self.ability_indicator.set_point(FRAMEPOINT.TOP,FRAMEPOINT.BOTTOM,0,h*0.02,self.base_indicator)
 
-        self.scroll_indicator = DamageIndicator(w*0.3,h*0.1,'_Textures\\Combat\\Modifier_Scroll.png','Purple',self,type_id)
+        self.scroll_indicator = DamageIndicator(w*0.3,h*0.1,'_Textures\\Combat\\Modifier_Scroll.png',TextColors.PURPLE,self,type_id)
         self.scroll_indicator.set_point(FRAMEPOINT.TOP,FRAMEPOINT.BOTTOM,0,h*0.02,self.ability_indicator)
 
         self.total_circle = Image(h*0.4,h*0.4,'_Textures\\Combat\\Total_Circle.png',self)
         self.total_circle.set_point(FRAMEPOINT.BOTTOMRIGHT if type_id == 0 else FRAMEPOINT.BOTTOMLEFT,FRAMEPOINT.BOTTOMRIGHT if type_id == 0 else FRAMEPOINT.BOTTOMLEFT,w*(0.04 if type_id == 0 else -0.04),0)
 
-        self.total_text = NumberImage(h*0.2,h*0.2,0,'Gold',self)
+        self.total_text = NumberImage(h*0.2,h*0.2,0,TextColors.GOLD,self)
         self.total_text.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER,0,0,self.total_circle)
 
         self.set_alpha(0)

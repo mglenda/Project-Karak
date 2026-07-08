@@ -33,7 +33,9 @@ class RewardService:
 
     def pick_up_item(self, hero: Hero, item: Item, slot: InventorySlot = None):
         leftover = hero.inventory.add_item(item, slot)
-        hero.add_buff(buff.PickedUpReward)
+        hero.add_buff(buff.ObtainedItem)
+        hero.refresh_actions()
+        self.context.get_tilemap().disable_all_tiles()
 
         tile = hero.get_tile()
         if leftover is None:

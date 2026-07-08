@@ -1,5 +1,6 @@
 from GraphicsEngine.Image import Image,Frame
 from GraphicsEngine.NumberImage import NumberImage
+from GraphicsEngine.TextColors import TextColors
 from GraphicsEngine.Constants import Framepoint as FRAMEPOINT
 
 class Placeable(Image):
@@ -12,7 +13,7 @@ class Placeable(Image):
         self.wheel_img = Image(w=self.w*0.55,h=self.h*0.55,path='_Textures\\Minions\\PowerWheel.png',parent=self)
         self.wheel_img.set_point(FRAMEPOINT.BOTTOMRIGHT,FRAMEPOINT.BOTTOMRIGHT)
 
-        self.wheel_txt = NumberImage(w=self.w*0.35,h=self.h*0.35,color="Gold",value=0,parent=self.wheel_img)
+        self.wheel_txt = NumberImage(w=self.w*0.35,h=self.h*0.35,color=TextColors.GOLD,value=0,parent=self.wheel_img)
         self.wheel_txt.set_point(FRAMEPOINT.CENTER,FRAMEPOINT.CENTER)
         
     def set_wheel_value(self, value: int):
