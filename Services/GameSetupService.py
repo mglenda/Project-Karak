@@ -22,7 +22,7 @@ class GameSetupService:
         self.context.capture_initial_hero_order()
 
         from GameEngine.Item import Item
-        from GameEngine.ItemDefinition import Axe, Sword, Key, FrostFist, HealingPortal, MagicBolt, DragonChest
+        from GameEngine.ItemDefinition import Axe, Sword, Key, FrostFist, HealingPortal, MagicBolt, DragonChest, Chest
 
         for h in self.context.heroes:
             h.move_to_tile(self.context.get_tilemap().tiles[0])
@@ -34,12 +34,21 @@ class GameSetupService:
         # self.context.heroes[0].inventory.add_item(Item(HealingPortal))
         # self.context.heroes[0].inventory.add_item(Item(MagicBolt))
         # self.context.heroes[0].inventory.add_item(Item(Sword))
-        # self.context.heroes[0].inventory.add_item(Item(DragonChest))
+
+        # self.context.heroes[1].inventory.add_item(Item(Axe))
+        # self.context.heroes[1].inventory.add_item(Item(FrostFist))
+        # self.context.heroes[1].inventory.add_item(Item(Key))
+        # self.context.heroes[1].inventory.add_item(Item(HealingPortal))
+        # self.context.heroes[1].inventory.add_item(Item(MagicBolt))
+        # self.context.heroes[1].inventory.add_item(Item(Sword))
+        # self.context.heroes[0].inventory.add_item(Item(Chest))
+        # self.context.heroes[0].inventory.add_item(Item(Chest))
+        # self.context.heroes[1].inventory.add_item(Item(Chest))
 
         # self.movement_service.apply_curse(self.context.heroes[0])
 
-        # self.context.heroes[2].hit_points = 1
-
+        # self.context.heroes[0].hit_points = 1
+        # self.context.heroes[1].hit_points = 1
         # self.context.heroes[1].inventory.add_item(Item(Axe))
         # self.context.heroes[1].inventory.add_item(Item(Axe))
 

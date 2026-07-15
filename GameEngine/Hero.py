@@ -45,6 +45,7 @@ class Hero(Duelist):
 
         self.actions = [action_type(self, self.game) for action_type in get_default_action_types()]
         self.active_buffs = []
+        self.pending_reincarnation = False
 
         a_type: Type[Action] = None
         for a_type in self.definition.special_actions:
@@ -76,7 +77,7 @@ class Hero(Duelist):
     def refresh_move_points(self):
         self.move_points = self.max_move_points
 
-    def hurt(self, amnt: int = 1):
+    def hurt(self, amnt: int = 1, defer_reincarnation: bool = False):
         self.hit_points -= amnt
         if self.hit_points < 0:
             self.hit_points = 0
@@ -84,10 +85,31 @@ class Hero(Duelist):
         if self.hit_points == 0:
             for action in self.actions:
                 if isinstance(action,Reincarnation) and action.is_available():
+                    if defer_reincarnation:
+                        self.pending_reincarnation = True
+                        if not self.has_buff(Unconsciousness):
+                            self.add_buff(Unconsciousness)
+                        return
                     action.run()
                     return
 
-            self.add_buff(Unconsciousness)
+            if not self.has_buff(Unconsciousness):
+                self.add_buff(Unconsciousness)
+
+    def has_pending_reincarnation(self) -> bool:
+        return self.pending_reincarnation
+
+    def resolve_pending_reincarnation(self) -> bool:
+        if not self.pending_reincarnation:
+            return False
+
+        self.pending_reincarnation = False
+        self.remove_buffs(Unconsciousness)
+        for action in self.actions:
+            if isinstance(action, Reincarnation):
+                action.run()
+                return True
+        return False
 
     def heal(self, amnt: int = None):
         if amnt is None:
@@ -148,6 +170,12 @@ class Hero(Duelist):
         return power
     
     def get_available_actions(self) -> list[Action]:
+        if self.game.hero_selection_service.is_active():
+            return []
+
+        if self.game.combat_service.is_arena_loot_active():
+            return []
+
         if self.has_buff(ChoosingTile):
             return []
 

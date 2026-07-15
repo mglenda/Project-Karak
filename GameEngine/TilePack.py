@@ -10,7 +10,7 @@ class TilePack():
         for _ in range(6):
             self.pack.append(Tiles.Arena)
         for _ in range(4):
-            self.pack.append(Tiles.Portal)
+            self.pack.append(Tiles.Portal) 
         for _ in range(2):
             self.pack.append(Tiles.Fountain)
         for _ in range(5):

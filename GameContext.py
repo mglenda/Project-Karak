@@ -35,6 +35,8 @@ class GameContext:
     def get_current_hero_active(self) -> Hero:
         if self.combat is not None and self.combat.is_arena_duel():
             return self.combat.get_active_duelist()
+        if self.reward is not None:
+            return self.reward.get_hero()
         return self.get_current_hero()
 
     def capture_initial_hero_order(self) -> None:

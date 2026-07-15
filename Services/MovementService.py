@@ -23,6 +23,10 @@ class MovementService:
         self.dice_service = dice_service
         self.curse_roll_active = False
         self.curse_roll_result_until = None
+        self.arena_service = None
+
+    def set_arena_service(self, arena_service) -> None:
+        self.arena_service = arena_service
 
     def choose_minion(self, tile: TileObject):
         arr = self.context.minion_pack.pick()
@@ -52,6 +56,10 @@ class MovementService:
         hero.move_to_tile(tile)
         hero.reset_cooldowns(DurationScopes.DURATION_SCOPE_TILEMOVE)
         hero.remove_buffs(DurationScopes.DURATION_SCOPE_TILEMOVE)
+        if tile.get_definition().is_arena and not tile.arena_triggered and self.arena_service is not None:
+            tile.arena_triggered = True
+            self.arena_service.start_arena_duel(tile)
+            return
         if tile.get_definition().is_cursed and not hero.is_cursed():
             self.start_curse_roll_prompt()
             return

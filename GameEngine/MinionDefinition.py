@@ -7,6 +7,7 @@ class MinionDefinition(PlaceableDefinition):
     power: int
     agressive: bool
     reward: ItemDefinition
+    curse_target_on_defeat: bool = False
 
 class Rat(MinionDefinition):
     power: int = 5
@@ -49,6 +50,7 @@ class Mummy(MinionDefinition):
     path:str = PATH + 'Mummy.png'
     agressive: bool = True
     reward: ItemDefinition = MagicBolt
+    curse_target_on_defeat: bool = True
 
 class SkeletonKeymaster(MinionDefinition):
     power: int = 8

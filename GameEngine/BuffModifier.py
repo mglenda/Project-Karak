@@ -65,6 +65,11 @@ class CannotDoAnything(BuffModifier):
     def __init__(self, hero):
         super().__init__(hero)
 
+class CannotPickUpItems(BuffModifier):
+
+    def __init__(self, hero):
+        super().__init__(hero)
+
 class CanWalkThroughWalls(BuffModifier):
 
     def __init__(self, hero):

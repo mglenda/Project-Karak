@@ -5,6 +5,7 @@ from Services.RewardService import RewardService
 from Services.GameSetupService import GameSetupService
 from Services.TurnService import TurnService
 from Services.TexturePreloadService import TexturePreloadService
+from Services.HeroSelectionService import HeroSelectionService
 from GraphicsEngine.LoadingScreen import LoadingScreen
 from GameContext import GameContext
 from typing import TYPE_CHECKING
@@ -19,9 +20,11 @@ class Game():
     def __init__(self) -> None:
         self.context = GameContext()
         self.dice_service = DiceService(self.context)
-        self.combat_service = CombatService(self.context, self.dice_service)
         self.movement_service = MovementService(self.context, self.dice_service)
+        self.hero_selection_service = HeroSelectionService(self.context, self.movement_service)
         self.reward_service = RewardService(self.context)
+        self.combat_service = CombatService(self.context, self.dice_service, self.movement_service, self.hero_selection_service, self.reward_service)
+        self.movement_service.set_arena_service(self.combat_service)
         self.setup_service = GameSetupService(self.context, self.movement_service, self)
         self.turn_service = TurnService(self.context, self.movement_service)
         self.texture_preload_service = TexturePreloadService(self.context)
@@ -59,6 +62,8 @@ class Game():
         self.context.ui.get_action_panel().update()
         self.context.ui.get_reward_panel().update()
         self.context.ui.get_turn_order_panel().update()
+        self.context.ui.get_hero_selection_panel().update()
+        self.context.ui.get_arena_loot_panel().update()
 
     def draw(self):
         self.context.ui.draw()

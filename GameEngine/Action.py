@@ -3,7 +3,7 @@ from __future__ import annotations
 from GameEngine.Cooldown import Cooldown
 from GameEngine.Constants import DurationScopes, ItemTypes
 from GameEngine.Item import Item
-from GameEngine.ItemDefinition import Chest, FrostFist as FrostFistItem, HealingPortal, Key, MagicBolt as MagicBoltItem
+from GameEngine.ItemDefinition import Chest, FrostFist as FrostFistItem, HealingPortal, Key, MagicBolt as MagicBoltItem, ThornOfDarkness as ThornOfDarknessItem
 from GameEngine.Minion import Minion
 from GameEngine.MinionDefinition import ChestClosed
 import GameEngine.Buff as buff
@@ -143,9 +143,10 @@ class PickUpItem(Action):
         return (
             super().get_availability()
             and not self.hero.has_buff(buff.ObtainedItem)
+            and not self.hero.has_modifier(bMod.CannotPickUpItems)
             and placeable is not None
             and isinstance(placeable, Item)
-            and placeable.type in (ItemTypes.WEAPON, ItemTypes.SCROLL, ItemTypes.KEY)
+            and placeable.type in (ItemTypes.WEAPON, ItemTypes.SCROLL, ItemTypes.KEY, ItemTypes.CHEST)
             and self.hero.inventory.can_pick_up_item(placeable)
         )
     
@@ -373,6 +374,51 @@ class ActionHealingPortal(Action):
         self.hero.remove_modifier(bMod.Cursed)
         self.hero.heal()
         self.game.movement_service.load_move_options()
+
+class ActionThornOfDarkness(Action):
+    path = PATH + 'ThornOfDarkness.png'
+    path_focused = PATH + 'ThornOfDarkness.png'
+    prio: int = 9
+    action_types: list[int] = [ACTION_TYPE_SCROLL]
+    modifiers_default: list[Type[bMod.BuffModifier]] = []
+    modifiers: list[bMod.BuffModifier]
+    passive = False
+    is_default = True
+
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
+
+    def get_availability(self):
+        return (
+            not self.game.movement_service.is_curse_roll_active()
+            and self.cooldown is None
+            and self.hero.inventory.has_item(ThornOfDarknessItem)
+            and not self.hero.is_in_combat()
+            and not self.hero.has_modifier(bMod.Injured)
+            and not self.hero.has_buff(buff.ChoosingTile)
+            and not self.hero.has_buff(buff.DisableAllActions)
+            and (
+                not self.hero.is_in_hostile_tile()
+                or self.hero.has_modifier(bMod.IgnoreHostiles)
+                or self.hero.has_modifier(bMod.CannotStartCombat)
+            )
+        )
+
+    def run(self):
+        if self.hero.inventory.consume_item(ThornOfDarknessItem) is None:
+            self.update()
+            return
+
+        self.game.hero_selection_service.start_selection(
+            self.hero,
+            allow_self=True,
+            on_select=self.hurt_selected_hero,
+            prompt='Choose a hero to hurt',
+        )
+
+    def hurt_selected_hero(self, hero: Hero) -> None:
+        hero.hurt(defer_reincarnation=True)
+        hero.refresh_actions()
 
 class Reincarnation(Action):
     path = PATH + 'Reincarnation.png'

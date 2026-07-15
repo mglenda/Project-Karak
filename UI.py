@@ -9,6 +9,8 @@ from UserInterface.DicePanel import DicePanel
 from UserInterface.RewardPanel import RewardPanel
 from UserInterface.CursePanel import CursePanel
 from UserInterface.TurnOrderPanel import TurnOrderPanel
+from UserInterface.HeroSelectionPanel import HeroSelectionPanel
+from UserInterface.ArenaLootPanel import ArenaLootPanel
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -25,6 +27,8 @@ class UI(MouseController):
     reward_panel: RewardPanel
     curse_panel: CursePanel
     turn_order_panel: TurnOrderPanel
+    hero_selection_panel: HeroSelectionPanel
+    arena_loot_panel: ArenaLootPanel
 
     def __init__(self, game: "Game") -> None:
         super().__init__(Screen())
@@ -45,6 +49,9 @@ class UI(MouseController):
         self.reward_panel = RewardPanel(self.screen, game)
 
         self.action_panel = ActionPanel(self.screen, game)
+
+        self.hero_selection_panel = HeroSelectionPanel(self.screen, game)
+        self.arena_loot_panel = ArenaLootPanel(self.screen, game)
 
     def get_hero_panel(self) -> HeroPanel:
         return self.hero_panel
@@ -70,8 +77,14 @@ class UI(MouseController):
     def get_turn_order_panel(self) -> TurnOrderPanel:
         return self.turn_order_panel
 
+    def get_hero_selection_panel(self) -> HeroSelectionPanel:
+        return self.hero_selection_panel
+
+    def get_arena_loot_panel(self) -> ArenaLootPanel:
+        return self.arena_loot_panel
+
     def draw(self):
-        if self.combat_panel.is_visible() or self.reward_panel.is_visible() or self.curse_panel.is_visible():
+        if self.combat_panel.is_visible() or self.reward_panel.is_visible() or self.curse_panel.is_visible() or self.hero_selection_panel.is_visible() or self.arena_loot_panel.is_visible():
             self.disable_screen.set_visible(True)
         else:
             self.disable_screen.set_visible(False)

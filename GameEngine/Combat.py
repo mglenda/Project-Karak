@@ -21,10 +21,10 @@ class Combat:
         duelist_1.enter_comat(opponent=duelist_2)
         duelist_2.enter_comat(opponent=duelist_1)
 
-    def end(self):
+    def end(self, add_exhausted: bool = True):
         for d in self.duelists:
             d.leave_combat()
-            if isinstance(d, Hero):
+            if add_exhausted and isinstance(d, Hero):
                 d.add_buff(buff.Exhausted)
 
     def get_duelist(self, id: int) -> Duelist:
@@ -57,9 +57,9 @@ class Combat:
             return self.duelists[0]
         elif self.duelists[1].get_total_power() < self.duelists[0].get_total_power():
             return self.duelists[1]
-        elif self.duelists[1].get_total_power() == self.duelists[0].get_total_power() and self.duelists[0].has_modifier(bMod.WinOnDraw):
+        elif self.duelists[1].get_total_power() == self.duelists[0].get_total_power() and self.duelists[0].has_modifier(bMod.WinOnDraw) and not self.duelists[1].has_modifier(bMod.WinOnDraw):
             return self.duelists[1]
-        elif self.duelists[1].get_total_power() == self.duelists[0].get_total_power() and self.duelists[1].has_modifier(bMod.WinOnDraw):
+        elif self.duelists[1].get_total_power() == self.duelists[0].get_total_power() and self.duelists[1].has_modifier(bMod.WinOnDraw) and not self.duelists[0].has_modifier(bMod.WinOnDraw):
             return self.duelists[0]
         else:
             return None

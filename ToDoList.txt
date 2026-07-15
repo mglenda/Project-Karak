@@ -1,7 +1,2 @@
-1. Hero Panel -> sposob zobrazenia vsetkych herov, ake maju itemy a kolko maju HP
-2. Po zabiti mumie moznost aplikovanie curse na lubovolneho hraca vratane seba a vratane aj hraca ktory uz prekliatie ma
-3. Dvihnutie otvorenej truhly bez kluca malo by ist pridat do PickUpItem len novy item type ziadny vyber inventar slotu vzdy sa pridava truhla hracovi
-4. Netopierov Zvytok
-5. Arena Duel 
 6. Pan Karaku
 7. Zabitie draka koniec hry - Victory Screen (zamysliet sa nad logovanim hodov pripadne inymi vecami a vo Victory Screene zobrazit statistiky)$

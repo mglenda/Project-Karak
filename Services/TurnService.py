@@ -19,7 +19,7 @@ class TurnService:
         hero = self.context.get_current_hero()
 
         for h in self.context.heroes:
-            if h.has_buff(buff.Unconsciousness):
+            if h.has_buff(buff.Unconsciousness) and not h.has_pending_reincarnation():
                 h.remove_buffs(buff.Unconsciousness)
                 h.add_buff(buff.Injured)
 
@@ -29,7 +29,8 @@ class TurnService:
         self.context.heroes[i] = hero
 
         self.refresh_hero(self.context.heroes[0])
-        self.movement_service.load_move_options()
+        if not self.context.heroes[0].resolve_pending_reincarnation():
+            self.movement_service.load_move_options()
 
     def refresh_hero(self, hero: Hero):
         hero.refresh_move_points()

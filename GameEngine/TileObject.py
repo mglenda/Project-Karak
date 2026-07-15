@@ -29,6 +29,7 @@ class TileObject:
         self.path = definition.path
         self.is_spawn = definition.is_spawn
         self.definition = definition
+        self.arena_triggered = False
 
         self.row = row
         self.column = column
