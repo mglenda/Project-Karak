@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from GameContext import GameContext
 from GameEngine.Combat import Combat
-from GameEngine.DiceService import DiceService
+from Services.DiceService import DiceService
 from GameEngine.Duelist import Duelist
 from GameEngine.Constants import DurationScopes
 from GameEngine.Hero import Hero

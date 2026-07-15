@@ -174,7 +174,7 @@ Pouzivatel schvalil pokracovat na krok 3.
 
 Bolo pridane:
 
-- `GameEngine/DiceService.py`
+- `Services/DiceService.py`
 
 Dice flow bol presunuty z `Game.py` do `DiceService`:
 
@@ -205,7 +205,7 @@ Dice flow bol presunuty z `Game.py` do `DiceService`:
 Overenie:
 
 ```powershell
-python -m py_compile Game.py GameContext.py GameEngine/DiceService.py GameEngine/DiceManager.py GameEngine/Dice.py UserInterface/DicePanel.py UserInterface/CombatPanel.py UserInterface/ActionPanel.py GameEngine/Action.py
+python -m py_compile Game.py GameContext.py Services/DiceService.py GameEngine/DiceManager.py GameEngine/Dice.py UserInterface/DicePanel.py UserInterface/CombatPanel.py UserInterface/ActionPanel.py GameEngine/Action.py
 python -c "import Game"
 ```
 
@@ -217,7 +217,7 @@ Pouzivatel schvalil pokracovat na krok 4.
 
 Bolo pridane:
 
-- `GameEngine/CombatService.py`
+- `Services/CombatService.py`
 
 Combat flow bol presunuty z `Game.py` do `CombatService`:
 
@@ -254,7 +254,7 @@ Doplnene typovanie pre IntelliSense:
 Overenie:
 
 ```powershell
-python -m py_compile Game.py GameContext.py GameEngine/DiceService.py GameEngine/CombatService.py GameEngine/Combat.py GameEngine/Action.py UserInterface/CombatPanel.py
+python -m py_compile Game.py GameContext.py Services/DiceService.py Services/CombatService.py GameEngine/Combat.py GameEngine/Action.py UserInterface/CombatPanel.py
 python -c "import Game"
 ```
 
@@ -266,7 +266,7 @@ Pouzivatel schvalil pokracovat na krok 5.
 
 Bolo pridane:
 
-- `GameEngine/MovementService.py`
+- `Services/MovementService.py`
 
 Movement/tile placement flow bol presunuty z `Game.py` do `MovementService`:
 
@@ -299,7 +299,7 @@ Upratane importy v `Game.py`:
 Overenie:
 
 ```powershell
-python -m py_compile Game.py GameContext.py GameEngine/DiceService.py GameEngine/CombatService.py GameEngine/MovementService.py GameEngine/TileMap.py GameEngine/Action.py
+python -m py_compile Game.py GameContext.py Services/DiceService.py Services/CombatService.py Services/MovementService.py GameEngine/TileMap.py GameEngine/Action.py
 python -c "import Game"
 ```
 
@@ -311,7 +311,7 @@ Pouzivatel schvalil pokracovat na krok 6.
 
 Bolo pridane:
 
-- `GameEngine/RewardService.py`
+- `Services/RewardService.py`
 
 Reward flow bol presunuty z `Game.py` do `RewardService`:
 
@@ -340,7 +340,7 @@ Dolezity detail:
 Overenie:
 
 ```powershell
-python -m py_compile Game.py GameContext.py GameEngine/DiceService.py GameEngine/CombatService.py GameEngine/MovementService.py GameEngine/RewardService.py GameEngine/Reward.py GameEngine/Action.py UserInterface/RewardPanel.py
+python -m py_compile Game.py GameContext.py Services/DiceService.py Services/CombatService.py Services/MovementService.py Services/RewardService.py GameEngine/Reward.py GameEngine/Action.py UserInterface/RewardPanel.py
 python -c "import Game"
 ```
 
@@ -512,8 +512,8 @@ Rozhodnutie:
 
 Bolo pridane:
 
-- `GameEngine/GameSetupService.py`
-- `GameEngine/TurnService.py`
+- `Services/GameSetupService.py`
+- `Services/TurnService.py`
 
 Presunute:
 
@@ -635,3 +635,4 @@ Zastavit sa a dat pouzivatelovi suhrn zaverecnej kontroly.
 - Pri typoch bez vhodneho priameho runtime importu pouzivat `TYPE_CHECKING` a string anotacie, aby IntelliSense fungoval bez import cyklov.
 - `.pyc` a `__pycache__` boli upratane cez `.gitignore`, dalej ich netreba riesit.
 - Preklepy typu `enter_comat`, `destory_unknowns`, `agressive` riesit iba ak budu priamo v dotknutom flow.
+

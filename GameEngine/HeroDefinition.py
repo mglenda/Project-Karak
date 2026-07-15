@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from GameEngine.Action import AstralWalking, Backstab, DoubleAttack, MagicalAffinity, Stealth
+from GameEngine.Action import AstralWalking, Backstab, DoubleAttack, MagicalAffinity, Reincarnation, Stealth
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -26,7 +26,7 @@ class Warrior(HeroDefinition):
     portrait_path: str = PATH + 'Warrior.png'
     icon_path: str = ICON_PATH + 'Warrior.png'
     combat_icon_path: str = COMBAT_ICON_PATH + 'Warrior.png'
-    special_actions: list[type[Action]] = [DoubleAttack]
+    special_actions: list[type[Action]] = [DoubleAttack, Reincarnation]
 
 class Warlock(HeroDefinition):
     portrait_path: str = PATH + 'Warlock.png'

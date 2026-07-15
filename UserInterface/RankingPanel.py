@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 PLACEHOLDER_ICON_PATH = '_Textures\\Heroes\\MyIcons\\Acrobat.png'
 CHEST_ICON_PATH = '_Textures\\ScorePanel\\ChestIcon.png'
+CURSE_ICON_PATH = '_Textures\\Abilities\\Curse.png'
 
 
 class RankingRow:
@@ -26,6 +27,7 @@ class RankingRow:
         padding = h * 0.12
         rank_w = w * 0.14
         icon_size = h * 0.95
+        status_icon_size = h * 0.75
 
         self.rank_text = NumberImage(rank_w,h*0.65,rank,TextColors.WHITE,self.main)
         self.rank_text.set_point(FRAMEPOINT.LEFT, FRAMEPOINT.LEFT, padding, 0)
@@ -42,9 +44,13 @@ class RankingRow:
         self.chest_icon = Image(icon_size, icon_size, CHEST_ICON_PATH, self.main)
         self.chest_icon.set_point(FRAMEPOINT.RIGHT, FRAMEPOINT.LEFT, - padding, 0, self.score_text)
 
+        self.curse_icon = Image(status_icon_size, status_icon_size, CURSE_ICON_PATH, self.main)
+        self.curse_icon.set_point(FRAMEPOINT.RIGHT, FRAMEPOINT.LEFT, - padding, 0, self.chest_icon)
+        self.curse_icon.set_visible(False)
 
         self.hero: Hero = None
         self.score: float = None
+        self.cursed: bool = None
 
     def set_point(self, att_point: int, att_point_parent: int, x_offset: int = 0, y_offset: int = 0, parent: Frame = None):
         self.main.set_point(att_point, att_point_parent, x_offset, y_offset, parent)
@@ -62,6 +68,11 @@ class RankingRow:
         if self.score != score:
             self.score = score
             self.score_text.set_value(score)
+
+        cursed = hero.is_cursed()
+        if self.cursed != cursed:
+            self.cursed = cursed
+            self.curse_icon.set_visible(cursed)
 
 
 class RankingPanel:

@@ -22,5 +22,6 @@ class HeroPanel():
         self.portrait.set_texture(hero.get_definition().portrait_path)
         self.portrait.set_move_values(hero.get_move_points(),hero.get_max_move_points())
         self.portrait.set_hp_values(hero.get_hit_points(),hero.get_max_hit_points())
+        self.portrait.set_cursed(hero.is_cursed())
 
         self.inventory_panel.update(hero)

@@ -36,6 +36,7 @@ class Action:
     available: bool
     passive: bool
     is_default: bool = False
+    available_during_curse_roll: bool = False
 
     def __init__(self, hero: Hero, game: "Game"):
         self.game = game
@@ -48,6 +49,9 @@ class Action:
             self.modifiers.append(m_class(hero))
 
     def get_availability(self) -> bool:
+        if self.game.movement_service.is_curse_roll_active() and not self.available_during_curse_roll:
+            return False
+
         return self.cooldown is None and not self.hero.has_modifier(bMod.CannotDoAnything) and (not self.is_action_type(ACTION_TYPE_ABILITY) or not self.hero.has_modifier(bMod.Cursed)) and (self.is_action_type(ACTION_TYPE_COMBAT) or not self.hero.has_modifier(bMod.Injured))
 
     def is_available(self) -> bool:
@@ -60,6 +64,8 @@ class Action:
         self.update_priority()
         former_available = self.available
         self.available = self.get_availability()
+        if self.game.movement_service.is_curse_roll_active() and not self.available_during_curse_roll:
+            self.available = False
 
         if former_available != self.available:
             for m in self.modifiers:
@@ -254,6 +260,27 @@ class RollDice(Action):
     def run(self):
         self.game.dice_service.start_dice_roll(self.hero)
 
+class CurseRoll(Action):
+    path = PATH + 'RollDice.png'
+    path_focused = PATH + 'RollDiceFocused.png'
+    prio: int = 0
+    action_types: list[int] = [ACTION_TYPE_GENERAL]
+    modifiers_default: list[Type[bMod.BuffModifier]] = []
+    modifiers: list[bMod.BuffModifier]
+    passive = False
+    is_default = True
+    available_during_curse_roll = True
+
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
+
+    def get_availability(self):
+        return self.game.movement_service.is_curse_roll_action_available()
+
+    def run(self):
+        if self.get_availability():
+            self.game.movement_service.roll_curse_dice()
+
 class Revitalize(Action):
     path = PATH + 'Revitalize.png'
     path_focused = PATH + 'RevitalizeFocused.png'
@@ -336,6 +363,33 @@ class ActionHealingPortal(Action):
             self.update()
             return
 
+        self.hero.add_buff(buff.ChoosingTile)
+        self.game.context.get_tilemap().load_healing_portal_targets(self)
+        self.game.context.ui.get_action_panel().clear_actions()
+
+    def teleport_to_healing_tile(self, tile):
+        self.hero.remove_buffs(buff.ChoosingTile)
+        self.hero.move_to_tile(tile, consume_move_points=False)
+        self.hero.remove_modifier(bMod.Cursed)
+        self.hero.heal()
+        self.game.movement_service.load_move_options()
+
+class Reincarnation(Action):
+    path = PATH + 'Reincarnation.png'
+    path_focused = PATH + 'Reincarnation.png'
+    prio: int = 0
+    action_types: list[int] = [ACTION_TYPE_ABILITY]
+    modifiers_default: list[Type[bMod.BuffModifier]] = []
+    modifiers: list[bMod.BuffModifier]
+    passive = True
+
+    def __init__(self, hero, game: "Game"):
+        super().__init__(hero, game)
+
+    def get_availability(self):
+        return super().get_availability()
+
+    def run(self):
         self.hero.add_buff(buff.ChoosingTile)
         self.game.context.get_tilemap().load_healing_portal_targets(self)
         self.game.context.ui.get_action_panel().clear_actions()

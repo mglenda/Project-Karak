@@ -5,9 +5,9 @@ from GameEngine.Duelist import Duelist
 from GameEngine.Minion import Minion
 from GameEngine.Inventory import Inventory
 from GameEngine.Constants import Constants
-from GameEngine.Action import Action, PickUpItem, get_default_action_types
-from GameEngine.Buff import Buff,Unconsciousness,Curse,ChoosingTile
-from GameEngine.BuffModifier import BuffModifier,CanWalkThroughWalls
+from GameEngine.Action import Action, PickUpItem, Reincarnation, get_default_action_types
+from GameEngine.Buff import Buff,Unconsciousness,ChoosingTile
+from GameEngine.BuffModifier import BuffModifier,CanWalkThroughWalls,Cursed
 import GameEngine.DiceDefinition as diceType
 from typing import TYPE_CHECKING, Type, overload
 
@@ -82,6 +82,11 @@ class Hero(Duelist):
             self.hit_points = 0
 
         if self.hit_points == 0:
+            for action in self.actions:
+                if isinstance(action,Reincarnation) and action.is_available():
+                    action.run()
+                    return
+
             self.add_buff(Unconsciousness)
 
     def heal(self, amnt: int = None):
@@ -129,6 +134,9 @@ class Hero(Duelist):
 
     def get_chest_score(self) -> float:
         return self.inventory.get_chest_score()
+
+    def get_chest_count(self) -> int:
+        return self.inventory.get_chest_count()
 
     def get_non_chest_non_weapon_slot_item_count(self) -> int:
         return self.inventory.get_non_chest_non_weapon_slot_item_count()
@@ -241,13 +249,13 @@ class Hero(Duelist):
         self.refresh_actions()
                 
     def get_dices(self) -> list[diceType.DiceDefinition]:
-        return [diceType.Normal,diceType.Normal,diceType.Warlock]
+        return [diceType.Normal,diceType.Normal]
     
     def is_on_fountain(self) -> bool:
         return self.tile is not None and self.tile.get_definition().is_healing
     
     def is_cursed(self) -> bool:
-        return self.has_buff(Curse)
+        return self.has_modifier(Cursed)
     
     def can_pass_walls(self) -> bool:
         return self.has_modifier(CanWalkThroughWalls)

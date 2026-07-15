@@ -11,8 +11,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from GameContext import GameContext
-    from GameEngine.Action import ActionHealingPortal
-    from GameEngine.MovementService import MovementService
+    from GameEngine.Action import ActionHealingPortal, Reincarnation
+    from Services.MovementService import MovementService
 
 class TileMap:
     tilesize: int
@@ -98,7 +98,7 @@ class TileMap:
             tile.set_active(True)
             tile.on_click(self.movement_service.move_to_tile, tile)
 
-    def load_healing_portal_targets(self, action: ActionHealingPortal):
+    def load_healing_portal_targets(self, action: ActionHealingPortal | Reincarnation):
         self.disable_all_tiles()
         for tile in self.tiles:
             if tile.get_definition().is_healing:

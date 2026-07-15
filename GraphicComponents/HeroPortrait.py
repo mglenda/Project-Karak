@@ -4,8 +4,11 @@ from GraphicsEngine.Constants import Framepoint as FRAMEPOINT
 from GraphicsEngine.NumberImage import NumberImage
 from GraphicsEngine.TextColors import TextColors
 
+CURSE_ICON_PATH = '_Textures\\Abilities\\Curse.png'
+
 class HeroPortrait(Image):
     stats_frame: Rect
+    curse_icon: Image
     move_icon: Image
     health_icon: Image
     move_text: NumberImage
@@ -13,6 +16,11 @@ class HeroPortrait(Image):
 
     def __init__(self, w: int, h: int, parent: Frame) -> None:
         super().__init__(w,h,'_Textures\\Heroes\\Retextured\\Acrobat.png',parent)
+
+        curse_icon_size = min(self.w, self.h) * 0.45
+        self.curse_icon = Image(curse_icon_size, curse_icon_size, CURSE_ICON_PATH, self)
+        self.curse_icon.set_point(FRAMEPOINT.TOPRIGHT, FRAMEPOINT.TOPRIGHT)
+        self.curse_icon.set_visible(False)
 
         self.stats_frame = Rect(self.w,self.h*0.4,(0,0,0),self)
         self.stats_frame.set_point(FRAMEPOINT.BOTTOM,FRAMEPOINT.BOTTOM)
@@ -42,3 +50,6 @@ class HeroPortrait(Image):
 
     def set_move_values(self, ms: int, ms_max: int):
         self.move_text.set_values(current=ms,max=ms_max)
+
+    def set_cursed(self, cursed: bool):
+        self.curse_icon.set_visible(cursed)

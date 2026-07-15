@@ -53,7 +53,9 @@ class TextImage():
         self.alpha = alpha
         if w is not None or h is not None:
             self.surface = pygame.Surface((self.w,self.h), pygame.SRCALPHA)
-            self.surface.blit(rendered_surface,(0,0))
+            x = round((self.w - rendered_surface.get_width()) / 2)
+            y = round((self.h - rendered_surface.get_height()) / 2)
+            self.surface.blit(rendered_surface,(x,y))
             if alpha < 255:
                 self.surface.set_alpha(alpha)
         else:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from GameContext import GameContext
 from GameEngine.Constants import DurationScopes
-from GameEngine.MovementService import MovementService
+from Services.MovementService import MovementService
 import GameEngine.Buff as buff
 from typing import TYPE_CHECKING
 

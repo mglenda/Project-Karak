@@ -15,11 +15,11 @@ class TextField(Frame):
 
     def set_text(self,text: str):
         self.text = text
-        self.refresh_surface(w=self.w,h=self.h)
+        self.refresh_surface()
 
     def set_color(self,font_color: tuple):
         self.font_color = font_color
-        self.refresh_surface(w=self.w,h=self.h)
+        self.refresh_surface()
 
     def set_font_size(self,font_size:int):
         self.font_size = font_size
@@ -40,6 +40,9 @@ class TextField(Frame):
         self.surface = MEMORY_ENGINE.get_txt_buffer().get(font_color=self.font_color,font_size=self.font_size,text=self.text,font_path=self.font_path,angle=self.angle,w=w,h=h,alpha=self.alpha)
         self.w = self.surface.get_width() if w is None else w
         self.h = self.surface.get_height() if h is None else h
+        self.attach()
+        for child in self.get_abs_att_children():
+            child.attach()
 
     def rotate(self, angle: int):
         super().rotate(angle)

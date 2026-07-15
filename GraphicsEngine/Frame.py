@@ -189,13 +189,14 @@ class Frame(FrameInterface):
             c.set_size(c.get_w()*factor_w,c.get_h()*factor_h)
             c.attach()
 
-    def set_alpha(self, alpha: int):
+    def set_alpha(self, alpha: int, ignore_children: bool = False):
         if alpha != self.alpha:
             self.alpha = alpha
             self.refresh_surface()
             
-            for c in self.children:
-                c.set_alpha(alpha)
+            if not ignore_children:
+                for c in self.children:
+                    c.set_alpha(alpha)
 
     def refresh_surface(self):
         pass

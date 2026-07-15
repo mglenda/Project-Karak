@@ -1,10 +1,10 @@
-from GameEngine.DiceService import DiceService
-from GameEngine.CombatService import CombatService
-from GameEngine.MovementService import MovementService
-from GameEngine.RewardService import RewardService
-from GameEngine.GameSetupService import GameSetupService
-from GameEngine.TurnService import TurnService
-from GameEngine.TexturePreloadService import TexturePreloadService
+from Services.DiceService import DiceService
+from Services.CombatService import CombatService
+from Services.MovementService import MovementService
+from Services.RewardService import RewardService
+from Services.GameSetupService import GameSetupService
+from Services.TurnService import TurnService
+from Services.TexturePreloadService import TexturePreloadService
 from GraphicsEngine.LoadingScreen import LoadingScreen
 from GameContext import GameContext
 from typing import TYPE_CHECKING
@@ -20,7 +20,7 @@ class Game():
         self.context = GameContext()
         self.dice_service = DiceService(self.context)
         self.combat_service = CombatService(self.context, self.dice_service)
-        self.movement_service = MovementService(self.context)
+        self.movement_service = MovementService(self.context, self.dice_service)
         self.reward_service = RewardService(self.context)
         self.setup_service = GameSetupService(self.context, self.movement_service, self)
         self.turn_service = TurnService(self.context, self.movement_service)
@@ -48,6 +48,7 @@ class Game():
         return self.context.running
 
     def update(self):
+        self.movement_service.update()
         for h in self.context.heroes:
             h.refresh_actions()
 
@@ -57,7 +58,7 @@ class Game():
         self.context.ui.get_dice_panel().update()
         self.context.ui.get_action_panel().update()
         self.context.ui.get_reward_panel().update()
-        self.context.ui.get_ranking_panel().update()
+        self.context.ui.get_turn_order_panel().update()
 
     def draw(self):
         self.context.ui.draw()

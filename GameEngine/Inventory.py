@@ -130,6 +130,9 @@ class Inventory:
                 score += item.definition.chest_score
         return score
 
+    def get_chest_count(self) -> int:
+        return len(self.chests)
+
     def get_weapon_power(self) -> int:
         power: int = 0
         for slot in self.get_slots_by_type(ItemTypes.WEAPON):

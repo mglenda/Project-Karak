@@ -1,0 +1,4 @@
+interface:
+  display_name: "Karak Feature Development"
+  short_description: "Extend Karak using its native architecture"
+  default_prompt: "Use $karak-feature-development to implement a new Karak feature consistently with the project architecture."

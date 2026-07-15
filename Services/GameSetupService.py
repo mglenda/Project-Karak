@@ -1,5 +1,5 @@
 from GameContext import GameContext
-from GameEngine.MovementService import MovementService
+from Services.MovementService import MovementService
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -19,6 +19,7 @@ class GameSetupService:
         self.context.heroes.append(Hero(Wizard, 'Marek', self.game))
         self.context.heroes.append(Hero(Thief, 'Katka', self.game))
         self.context.heroes.append(Hero(Warrior, 'Cico', self.game))
+        self.context.capture_initial_hero_order()
 
         from GameEngine.Item import Item
         from GameEngine.ItemDefinition import Axe, Sword, Key, FrostFist, HealingPortal, MagicBolt, DragonChest
@@ -27,15 +28,17 @@ class GameSetupService:
             h.move_to_tile(self.context.get_tilemap().tiles[0])
             h.refresh_move_points()
 
-        self.context.heroes[0].inventory.add_item(Item(Axe))
-        self.context.heroes[0].inventory.add_item(Item(FrostFist))
-        self.context.heroes[0].inventory.add_item(Item(Key))
-        self.context.heroes[0].inventory.add_item(Item(HealingPortal))
-        self.context.heroes[0].inventory.add_item(Item(MagicBolt))
-        self.context.heroes[0].inventory.add_item(Item(Sword))
-        self.context.heroes[0].inventory.add_item(Item(DragonChest))
+        # self.context.heroes[0].inventory.add_item(Item(Axe))
+        # self.context.heroes[0].inventory.add_item(Item(FrostFist))
+        # self.context.heroes[0].inventory.add_item(Item(Key))
+        # self.context.heroes[0].inventory.add_item(Item(HealingPortal))
+        # self.context.heroes[0].inventory.add_item(Item(MagicBolt))
+        # self.context.heroes[0].inventory.add_item(Item(Sword))
+        # self.context.heroes[0].inventory.add_item(Item(DragonChest))
 
-        self.context.heroes[1].hit_points = 1
+        # self.movement_service.apply_curse(self.context.heroes[0])
+
+        # self.context.heroes[2].hit_points = 1
 
         # self.context.heroes[1].inventory.add_item(Item(Axe))
         # self.context.heroes[1].inventory.add_item(Item(Axe))
