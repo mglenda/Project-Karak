@@ -12,6 +12,7 @@ from UserInterface.TurnOrderPanel import TurnOrderPanel
 from UserInterface.HeroSelectionPanel import HeroSelectionPanel
 from UserInterface.ArenaLootPanel import ArenaLootPanel
 from UserInterface.LordOfKarakPanel import LordOfKarakPanel
+from UserInterface.EndGamePanel import EndGamePanel
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -31,6 +32,7 @@ class UI(MouseController):
     hero_selection_panel: HeroSelectionPanel
     arena_loot_panel: ArenaLootPanel
     lord_of_karak_panel: LordOfKarakPanel
+    end_game_panel: EndGamePanel
 
     def __init__(self, game: "Game") -> None:
         super().__init__(Screen())
@@ -55,6 +57,7 @@ class UI(MouseController):
         self.hero_selection_panel = HeroSelectionPanel(self.screen, game)
         self.arena_loot_panel = ArenaLootPanel(self.screen, game)
         self.lord_of_karak_panel = LordOfKarakPanel(self.screen, game)
+        self.end_game_panel = EndGamePanel(self.screen, game)
 
     def get_hero_panel(self) -> HeroPanel:
         return self.hero_panel
@@ -89,8 +92,11 @@ class UI(MouseController):
     def get_lord_of_karak_panel(self) -> LordOfKarakPanel:
         return self.lord_of_karak_panel
 
+    def get_end_game_panel(self) -> EndGamePanel:
+        return self.end_game_panel
+
     def draw(self):
-        if self.combat_panel.is_visible() or self.reward_panel.is_visible() or self.curse_panel.is_visible() or self.hero_selection_panel.is_visible() or self.arena_loot_panel.is_visible() or self.lord_of_karak_panel.is_visible():
+        if self.combat_panel.is_visible() or self.reward_panel.is_visible() or self.curse_panel.is_visible() or self.hero_selection_panel.is_visible() or self.arena_loot_panel.is_visible() or self.lord_of_karak_panel.is_visible() or self.end_game_panel.is_visible():
             self.disable_screen.set_visible(True)
         else:
             self.disable_screen.set_visible(False)

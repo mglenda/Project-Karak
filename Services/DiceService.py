@@ -8,11 +8,17 @@ from typing import Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from GameEngine.Hero import Hero
+    from Services.GameStatisticsService import GameStatisticsService
 
 
 class DiceService:
     def __init__(self, context: GameContext) -> None:
         self.context = context
+        self.statistics_service: GameStatisticsService | None = None
+        self.rerolling = False
+
+    def set_statistics_service(self, statistics_service: GameStatisticsService) -> None:
+        self.statistics_service = statistics_service
 
     def create_dice_manager(self, dice_types: list[DiceDefinition]):
         self.context.dice_manager = DiceManager(dice_types)
@@ -25,6 +31,7 @@ class DiceService:
         self.context.rolling_hero = hero
         self.context.apply_roll_lock = apply_roll_lock
         self.context.dice_roll_finished_callback = on_finish
+        self.rerolling = False
         dice_manager.start_roll()
         self.context.ui.get_action_panel().clear_actions()
 
@@ -33,8 +40,9 @@ class DiceService:
         if dice_manager is None or dice_manager.is_rolling():
             return
 
-        self.context.rolling_hero = None
+        self.context.rolling_hero = self.context.get_current_hero_active()
         self.context.apply_roll_lock = False
+        self.rerolling = True
         dice_manager.start_reroll(index)
         self.context.ui.get_action_panel().clear_actions()
 
@@ -44,6 +52,12 @@ class DiceService:
             return
 
         dice_manager.commit_roll()
+        rolling_hero = self.context.rolling_hero
+        if self.statistics_service is not None and rolling_hero is not None:
+            if self.rerolling:
+                self.statistics_service.record_reroll(rolling_hero)
+            else:
+                self.statistics_service.record_roll(rolling_hero, dice_manager.get_value())
         if self.context.apply_roll_lock and self.context.rolling_hero is not None:
             self.context.rolling_hero.add_buff(buff.CannotRollDices)
             self.context.rolling_hero.refresh_actions()
@@ -52,6 +66,7 @@ class DiceService:
         self.context.rolling_hero = None
         self.context.apply_roll_lock = False
         self.context.dice_roll_finished_callback = None
+        self.rerolling = False
         if on_finish is not None:
             on_finish(dice_manager)
 

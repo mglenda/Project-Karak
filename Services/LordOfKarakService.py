@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class LordOfKarakService:
-    SECRET_CHAMBERS_REQUIRED = 1
+    SECRET_CHAMBERS_REQUIRED = 4
 
     def __init__(self, context: GameContext) -> None:
         self.context = context

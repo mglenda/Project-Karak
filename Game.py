@@ -7,6 +7,8 @@ from Services.TurnService import TurnService
 from Services.TexturePreloadService import TexturePreloadService
 from Services.HeroSelectionService import HeroSelectionService
 from Services.LordOfKarakService import LordOfKarakService
+from Services.EndGameService import EndGameService
+from Services.GameStatisticsService import GameStatisticsService
 from GraphicsEngine.LoadingScreen import LoadingScreen
 from GameContext import GameContext
 from typing import TYPE_CHECKING
@@ -20,11 +22,16 @@ pygame.init()
 class Game():
     def __init__(self) -> None:
         self.context = GameContext()
+        self.statistics_service = GameStatisticsService()
         self.dice_service = DiceService(self.context)
+        self.dice_service.set_statistics_service(self.statistics_service)
         self.movement_service = MovementService(self.context, self.dice_service)
         self.hero_selection_service = HeroSelectionService(self.context, self.movement_service)
         self.reward_service = RewardService(self.context)
         self.combat_service = CombatService(self.context, self.dice_service, self.movement_service, self.hero_selection_service, self.reward_service)
+        self.end_game_service = EndGameService(self.context, self.reward_service, self.statistics_service)
+        self.combat_service.set_end_game_service(self.end_game_service)
+        self.combat_service.set_statistics_service(self.statistics_service)
         self.movement_service.set_arena_service(self.combat_service)
         self.lord_of_karak_service = LordOfKarakService(self.context)
         self.movement_service.set_lord_of_karak_service(self.lord_of_karak_service)
@@ -68,6 +75,7 @@ class Game():
         self.context.ui.get_hero_selection_panel().update()
         self.context.ui.get_arena_loot_panel().update()
         self.context.ui.get_lord_of_karak_panel().update()
+        self.context.ui.get_end_game_panel().update()
 
     def draw(self):
         self.context.ui.draw()

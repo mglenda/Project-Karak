@@ -14,6 +14,8 @@ if TYPE_CHECKING:
     from Services.HeroSelectionService import HeroSelectionService
     from Services.MovementService import MovementService
     from Services.RewardService import RewardService
+    from Services.EndGameService import EndGameService
+    from Services.GameStatisticsService import GameStatisticsService
     from GameEngine.Item import Item
 
 
@@ -28,6 +30,14 @@ class CombatService:
         self.arena_loot_winner = None
         self.arena_loot_loser = None
         self.arena_loot_items = []
+        self.end_game_service: EndGameService | None = None
+        self.statistics_service: GameStatisticsService | None = None
+
+    def set_end_game_service(self, end_game_service: EndGameService) -> None:
+        self.end_game_service = end_game_service
+
+    def set_statistics_service(self, statistics_service: GameStatisticsService) -> None:
+        self.statistics_service = statistics_service
 
     def start_arena_duel(self, tile) -> None:
         attacker = self.context.get_current_hero()
@@ -104,6 +114,8 @@ class CombatService:
 
         if combat is not None:
             if combat.is_finished():
+                if self.statistics_service is not None:
+                    self.statistics_service.record_combat(combat)
                 loser = None
                 curse_target_on_defeat = False
                 if combat.is_draw():
@@ -118,7 +130,8 @@ class CombatService:
                         self.context.get_current_hero().move_to_former_tile()
                     elif isinstance(loser, Minion):
                         curse_target_on_defeat = loser.definition.curse_target_on_defeat
-                        loser.remove()
+                        if self.end_game_service is None or not self.end_game_service.handle_minion_defeated(winner, loser):
+                            loser.remove()
                     elif combat.is_arena_duel():
                         loser.hurt()
                         self.arena_loot_winner = winner
@@ -139,7 +152,8 @@ class CombatService:
                 self.context.ui.get_arena_loot_panel().update()
                 if combat.is_arena_duel() and not self.is_arena_loot_active():
                     self.movement_service.load_move_options()
-                if not combat.is_draw() and isinstance(loser, Minion) and curse_target_on_defeat:
+                if (not combat.is_draw() and isinstance(loser, Minion) and curse_target_on_defeat
+                        and (self.end_game_service is None or not self.end_game_service.is_active())):
                     self.hero_selection_service.start_selection(
                         self.context.get_current_hero(),
                         allow_self=True,

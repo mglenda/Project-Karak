@@ -33,9 +33,10 @@ class Minion(Placeable, Duelist):
     def get_combat_icon_path(self) -> str:
         return self.definition.path
     
-    def remove(self):
+    def remove(self, drop_reward: bool = True):
         Placeable.remove(self)
-        self.tile.add_placeable(Item(self.definition.reward))
+        if drop_reward:
+            self.tile.add_placeable(Item(self.definition.reward))
 
     def is_explored(self) -> bool:
         return self.explored
