@@ -44,14 +44,29 @@ class Hero(Duelist):
         self.power = 0
 
         self.actions = [action_type(self, self.game) for action_type in get_default_action_types()]
+        self.special_actions = []
         self.active_buffs = []
         self.pending_reincarnation = False
 
         a_type: Type[Action] = None
         for a_type in self.definition.special_actions:
-            self.actions.append(a_type(self, self.game))
+            action = a_type(self, self.game)
+            self.actions.append(action)
+            self.special_actions.append(action)
 
         self.actions.sort(key=lambda x: x.prio)
+
+    def replace_special_actions(self, action_types: list[Type[Action]]) -> None:
+        for action in self.special_actions:
+            if action.is_available():
+                for modifier in action.modifiers:
+                    modifier.disable()
+            if action in self.actions:
+                self.actions.remove(action)
+        self.special_actions = [action_type(self, self.game) for action_type in action_types]
+        self.actions.extend(self.special_actions)
+        self.actions.sort(key=lambda action: action.prio)
+        self.refresh_actions()
 
     def get_inventory(self) -> Inventory:
         return self.inventory
@@ -171,6 +186,9 @@ class Hero(Duelist):
     
     def get_available_actions(self) -> list[Action]:
         if self.game.hero_selection_service.is_active():
+            return []
+
+        if self.game.lord_of_karak_service.is_active():
             return []
 
         if self.game.combat_service.is_arena_loot_active():

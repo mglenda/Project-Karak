@@ -24,9 +24,13 @@ class MovementService:
         self.curse_roll_active = False
         self.curse_roll_result_until = None
         self.arena_service = None
+        self.lord_of_karak_service = None
 
     def set_arena_service(self, arena_service) -> None:
         self.arena_service = arena_service
+
+    def set_lord_of_karak_service(self, service) -> None:
+        self.lord_of_karak_service = service
 
     def choose_minion(self, tile: TileObject):
         arr = self.context.minion_pack.pick()
@@ -46,6 +50,11 @@ class MovementService:
     def confirm_tile_placement(self, tile: TileObject):
         self.context.get_current_hero().remove_buffs(buff.ChoosingTile)
         tile.on_click(self.move_to_tile, tile)
+        if self.lord_of_karak_service is not None and self.lord_of_karak_service.handle_tile_placed(tile, lambda: self._finish_tile_placement(tile)):
+            return
+        self._finish_tile_placement(tile)
+
+    def _finish_tile_placement(self, tile: TileObject):
         if tile.is_spawn:
             self.choose_minion(tile)
         else:

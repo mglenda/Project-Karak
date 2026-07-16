@@ -8,6 +8,7 @@ class TileDefinition():
     is_portal: bool
     is_healing: bool
     is_cursed: bool
+    is_secret_chamber: bool = False
 
 class Unknown(TileDefinition):
     pathing: tuple = (1,1,1,1)
@@ -41,6 +42,7 @@ class Arena(TileDefinition):
     path: str = PATH + 'Arena.png'
     is_spawn = False
     is_arena = True
+    is_secret_chamber = True
     is_portal = False
     is_healing = False
     is_cursed = False
@@ -116,6 +118,7 @@ class Curse(TileDefinition):
     is_portal = False
     is_healing = False
     is_cursed = True
+    is_secret_chamber = True
 
 class Fountain(TileDefinition):
     pathing: tuple = (0,1,1,0)

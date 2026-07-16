@@ -85,6 +85,7 @@ class TurnOrderRow:
         self.item_icons: list[Image] = []
         self.loaded_slots: tuple[object | None, ...] = ()
         self.hero: Hero | None = None
+        self.loaded_icon_path: str | None = None
         self.highlighted: bool | None = None
 
     def _center_group(self, center_x: float, icon: Image, text: TextField) -> None:
@@ -102,8 +103,12 @@ class TurnOrderRow:
     def update(self, order: int, hero: Hero, highlighted: bool) -> None:
         if self.hero is not hero:
             self.hero = hero
-            self.hero_icon.set_texture(hero.get_icon_path())
             self.name_text.set_text(hero.get_name())
+
+        icon_path = hero.get_icon_path()
+        if self.loaded_icon_path != icon_path:
+            self.loaded_icon_path = icon_path
+            self.hero_icon.set_texture(icon_path)
 
         self.order_text.set_text(f'{order}.')
         self.health_text.set_text(f'{hero.get_hit_points()}/{hero.get_max_hit_points()}')
